@@ -68,6 +68,13 @@ public class NovaExploraria extends BaseCapitalIndustry {
         if(amountOfExpeditions<=0){
             amountOfExpeditions = 0;
         }
+        /// Existing save file fix
+        if(!Global.getSector().getPlayerMemoryWithoutUpdate().is("$aotd_fix_nova",true)){
+            Global.getSector().getPlayerMemoryWithoutUpdate().set("$aotd_fix_nova",true);
+            if(amountOfExpeditions >= Math.abs(abyssDivers.size()+techHunterFleets.size())){
+                amountOfExpeditions -= (Math.abs(abyssDivers.size()+techHunterFleets.size()));
+            }
+        }
     }
     public void cleanupInactiveFleets() {
         techHunterFleets.removeIf(fleet -> fleet == null || fleet.isDespawning()|| !fleet.isAlive());
@@ -127,7 +134,7 @@ public class NovaExploraria extends BaseCapitalIndustry {
 
     public void sentExpeditionFleet(StarSystemAPI systemToSurvey){
         if(!canSentExpedition())return;
-        setAmountOfExpeditions(getCurrentAmountOfExpeditions()+1);
+        setAmountOfExpeditions(amountOfExpeditions+1);
 
         CampaignFleetAPI fleet = createTechHunter(FleetTypes.SCAVENGER_MEDIUM,market.getStarSystem().getLocation(), null, market, false, Misc.random);
         fleet.setFaction(Factions.PLAYER);
@@ -171,8 +178,6 @@ public class NovaExploraria extends BaseCapitalIndustry {
         techHunterFleets.add(fleet);
 
         fleet.addScript(new TechHuntersFleetRouteManager(fleet, data,expectedMonths));
-
-
 
     }
     public void sentAbyssDivers(int expectedMonths){

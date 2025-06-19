@@ -2,6 +2,8 @@ package data.scripts.policies;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.econ.MutableCommodityQuantity;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
@@ -10,6 +12,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.managers.AoTDFactionManager;
 import data.scripts.models.BaseFactionPolicy;
+import org.lazywizard.console.Console;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -36,6 +39,31 @@ public class AILegalization extends BaseFactionPolicy {
         for (String string : factionsThatMadeItIllegal) {
             Global.getSector().getFaction(string).setRelationship(Factions.PLAYER,-100);
         }
+        ///  applyPolicy was missing the entire functionality of AI Legalization except for making the player hostile
+        ///  to all AI illegal factions ~Purple Nebula
+        AoTDFactionManager.getMarketsUnderPlayer().forEach(x-> {
+            x.getIndustries().forEach( i-> {
+                if (i.getAICoreId() != null) {
+                    for (MutableCommodityQuantity mcq : i.getAllSupply()) {
+                        mcq.getQuantity().modifyFlat("AI_Legalization",1f,"AI Legalization (AI Core Assigned");
+                    }
+                }
+                else {
+                    for (MutableCommodityQuantity mcq : i.getAllSupply()) {
+                        mcq.getQuantity().unmodify("AI_Legalization");
+                    }
+                }
+            });
+            if (x.getAdmin().isAICore()) {
+                x.getStability().modifyFlat("AI_Legalization",2f,"AI Legalization (AI Core Admin");
+                x.getIncomeMult().modifyPercent("AI_Legalization",30f,"AI Legalization (AI Core Admin");
+            }
+            else {
+                if (!x.getStability().isUnmodified()) x.getStability().unmodify("AI_Legalization");
+                if (!x.getIncomeMult().isUnmodified()) x.getIncomeMult().unmodify("AI_Legalization");
+
+            }
+        });
     }
 
     @Override
