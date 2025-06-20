@@ -2,6 +2,7 @@ package data.scripts.policies;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.Industry;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.econ.impl.BaseIndustry;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.ui.Alignment;
@@ -44,15 +45,22 @@ public class RapidIndustrialization extends BaseFactionPolicy {
         });
 
     }
+    @Override
+    public void applyForMarket(MarketAPI x) {
+        x.getUpkeepMult().modifyMult(getID(), 1.5f, "Rapid industrialization");
+    }
+
+    @Override
+    public void unapplyForMarket(MarketAPI x) {
+        x.getUpkeepMult().unmodifyFlat(getID());
+    }
 
     @Override
     public void applyPolicy() {
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x -> x.getUpkeepMult().modifyMult(getID(), 1.5f, "Rapid industrialization"));
     }
 
     @Override
     public void unapplyPolicy() {
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x -> x.getUpkeepMult().unmodifyMult(getID()));
 
     }
 

@@ -48,7 +48,7 @@ public class EmbraceLudd extends BaseFactionPolicy {
     public void applyPolicy() {
         AoTDFactionManager.getMarketsUnderPlayer().forEach(x->{
             if(!x.hasCondition("aotd_followers_ludd")){
-                x.addCondition("aotd_followers_ludd"); /// Had "addIndustry" instead
+                x.addCondition("aotd_followers_ludd");
             }
         });
     }

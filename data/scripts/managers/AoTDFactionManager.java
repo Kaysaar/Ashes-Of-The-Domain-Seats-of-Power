@@ -422,6 +422,7 @@ public class AoTDFactionManager {
         currentFactionPolicies.forEach(BaseFactionPolicy::applyPolicy);
         cycles.forEach(x -> x.getEventsDuringCycle().forEach(y -> y.applyEffects(y.getEventsAffected())));
         goalsScripts.values().forEach(x -> x.advance(amount));
+        Global.getSector().getEconomy().getMarketsCopy().stream().filter(x->!x.hasCondition("aotd_handle_polciies")).forEach(x->x.addCondition("aotd_handle_polciies"));
     }
 
     public void addNewPolicy(String id) {

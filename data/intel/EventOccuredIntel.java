@@ -62,7 +62,7 @@ public class EventOccuredIntel extends BaseIntelPlugin {
 
     @Override
     public boolean shouldRemoveIntel() {
-        return isEnding()||isEnded();
+        return isEnded();
     }
 
     @Override

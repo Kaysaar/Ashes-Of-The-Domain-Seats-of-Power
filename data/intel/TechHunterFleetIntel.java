@@ -63,7 +63,10 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
     public String getIcon() {
         return Global.getSettings().getSpriteName("intel", "fleet_log");
     }
-
+    @Override
+    public boolean shouldRemoveIntel() {
+        return isEnded();
+    }
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
         Color h = Misc.getHighlightColor();

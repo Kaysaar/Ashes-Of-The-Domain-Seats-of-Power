@@ -103,7 +103,7 @@ public class BaseFactionTimelineEvent {
     public void createIntelEntryForUnlocking() {
         EventOccuredIntel intel = new EventOccuredIntel(this);
         Global.getSector().getIntelManager().addIntel(intel);
-        intel.endAfterDelay(1f);
+        intel.endAfterDelay(5f);
         AoTDFactionManager.getInstance().addXP((int) (BaseFactionTimelineEvent.multiplier*getPointsForGoal()*10));
     }
 

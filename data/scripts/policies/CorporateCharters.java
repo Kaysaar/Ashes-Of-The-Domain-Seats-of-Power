@@ -1,5 +1,6 @@
 package data.scripts.policies;
 
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -43,18 +44,20 @@ public class CorporateCharters extends BaseFactionPolicy {
     }
 
     @Override
-    public void applyPolicy() {
-        int amountOfMonopolies = ProsperityGoal.mapOfMonopolies.entrySet().stream().filter(x->{
-            String[] array = x.getValue().toArray(new String[0]);
+    public void applyForMarket(MarketAPI x) {
+
+        int amountOfMonopolies = ProsperityGoal.mapOfMonopolies.entrySet().stream().filter(y->{
+            String[] array = y.getValue().toArray(new String[0]);
             return AoTDFactionManager.doesHaveMonopolyOverCommodities(30,array);
         }).toList().size();
-        if(amountOfMonopolies>0){
-            AoTDFactionManager.getMarketsUnderPlayer().forEach(x->x.getIncomeMult().modifyMult(getID(),1+(0.1f*amountOfMonopolies),"Market Sustenance"));
-
-        }
-
+        x.getIncomeMult().modifyMult(getID(),1+(0.1f*amountOfMonopolies),"Market Sustenance");
     }
 
+
+    @Override
+    public void unapplyForMarket(MarketAPI x) {
+        x.getIncomeMult().unmodifyMult(getID());
+    }
     @Override
     public boolean showInUI() {
         return AoTDFactionManager.getInstance().getScriptForGoal(TimelineEventType.PROSPERITY).reachedGoal("goal_3");
@@ -62,7 +65,6 @@ public class CorporateCharters extends BaseFactionPolicy {
 
     @Override
     public void unapplyPolicy() {
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x->{x.getIncomeMult().unmodifyMult(getID());});
         super.unapplyPolicy();
     }
 

@@ -1,6 +1,7 @@
 package data.scripts.policies;
 
 import ashlib.data.plugins.ui.models.ProgressBarComponent;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -39,24 +40,35 @@ public class ExpandInfrastructure extends BaseFactionPolicy {
 
     @Override
     public void applyPolicy() {
+
+    }
+
+    @Override
+    public void applyForMarket(MarketAPI x) {
         if(getDaysTillPlaced()<720){
-            AoTDFactionManager.getMarketsUnderPlayer().forEach(x->x.getIndustries().forEach(y->y.getAllSupply().forEach(z->{
+            x.getIndustries().forEach(y->y.getAllSupply().forEach(z->{
                 z.getQuantity().unmodifyFlat(getID());
 
                 int before  = z.getQuantity().getModifiedInt();
                 int penalty = Math.round(before*0.4f);
                 z.getQuantity().modifyFlat(getID(),-penalty,"Expand Infrastructure Policy");
-            })));
-        }
+            }));
+       }
         else{
-            AoTDFactionManager.getMarketsUnderPlayer().forEach(x->x.getIndustries().forEach(y->y.getAllSupply().forEach(z->{
-                z.getQuantity().unmodifyFlat(getID());
-            })));            AoTDFactionManager.getMarketsUnderPlayer().forEach(x->x.getAccessibilityMod().modifyFlat("expand_infrastructure",0.25f,"Expanded Infrastructure"));
-        }
+            x.getIndustries().forEach(y->y.getAllSupply().forEach(z->z.getQuantity().unmodifyMult(getID())));
+            x.getAccessibilityMod().modifyFlat(getID(),0.25f,"Expanded Infrastructure");        }
+
     }
 
     @Override
+    public void unapplyForMarket(MarketAPI x) {
+        x.getIndustries().forEach(y->y.getAllSupply().forEach(z->z.getQuantity().unmodifyMult("expand_infrastructure")));
+        x.getAccessibilityMod().unmodifyFlat(getID());
+
+}
+
+    @Override
     public void unapplyPolicy() {
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x->x.getIndustries().forEach(y->y.getAllSupply().forEach(z->z.getQuantity().unmodifyMult("expand_infrastructure"))));
+
     }
 }

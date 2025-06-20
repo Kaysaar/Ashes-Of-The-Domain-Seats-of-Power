@@ -52,8 +52,8 @@ public class FactionTimelineViewerComponent implements ExtendUIPanelPlugin {
         ;
         mover = new RightMouseTooltipMoverV2();
         mover.init(dummy, mainPanel);
-        left = tooltip.addButton("<<", "<<", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 40, 40, 0f);
-        right = tooltip.addButton(">>", ">>", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 40, 40, 0f);
+        left = tooltip.addButton("<<", "<<", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
+        right = tooltip.addButton(">>", ">>", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
         left.getPosition().inTL(mainPanel.getPosition().getCenterX()-left.getPosition().getWidth()-10, mainPanel.getPosition().getHeight()-left.getPosition().getHeight()-5);
         right.getPosition().inTL(mainPanel.getPosition().getCenterX()+right.getPosition().getWidth()+10, mainPanel.getPosition().getHeight()-right.getPosition().getHeight()-5);
         tooltip.setHeightSoFar(0f);

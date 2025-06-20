@@ -14,7 +14,6 @@ import com.fs.starfarer.api.util.Pair;
 import data.scripts.factiongoals.ProsperityGoal;
 import data.scripts.managers.AoTDFactionManager;
 import data.scripts.models.BaseFactionPolicy;
-import org.lazywizard.console.Console;
 
 import java.awt.*;
 
@@ -40,8 +39,9 @@ public class MarketSustenance extends BaseFactionPolicy {
     public void applyPolicy() {
         AoTDFactionManager.getMarketsUnderPlayer().forEach(x->{
             if(x.hasIndustry(Industries.COMMERCE)){
-                x.getIndustry(Industries.COMMERCE).getSupply(Commodities.FOOD).getQuantity().modifyFlat("market_sustenance",x.getSize(),"Market Sustenance");
-                // TODO : Based on current accessibility, per 50% do +1 food | (Could not figure out how to grab current accessibility) ~Purple Nebula
+                int amount = (int) (x.getAccessibilityMod().computeEffective(0f)/0.5f);
+                x.getIndustry(Industries.COMMERCE).getSupply(Commodities.FOOD).getQuantity().modifyFlat("market_sustenance_size",x.getSize()+amount,"Market Sustenance");
+
             }
             if(x.getCommodityData(Commodities.FOOD).getDeficitQuantity()>0){
                 x.getStability().modifyFlat("market_sustanance",-6,"Market Sustenance (Food shortages)");

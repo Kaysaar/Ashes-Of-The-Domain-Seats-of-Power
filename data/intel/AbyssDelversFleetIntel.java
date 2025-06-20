@@ -61,6 +61,11 @@ public class AbyssDelversFleetIntel extends BaseIntelPlugin {
     }
 
     @Override
+    public boolean shouldRemoveIntel() {
+        return isEnded();
+    }
+
+    @Override
     protected void notifyEnded() {
         target = null;
         getCargo().clear();

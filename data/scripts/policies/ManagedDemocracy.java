@@ -65,26 +65,27 @@ public class ManagedDemocracy extends BaseFactionPolicy implements EconomyTickLi
     public void applyPolicy() {
         List<MarketAPI> markets = AoTDFactionManager.getMarketsUnderPlayer();
         markets.forEach(x->{
-            MutableMarketStatsAPI marketStats =x.getStats();
-            marketStats.getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).modifyMult(getID(),1.5f,"Super Defences");
-            marketStats.getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).modifyPercent(getID(),50f,"Super Fleets");
-            x.getIncomeMult().modifyMult(getID(),0.65f,"Super Spending");
-            x.getStability().modifyFlat(getID(),2,"Absolute Liberty");
+
         });
 
     }
 
     @Override
-    public void unapplyPolicy() {
-        List<MarketAPI> markets = AoTDFactionManager.getMarketsUnderPlayer();
-        markets.forEach(x->{
-            MutableMarketStatsAPI marketStats =x.getStats();
-            marketStats.getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).unmodifyMult(getID());
-            marketStats.getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).unmodifyPercent(getID());;
-            x.getIncomeMult().unmodifyMult(getID());
-            x.getStability().unmodify(getID());
+    public void applyForMarket(MarketAPI x) {
+        MutableMarketStatsAPI marketStats =x.getStats();
+        marketStats.getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).modifyMultAlways(getID(),1.5f,"Super Defences");
+        marketStats.getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).modifyFlat(getID(),0.50f,"Super Fleets");
+        x.getIncomeMult().modifyMult(getID(),0.65f,"Super Spending");
+        x.getStability().modifyFlat(getID(),2,"Absolute Liberty");
+    }
 
-        });
+    @Override
+    public void unapplyForMarket(MarketAPI x) {
+        MutableMarketStatsAPI marketStats =x.getStats();
+        marketStats.getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).unmodifyMult(getID());
+        marketStats.getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).unmodify(getID());;
+        x.getIncomeMult().unmodifyMult(getID());
+        x.getStability().unmodify(getID());
     }
 
     @Override

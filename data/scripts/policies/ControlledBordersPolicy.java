@@ -1,6 +1,7 @@
 package data.scripts.policies;
 
 import ashlib.data.plugins.ui.models.ProgressBarComponent;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -53,26 +54,30 @@ public class ControlledBordersPolicy extends BaseFactionPolicy {
     }
 
     @Override
+    public void applyForMarket(MarketAPI x) {
+        int size = x.getSize();
+        int different = Misc.MAX_COLONY_SIZE - size;
+        if (different > 0) {
+            x.getStats().getDynamic().getMod(Stats.MAX_MARKET_SIZE).modifyFlat(getID(), -different);
+            x.getAccessibilityMod().modifyFlat(getID(), -0.8f,"Controlled Borders");
+        }
+    }
+
+    @Override
+    public void unapplyForMarket(MarketAPI x) {
+        x.getStats().getDynamic().getMod(Stats.MAX_MARKET_SIZE).unmodifyFlat(getID());
+        x.getAccessibilityMod().unmodifyFlat(getID());
+    }
+
+    @Override
     public void applyPolicy() {
         super.applyPolicy();
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x -> {
-            int size = x.getSize();
-            int different = Misc.MAX_COLONY_SIZE - size;
-            if (different > 0) {
-                x.getStats().getDynamic().getMod(Stats.MAX_MARKET_SIZE).modifyFlat(getID(), -different);
-                x.getAccessibilityMod().modifyFlat(getID(), -0.8f,"Controlled Borders");
-            }
 
-        });
     }
 
     @Override
     public void unapplyPolicy() {
         super.unapplyPolicy();
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x -> {
-            x.getStats().getDynamic().getMod(Stats.MAX_MARKET_SIZE).unmodifyFlat(getID());
-            x.getAccessibilityMod().unmodifyFlat(getID());
 
-        });
     }
 }

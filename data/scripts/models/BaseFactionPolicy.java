@@ -1,6 +1,7 @@
 package data.scripts.models;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -26,6 +27,12 @@ public  class BaseFactionPolicy {
         if(!getSpec().canBeRemoved()){
             tooltip.addPara("This policy can't be removed once in effect!",Misc.getNegativeHighlightColor(),3f).setAlignment(Alignment.MID);
         }
+    }
+    public  void applyForMarket(MarketAPI x){
+
+    }
+    public void unapplyForMarket(MarketAPI x){
+
     }
     public boolean canBeRemoved(){
         if(!getSpec().canBeRemoved()){

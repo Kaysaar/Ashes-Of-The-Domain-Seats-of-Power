@@ -21,6 +21,9 @@ import data.industry.NovaExploraria;
 import data.intel.NovaExplorariaExpeditionIntel;
 import org.lazywizard.lazylib.MathUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignmentAI implements FleetActionTextProvider, FleetEventListener {
     public StarSystemAPI target;
     public NovaExplorariaExpeditionIntel intel;
@@ -123,9 +126,11 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
             Misc.setAllPlanetsSurveyed(target,false);
             GenericPluginManagerAPI plugins = Global.getSector().getGenericPlugins();
             CoreDiscoverEntityPlugin plugin = (CoreDiscoverEntityPlugin) plugins.getPluginsOfClass(CoreDiscoverEntityPlugin.class).stream().findFirst().orElse(null);
-            for (SectorEntityToken allEntity : target.getAllEntities()) {
+            List<SectorEntityToken> entitiesToDiscover = target.getAllEntities().stream().filter(x->x.isDiscoverable()&& !(x instanceof CampaignFleetAPI)).toList();
+            for (SectorEntityToken allEntity : entitiesToDiscover) {
                 if(allEntity instanceof CampaignFleetAPI)continue;
                 if(allEntity.isDiscoverable()){
+                    assert plugin != null;
                     plugin.discoverEntity(allEntity);
                     intel.getOthers().add(allEntity.getName());
 

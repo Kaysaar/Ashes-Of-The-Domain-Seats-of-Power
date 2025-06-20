@@ -4,6 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.EconomyTickListener;
+import com.fs.starfarer.api.fleet.MutableMarketStatsAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.bases.LuddicPathBaseIntel;
 import com.fs.starfarer.api.impl.campaign.intel.bases.LuddicPathCellsIntel;
 import com.fs.starfarer.api.impl.campaign.intel.bases.PirateBaseIntel;
@@ -51,15 +53,22 @@ public class FullSurveillance extends BaseFactionPolicy implements EconomyTickLi
         }
 
     }
+    @Override
+    public void applyForMarket(MarketAPI x) {
+        x.getStability().modifyFlat(getID(),-3,"Full Surveillance");
+    }
 
     @Override
+    public void unapplyForMarket(MarketAPI x) {
+        x.getStability().unmodifyFlat(getID());
+    }
+    @Override
     public void applyPolicy() {
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x->x.getStability().modifyFlat(getID(),-3,"Full Surveillance"));
     }
 
     @Override
     public void unapplyPolicy() {
-        AoTDFactionManager.getMarketsUnderPlayer().forEach(x->x.getStability().unmodifyFlat(getID()));
+
     }
 
     @Override
