@@ -422,7 +422,16 @@ public class AoTDFactionManager {
         currentFactionPolicies.forEach(BaseFactionPolicy::applyPolicy);
         cycles.forEach(x -> x.getEventsDuringCycle().forEach(y -> y.applyEffects(y.getEventsAffected())));
         goalsScripts.values().forEach(x -> x.advance(amount));
-        Global.getSector().getEconomy().getMarketsCopy().stream().filter(x->!x.hasCondition("aotd_handle_polciies")).forEach(x->x.addCondition("aotd_handle_polciies"));
+        getMarketsUnderPlayer().stream().filter(x->!x.hasCondition("aotd_handle_polciies")).forEach(x->x.addCondition("aotd_handle_polciies"));
+        Global.getSector().getEconomy().getMarketsCopy().stream().filter(x->!x.getFaction().isPlayerFaction()).forEach(x->{
+            if(x.hasCondition("aotd_handle_polciies")) {
+                x.getCondition("aotd_handle_polciies").getPlugin().unapply(null);
+                x.removeCondition("aotd_handle_polciies");
+                x.removeCondition("aotd_ai_legal");
+                x.removeCondition("aotd_followers_ludd");
+            }
+
+        });
     }
 
     public void addNewPolicy(String id) {
@@ -444,9 +453,21 @@ public class AoTDFactionManager {
                     .ifPresent(x -> {
                         x.applyPolicyEffectAfterChangeInUI(true);
                         x.unapplyPolicy();
+                        getMarketsUnderPlayer().forEach(y->{
+                            if(y.hasCondition("aotd_handle_polciies")) {
+                                y.getCondition("aotd_handle_polciies").getPlugin().unapply(null);
+                            }
+
+                        });
                     });
 
             currentFactionPolicies.removeIf(x -> x.getSpec().getId().equals(id));
+            getMarketsUnderPlayer().forEach(y->{
+                if(y.hasCondition("aotd_handle_polciies")) {
+                    y.getCondition("aotd_handle_polciies").getPlugin().apply(null);
+                }
+
+            });
         }
     }
 

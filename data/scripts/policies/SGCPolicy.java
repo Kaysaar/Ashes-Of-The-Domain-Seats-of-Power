@@ -72,7 +72,7 @@ public class SGCPolicy extends BaseFactionPolicy {
         if(tier>0){
             x.getStats().getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).modifyFlat(getID(),(0.25f*tier),"Service Guarantees Citizenship");
         }
-        x.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).modifyPercent(getID(),10+(15*tier),"Service Guarantees Citizenship");
+        x.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).modifyFlat(getID(),(10+(15*tier))/100f,"Service Guarantees Citizenship");
         x.getStability().modifyFlat(getID(),1+tier,"Service Guarantees Citizenship");
         x.getIndustries().stream().filter(y->y.getDemand(Commodities.SUPPLIES).getQuantity().getModifiedInt()>0).forEach(y->y.getDemand(Commodities.SUPPLIES).getQuantity().modifyFlat(getID(), (float) (1+Math.floor(x.getSize()*0.5f))));
         x.getIndustries().stream().filter(y->y.getDemand(Commodities.HAND_WEAPONS).getQuantity().getModifiedInt()>0).forEach(y->y.getDemand(Commodities.HAND_WEAPONS).getQuantity().modifyFlat(getID(), (float) (Math.floor(x.getSize()*0.5f))-1));
@@ -80,10 +80,7 @@ public class SGCPolicy extends BaseFactionPolicy {
 
     @Override
     public void unapplyForMarket(MarketAPI x) {
-        int tier = getTierOfMarket(x);
-        if(tier>0){
-            x.getStats().getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).unmodifyMult(getID());
-        }
+        x.getStats().getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).unmodify(getID());
         x.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).unmodify(getID());
         x.getStability().unmodifyFlat(getID());
         x.getIndustries().stream().filter(y->y.getDemand(Commodities.SUPPLIES).getQuantity().getModifiedInt()>0).forEach(y->y.getDemand(Commodities.SUPPLIES).getQuantity().unmodifyFlat(getID()));
