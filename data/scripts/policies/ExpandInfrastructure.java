@@ -62,7 +62,8 @@ public class ExpandInfrastructure extends BaseFactionPolicy {
 
     @Override
     public void unapplyForMarket(MarketAPI x) {
-        x.getIndustries().forEach(y->y.getAllSupply().forEach(z->z.getQuantity().unmodifyMult("expand_infrastructure")));
+        x.getIndustries().forEach(y->y.getAllSupply().forEach(z->z.getQuantity().unmodifyFlat(getID())));
+        x.getIndustries().forEach(y->y.getAllSupply().forEach(z->z.getQuantity().unmodifyMult(getID())));
         x.getAccessibilityMod().unmodifyFlat(getID());
 
 }

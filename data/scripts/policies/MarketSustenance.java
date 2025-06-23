@@ -14,6 +14,7 @@ import com.fs.starfarer.api.util.Pair;
 import data.scripts.factiongoals.ProsperityGoal;
 import data.scripts.managers.AoTDFactionManager;
 import data.scripts.models.BaseFactionPolicy;
+import org.lazywizard.console.Console;
 
 import java.awt.*;
 
@@ -61,7 +62,7 @@ public class MarketSustenance extends BaseFactionPolicy {
 
         AoTDFactionManager.getMarketsUnderPlayer().forEach(x->{
             if(x.hasIndustry(Industries.COMMERCE)){
-                x.getIndustry(Industries.COMMERCE).getSupply(Commodities.FOOD).getQuantity().unmodify("market_sustenance");
+                x.getIndustry(Industries.COMMERCE).getSupply(Commodities.FOOD).getQuantity().unmodify("market_sustenance_size");
             }
             if(x.getCommodityData(Commodities.FOOD) != null){
                 x.getStability().unmodify("market_sustanance");

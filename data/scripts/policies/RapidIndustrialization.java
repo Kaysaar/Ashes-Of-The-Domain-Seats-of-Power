@@ -52,7 +52,7 @@ public class RapidIndustrialization extends BaseFactionPolicy {
 
     @Override
     public void unapplyForMarket(MarketAPI x) {
-        x.getUpkeepMult().unmodifyFlat(getID());
+        x.getUpkeepMult().unmodifyMult(getID());
     }
 
     @Override
