@@ -39,7 +39,7 @@ public class FullSurveillance extends BaseFactionPolicy implements EconomyTickLi
     }
     @Override
     public boolean showInUI() {
-        return AoTDFactionManager.getInstance().getScriptForGoal(TimelineEventType.PROSPERITY).reachedGoal("goal_4");
+        return AoTDFactionManager.getInstance().getScriptForGoal(TimelineEventType.MILITARY).reachedGoal("goal_4");
     }
     @Override
     public void applyPolicyEffectAfterChangeInUI(boolean removing) {

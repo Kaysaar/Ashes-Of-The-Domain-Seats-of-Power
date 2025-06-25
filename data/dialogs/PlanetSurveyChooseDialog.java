@@ -48,7 +48,7 @@ public class PlanetSurveyChooseDialog implements InteractionDialogPlugin {
                     public void pickedEntity(SectorEntityToken entity) {
                         dialog.dismiss();
                         StarSystemAPI system = Misc.getStarSystemForAnchor(entity);
-                     ;  MonthlyReport report = SharedData.getData().getCurrentReport();
+                        MonthlyReport report = SharedData.getData().getCurrentReport();
                         MonthlyReport.FDNode marketsNode = report.getNode(MonthlyReport.OUTPOSTS);
                         MonthlyReport.FDNode marketsNode2 = report.getNode(marketsNode,"nova_exploraria");
                         marketsNode2.mapEntity = AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
@@ -65,22 +65,7 @@ public class PlanetSurveyChooseDialog implements InteractionDialogPlugin {
                         //paymentNode.custom = MonthlyReport.EXPORTS;
                         //paymentNode.mapEntity = market.getPrimaryEntity();
                         paymentNode.upkeep += payment;
-                        paymentNode.tooltipCreator = new TooltipMakerAPI.TooltipCreator() {
-                            @Override
-                            public boolean isTooltipExpandable(Object tooltipParam) {
-                                return false;
-                            }
-
-                            @Override
-                            public float getTooltipWidth(Object tooltipParam) {
-                                return 400;
-                            }
-
-                            @Override
-                            public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
-                                tooltip.addPara("Cost due to recent Survey Team expeditions",5f);
-                            }
-                        };
+                        paymentNode.tooltipCreator = new PaymentNodeTTC();
                         paymentNode.mapEntity = AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
                         paymentNode.icon = Global.getSettings().getSpriteName("income_report", "generic_expense");
 

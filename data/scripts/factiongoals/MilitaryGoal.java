@@ -61,7 +61,8 @@ public class MilitaryGoal extends BaseFactionGoal{
             AoTDFactionManager.getInstance().getXpPointsPerMonth().modifyFlat("aotd_military",300);
         }
         else if(id.equals("goal_3")){
-
+            // Missing? -Purple | All stations will regain combat readiness much quicker
+            // Missing? -Purple | Increase ground defence modifier of planet by 1.5
         }
         else if(id.equals("goal_4")){
             if(!grantedRewards.containsKey(id)){
