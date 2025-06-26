@@ -73,10 +73,10 @@ public class ManagedDemocracy extends BaseFactionPolicy implements EconomyTickLi
     @Override
     public void applyForMarket(MarketAPI x) {
         MutableMarketStatsAPI marketStats =x.getStats();
-        marketStats.getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).modifyMultAlways(getID(),1.5f,"Super Defences");
-        marketStats.getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).modifyFlat(getID(),0.50f,"Super Fleets");
-        x.getIncomeMult().modifyMult(getID(),0.65f,"Super Spending");
-        x.getStability().modifyFlat(getID(),2,"Absolute Liberty");
+        marketStats.getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).modifyMultAlways(getID(),1.5f,"Super Defences (Managed Democracy)");
+        marketStats.getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).modifyFlat(getID(),0.50f,"Super Fleets (Managed Democracy)");
+        x.getIncomeMult().modifyMult(getID(),0.65f,"Super Spending (Managed Democracy)");
+        x.getStability().modifyFlat(getID(),2,"Absolute Liberty (Managed Democracy)");
     }
 
     @Override

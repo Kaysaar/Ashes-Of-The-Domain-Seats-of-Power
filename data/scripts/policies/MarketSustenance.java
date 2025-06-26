@@ -14,7 +14,6 @@ import com.fs.starfarer.api.util.Pair;
 import data.scripts.factiongoals.ProsperityGoal;
 import data.scripts.managers.AoTDFactionManager;
 import data.scripts.models.BaseFactionPolicy;
-import org.lazywizard.console.Console;
 
 import java.awt.*;
 

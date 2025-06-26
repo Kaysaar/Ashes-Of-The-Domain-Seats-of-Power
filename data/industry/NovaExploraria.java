@@ -20,6 +20,7 @@ import data.route.NovaExplorariaExpeditionFleetRouteManager;
 import data.route.TechHuntersFleetRouteManager;
 import data.scripts.managers.AoTDFactionManager;
 import data.ui.overview.capitalbuilding.BaseCapitalButton;
+import org.lazywizard.console.Console;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class NovaExploraria extends BaseCapitalIndustry {
 
     @Override
     public boolean showWhenUnavailable() {
-        return false;
+        return Global.getSector().getPlayerFleet().getCargo().getCredits().get() < this.getBuildCost();
     }
 
     @Override

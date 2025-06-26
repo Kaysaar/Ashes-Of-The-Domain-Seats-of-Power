@@ -12,7 +12,6 @@ import data.scripts.managers.AoTDFactionManager;
 import data.scripts.models.BaseFactionPolicy;
 import data.scripts.models.TimelineEventType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RapidIndustrialization extends BaseFactionPolicy {

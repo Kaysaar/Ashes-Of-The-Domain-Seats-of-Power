@@ -24,7 +24,7 @@ public class ControlledBordersPolicy extends BaseFactionPolicy {
     @Override
     public void createDetailedTooltipDescription(TooltipMakerAPI tooltip) {
         tooltip.addPara("Stops all colonies from growing",5f);
-        tooltip.addPara("Reduces accessibility by %s",3f,Misc.getNegativeHighlightColor(),"50%");
+        tooltip.addPara("Reduces accessibility by %s",3f,Misc.getNegativeHighlightColor(),"80%");
         tooltip.addPara("Note : Policy once enacted, can be removed after 365 days",3f);
         float progress = Math.min(1f,getDaysTillPlaced()/365);
 
