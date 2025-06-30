@@ -37,7 +37,7 @@ public class PlanetSurveyChooseDialog implements InteractionDialogPlugin {
             } else if (curr.isEnteredByPlayer()) {
                 continue;
             }
-            if (curr.getName().equals("Limbo")) continue;
+            if (curr.getName().contains("Limbo")) continue;
             if (curr.getHyperspaceAnchor() == null) continue;
             if (Misc.getStarSystemForAnchor(curr.getHyperspaceAnchor()) == null) continue;
             systems.add(curr.getHyperspaceAnchor());

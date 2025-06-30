@@ -109,7 +109,20 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
         unindent(info);
     }
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
-        return AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
+        // Caused a 'return value of "data.scripts.managers.AoTDFactionManager.getCapitalMarket()" is null'
+        // when losing the capital post sending a fleet with existing intel bulletins
+//        return AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
+
+        if (AoTDFactionManager.getInstance().getCapitalMarket() != null) {
+            SectorEntityToken capitalEntity = AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
+            Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().set("$knownCapital", capitalEntity);
+            return capitalEntity;
+        }
+        else {
+            SectorEntityToken knownCapital = (SectorEntityToken) Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().get("$knownCapital");
+            if (knownCapital == null) throw new RuntimeException("Player faction capital has never been set");
+            else return knownCapital;
+        }
     }
 
     @Override

@@ -6,11 +6,14 @@ import com.fs.starfarer.api.campaign.CargoAPI;
 import com.fs.starfarer.api.campaign.CargoStackAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
+import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import com.fs.starfarer.api.impl.campaign.ids.HullMods;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.managers.AoTDFactionManager;
+import org.lazywizard.console.Console;
 
 import java.awt.*;
 import java.util.Set;
@@ -121,7 +124,31 @@ public class AbyssDelversFleetIntel extends BaseIntelPlugin {
     }
 
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
-        return AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
+        // Caused a 'return value of "data.scripts.managers.AoTDFactionManager.getCapitalMarket()" is null'
+        // when losing the capital post sending a fleet with existing intel bulletins
+//        return AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
+
+        for (FleetMemberAPI fm : Global.getSector().getPlayerFleet().getFleetData().getMembersListCopy()) {
+            if (!fm.getVariant().getHullSpec().getHullName().contains("Guardian")) continue;
+            Console.showMessage("Is Guardian-class? : Yes");
+            boolean hasAutomatedHullmod = fm.getVariant().hasHullMod("automated");
+            Console.showMessage("Has Automated Hullmod? : " + hasAutomatedHullmod);
+            if (hasAutomatedHullmod) {
+                fm.getVariant().getHullMods().remove(HullMods.AUTOMATED);
+                Console.showMessage("Has removed \"Automated Ship\" hullmod? : Confirmed");
+            }
+        }
+
+        if (AoTDFactionManager.getInstance().getCapitalMarket() != null) {
+            SectorEntityToken capitalEntity = AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
+            Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().set("$knownCapital", capitalEntity);
+            return capitalEntity;
+        }
+        else {
+            SectorEntityToken knownCapital = (SectorEntityToken) Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().get("$knownCapital");
+            if (knownCapital == null) throw new RuntimeException("Player faction capital has never been set");
+            else return knownCapital;
+        }
     }
 
     @Override
