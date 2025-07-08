@@ -9,6 +9,7 @@ import com.fs.starfarer.api.ui.Fonts;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.dialogs.PaymentNodeAbyssTTC;
 import data.industry.NovaExploraria;
 import data.route.AbyssDelversFleetRouteManager;
 import data.scripts.managers.AoTDFactionManager;
@@ -65,22 +66,7 @@ public class AbyssExpeditionDialog extends BaseSliderDialog {
         //paymentNode.custom = MonthlyReport.EXPORTS;
         //paymentNode.mapEntity = market.getPrimaryEntity();
         paymentNode.upkeep += (costPerMonth*currentSegment);
-        paymentNode.tooltipCreator = new TooltipMakerAPI.TooltipCreator() {
-            @Override
-            public boolean isTooltipExpandable(Object tooltipParam) {
-                return false;
-            }
-
-            @Override
-            public float getTooltipWidth(Object tooltipParam) {
-                return 400;
-            }
-
-            @Override
-            public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
-                tooltip.addPara("Cost due to recent Abyss Delvers Expeditions",5f);
-            }
-        };
+        paymentNode.tooltipCreator = new PaymentNodeAbyssTTC();
         paymentNode.mapEntity = AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
         paymentNode.icon = Global.getSettings().getSpriteName("income_report", "generic_expense");
         NovaExploraria.getNova().sentAbyssDivers(currentSegment);
