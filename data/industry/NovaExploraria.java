@@ -59,7 +59,7 @@ public class NovaExploraria extends BaseCapitalIndustry {
 
     @Override
     public boolean showWhenUnavailable() {
-        return Global.getSector().getPlayerFleet().getCargo().getCredits().get() < this.getBuildCost();
+        return (Global.getSector().getPlayerFleet().getCargo().getCredits().get() < this.getBuildCost() && market.hasCondition("aotd_capital"));
     }
 
     @Override
