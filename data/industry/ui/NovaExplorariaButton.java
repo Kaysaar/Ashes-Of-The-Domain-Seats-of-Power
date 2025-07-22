@@ -64,12 +64,7 @@ public class NovaExplorariaButton extends BaseCapitalButton {
         super.advance(amount);
         if(surveyFleetButton.isChecked()){
             surveyFleetButton.setChecked(false);
-            Global.getSector().getCampaignUI().showInteractionDialogFromCargo(new PlanetSurveyChooseDialog(), null, new CampaignUIAPI.DismissDialogDelegate() {
-                @Override
-                public void dialogDismissed() {
-                    createUI();
-                }
-            });
+            Global.getSector().getCampaignUI().showInteractionDialogFromCargo(new PlanetSurveyChooseDialog(), null, this::createUI);
         }
         if(abyssButton.isChecked()){
             abyssButton.setChecked(false);
