@@ -9,6 +9,7 @@ import com.fs.starfarer.api.ui.IntelUIAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import data.scripts.CoreUITrackerScript;
+import data.scripts.managers.AoTDFactionManager;
 import data.scripts.models.BaseFactionTimelineEvent;
 
 import java.awt.*;
@@ -23,6 +24,15 @@ public class EventOccuredIntel extends BaseIntelPlugin {
     @Override
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
         // The location on the map of the intel
+        if(isEnded()){
+            return null;
+        }
+        if (!isEnding()) {
+            endAfterDelay(5f);
+        }
+        if(AoTDFactionManager.getMarketsUnderPlayer().isEmpty()){
+            return null;
+        }
         return Global.getSector().getPlayerFaction().getProduction().getGatheringPoint().getPrimaryEntity();
     }
 
@@ -56,6 +66,18 @@ public class EventOccuredIntel extends BaseIntelPlugin {
     }
 
     @Override
+    public void advance(float amount) {
+        super.advance(amount);
+        if (isEnded()||isEnding()) return;
+        if (!isEnding()) {
+            endAfterDelay(5f);
+            return;
+        }
+
+
+    }
+
+    @Override
     public boolean doesButtonHaveConfirmDialog(Object buttonId) {
         return super.doesButtonHaveConfirmDialog(buttonId);
     }
@@ -63,6 +85,12 @@ public class EventOccuredIntel extends BaseIntelPlugin {
     @Override
     public boolean shouldRemoveIntel() {
         return isEnded();
+    }
+
+    @Override
+    protected void notifyEnded() {
+        super.notifyEnded();
+
     }
 
     @Override

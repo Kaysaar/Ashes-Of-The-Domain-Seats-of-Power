@@ -13,6 +13,7 @@ import data.listeners.timeline.models.FirstIncomeColonyListener;
 import data.listeners.timeline.models.FirstIndustryListener;
 import data.listeners.timeline.models.FirstMarketConditionListener;
 import data.listeners.timeline.models.FirstSizeColonyListener;
+import data.scripts.listeners.CrisisReplacer;
 import data.scripts.managers.TimelineListenerManager;
 import data.memory.AoTDSopMemFlags;
 import data.scripts.CoreUITrackerScript;
@@ -30,6 +31,10 @@ import data.scripts.timelineevents.templates.FactionExpansionEvent;
 import data.scripts.timelineevents.templates.GroundDefenceModifierEvent;
 
 public class AoDCapitalsModPlugin extends BaseModPlugin {
+    @Override
+    public void onNewGame() {
+        Global.getSector().getListenerManager().addListener(new CrisisReplacer(),true);
+    }
 
     public void onGameLoad(boolean newGame) {
         if (!Global.getSettings().getModManager().isModEnabled("aotd_vok")) {

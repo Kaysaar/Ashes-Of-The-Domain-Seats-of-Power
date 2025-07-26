@@ -46,7 +46,7 @@ public class PlanetSurveyChooseDialog implements InteractionDialogPlugin {
                 Global.getSector().getPlayerFaction(), systems,
                 new BaseCampaignEntityPickerListener() {
                     public void pickedEntity(SectorEntityToken entity) {
-                        dialog.dismiss();
+
                         StarSystemAPI system = Misc.getStarSystemForAnchor(entity);
                         MonthlyReport report = SharedData.getData().getCurrentReport();
                         MonthlyReport.FDNode marketsNode = report.getNode(MonthlyReport.OUTPOSTS);
@@ -71,6 +71,7 @@ public class PlanetSurveyChooseDialog implements InteractionDialogPlugin {
 
 
                         NovaExploraria.getNova().sentExpeditionFleet(system);
+                        dialog.dismiss();
                     }
 
                     public void cancelledEntityPicking() {

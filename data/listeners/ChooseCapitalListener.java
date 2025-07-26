@@ -31,7 +31,7 @@ public class ChooseCapitalListener extends BaseIndustryOptionProvider {
         if (isUnsuitable(ind, false)) return null;
 
 
-        if (ind.getId().equals(Industries.POPULATION)&&ind.getMarket().getFaction().isPlayerFaction()&& !AoTDFactionManager.getInstance().didDeclaredCapital()&&ind.getMarket().getSize()>=5) {
+        if (ind.getId().equals(Industries.POPULATION)&&ind.getMarket().getPrimaryEntity() instanceof PlanetAPI &&ind.getMarket().getFaction().isPlayerFaction()&& !AoTDFactionManager.getInstance().didDeclaredCapital()&&ind.getMarket().getSize()>=5) {
 
             List<IndustryOptionData> result = new ArrayList<IndustryOptionData>();
 

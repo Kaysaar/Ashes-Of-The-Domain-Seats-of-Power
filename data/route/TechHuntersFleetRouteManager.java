@@ -21,6 +21,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import data.intel.TechHunterFleetIntel;
+import data.scripts.managers.AoTDFactionManager;
 import org.lazywizard.lazylib.MathUtils;
 
 import java.util.ArrayList;
@@ -109,7 +110,10 @@ public class TechHuntersFleetRouteManager extends RouteFleetAssignmentAI impleme
             if(reason.equals(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION)){
                 intel.setFinished(true);
                 intel.setSuccessful(true);
-                trueSource.getMarket().getSubmarket(Submarkets.SUBMARKET_STORAGE).getCargo().addAll(cargo);
+                if(!AoTDFactionManager.getMarketsUnderPlayer().isEmpty()){
+                    Global.getSector().getPlayerFaction().getProduction().getGatheringPoint().getSubmarket(Submarkets.SUBMARKET_STORAGE).getCargo().addAll(cargo);
+
+                }
                 intel.getCargo().addAll(cargo);
                 intel.endAfterDelay(5f);
                 cargo.clear();

@@ -20,7 +20,6 @@ import data.route.NovaExplorariaExpeditionFleetRouteManager;
 import data.route.TechHuntersFleetRouteManager;
 import data.scripts.managers.AoTDFactionManager;
 import data.ui.overview.capitalbuilding.BaseCapitalButton;
-import org.lazywizard.console.Console;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.ArrayList;

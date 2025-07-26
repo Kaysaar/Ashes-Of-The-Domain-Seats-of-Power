@@ -2,10 +2,13 @@ package data.scripts.managers;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.util.IntervalUtil;
+import data.intel.EventOccuredIntel;
 import data.listeners.timeline.models.BaseTimelineListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class TimelineListenerManager implements EveryFrameScript {
     public IntervalUtil intervalCheck = new IntervalUtil(2f, 2f);
@@ -62,7 +65,19 @@ public class TimelineListenerManager implements EveryFrameScript {
                 transientListeners.addAll(listenersInQueue);
                 listenersInQueue.clear();
             }
+            Iterator iter = Global.getSector().getIntelManager().getIntel(EventOccuredIntel.class).iterator();
+            ArrayList<BaseIntelPlugin>temp = new ArrayList<>();
+            while (iter.hasNext()) {
+                BaseIntelPlugin plugin = (BaseIntelPlugin) iter.next();
+                plugin.advance(intervalCheck.getElapsed());
+                if(plugin.isEnded()){
+                    temp.add(plugin);
+                }
+            }
+            temp.forEach(x->Global.getSector().getIntelManager().removeIntel(x));
+            temp.clear();
             executeAllListeners(amount);
+
         }
     }
     public void executeAllListeners(float amount) {

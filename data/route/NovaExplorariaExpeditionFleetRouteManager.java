@@ -20,6 +20,7 @@ import com.fs.starfarer.api.util.Misc;
 import data.industry.NovaExploraria;
 import data.intel.NovaExplorariaExpeditionIntel;
 import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,9 @@ import java.util.List;
 public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignmentAI implements FleetActionTextProvider, FleetEventListener {
     public StarSystemAPI target;
     public NovaExplorariaExpeditionIntel intel;
+    public boolean isReturning = false;
+    float daysSinceReturning = 0f;
+
 
     public NovaExplorariaExpeditionFleetRouteManager(CampaignFleetAPI fleet, RouteManager.RouteData route, StarSystemAPI target, NovaExplorariaExpeditionIntel intel) {
         super(fleet, route);
@@ -34,7 +38,8 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
         this.intel = intel;
         giveInitialAssignments();
     }
-    public  static String getSurveyClassForItem(PlanetAPI planet) {
+
+    public static String getSurveyClassForItem(PlanetAPI planet) {
         SurveyPlugin plugin = (SurveyPlugin) Global.getSettings().getNewPluginInstance("surveyPlugin");
         String type = plugin.getSurveyDataType(planet);
         if (type != null) {
@@ -43,6 +48,12 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
         }
         return "Class N";
     }
+
+    public void setReturning(boolean returning) {
+        isReturning = returning;
+    }
+
+
     @Override
     protected void giveInitialAssignments() {
         if (target == null) return;
@@ -56,7 +67,7 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
         fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, source, MathUtils.getRandomNumberInRange(2, 4), "Preparing for Expedition");
 
         SectorEntityToken jumpPointInSystem = target.getJumpPoints().get(0);
-        fleet.addAssignment(FleetAssignment.GO_TO_LOCATION, jumpPointInSystem, RouteLocationCalculator.getTravelDays(source, jumpPointInSystem) * 1.5f, "Going to "+target.getName()+" to explore it");
+        fleet.addAssignment(FleetAssignment.GO_TO_LOCATION, jumpPointInSystem, RouteLocationCalculator.getTravelDays(source, jumpPointInSystem) * 1.5f, "Going to " + target.getName() + " to explore it");
 
         SectorEntityToken lastSavedFrom = jumpPointInSystem;
 
@@ -76,7 +87,12 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
 
             lastSavedFrom = object;
         }
+        fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, source, 1, "Preparing to return", new Script() {
+            @Override
+            public void run() {
 
+            }
+        });
         fleet.addAssignment(FleetAssignment.GO_TO_LOCATION, source, 10000, "Returning from Expedition", new Script() {
             @Override
             public void run() {
@@ -101,6 +117,35 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
     @Override
     public void advance(float amount) {
         super.advance(amount);
+        daysSinceReturning += Global.getSector().getClock().convertToDays(amount);
+        if(fleet.isInHyperspace()){
+            //To prevent accidental teleport
+            isReturning = false;
+        }
+        if (daysSinceReturning > 30&&isReturning) {
+            if (fleet.getStarSystem() != null && fleet.getStarSystem().getFleets().stream().noneMatch(x -> x.getFaction() != null && x.getFaction().isHostileTo(Global.getSector().getPlayerFaction()))) {
+                isReturning = false;
+                Vector2f offset = Vector2f.sub(fleet.getLocation(), fleet.getStarSystem().getCenter().getLocation(), new Vector2f());
+                float maxInSystem = 20000f;
+                float maxInHyper = 2000f;
+                float f = offset.length() / maxInSystem;
+                //if (f > 1) f = 1;
+                if (f > 0.5f) f = 0.5f;
+
+                float angle = Misc.getAngleInDegreesStrict(offset);
+
+                Vector2f destOffset = Misc.getUnitVectorAtDegreeAngle(angle);
+                destOffset.scale(f * maxInHyper);
+
+                Vector2f.add(fleet.getStarSystem().getLocation(), destOffset, destOffset);
+                SectorEntityToken token = Global.getSector().getHyperspace().createToken(destOffset.x, destOffset.y);
+
+                JumpPointAPI.JumpDestination dest = new JumpPointAPI.JumpDestination(token, null);
+                Global.getSector().doHyperspaceTransition(fleet,fleet,dest);
+
+            }
+
+        }
     }
 
     @Override
@@ -110,26 +155,27 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
 
     @Override
     public void reportFleetDespawnedToListener(CampaignFleetAPI fleet, CampaignEventListener.FleetDespawnReason reason, Object param) {
-        if (reason.equals(CampaignEventListener.FleetDespawnReason.DESTROYED_BY_BATTLE)){
+        if (reason.equals(CampaignEventListener.FleetDespawnReason.DESTROYED_BY_BATTLE)) {
             intel.setFinished(true);
             intel.setSuccessful(false);
-            intel.sendUpdateIfPlayerHasIntel(null,false);
+            intel.sendUpdateIfPlayerHasIntel(null, false);
         }
-        if(reason.equals(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION)){
+        if (reason.equals(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION)) {
             intel.setSuccessful(true);
-            CoreScript.markSystemAsEntered(target,false);
-            MarketAPI gatheringPoint = Global.getSector().getPlayerFaction().getProduction().getGatheringPoint();;
-            intel.getSurveyMap().values().forEach(x->gatheringPoint.getSubmarket(Submarkets.SUBMARKET_STORAGE).getCargo().addCommodity(x,1));
+            CoreScript.markSystemAsEntered(target, false);
+            MarketAPI gatheringPoint = Global.getSector().getPlayerFaction().getProduction().getGatheringPoint();
+            ;
+            intel.getSurveyMap().values().forEach(x -> gatheringPoint.getSubmarket(Submarkets.SUBMARKET_STORAGE).getCargo().addCommodity(x, 1));
             intel.getSurveyMap().keySet().forEach(ListenerUtil::reportPlayerSurveyedPlanet);
 
             Misc.setAllPlanetsKnown(target);
-            Misc.setAllPlanetsSurveyed(target,false);
+            Misc.setAllPlanetsSurveyed(target, false);
             GenericPluginManagerAPI plugins = Global.getSector().getGenericPlugins();
             CoreDiscoverEntityPlugin plugin = (CoreDiscoverEntityPlugin) plugins.getPluginsOfClass(CoreDiscoverEntityPlugin.class).stream().findFirst().orElse(null);
-            List<SectorEntityToken> entitiesToDiscover = target.getAllEntities().stream().filter(x->x.isDiscoverable()&& !(x instanceof CampaignFleetAPI)).toList();
+            List<SectorEntityToken> entitiesToDiscover = target.getAllEntities().stream().filter(x -> x.isDiscoverable() && !(x instanceof CampaignFleetAPI)).toList();
             for (SectorEntityToken allEntity : entitiesToDiscover) {
-                if(allEntity instanceof CampaignFleetAPI)continue;
-                if(allEntity.isDiscoverable()){
+                if (allEntity instanceof CampaignFleetAPI) continue;
+                if (allEntity.isDiscoverable()) {
                     assert plugin != null;
                     plugin.discoverEntity(allEntity);
                     intel.getOthers().add(allEntity.getName());
@@ -138,7 +184,7 @@ public class NovaExplorariaExpeditionFleetRouteManager extends RouteFleetAssignm
             }
             intel.setSuccessful(true);
             intel.setFinished(true);
-            intel.sendUpdateIfPlayerHasIntel(null,false);
+            intel.sendUpdateIfPlayerHasIntel(null, false);
 
         }
         NovaExploraria.finishExpedition();
