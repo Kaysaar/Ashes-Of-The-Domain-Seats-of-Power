@@ -70,7 +70,7 @@ public class SGCPolicy extends BaseFactionPolicy {
     public void applyForMarket(MarketAPI x) {
         int tier = getTierOfMarket(x);  
         if(tier>0){
-            x.getStats().getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).modifyFlat(getID(),(0.25f*tier),"Service Guarantees Citizenship");
+            x.getStats().getDynamic().getMod(Stats.GROUND_DEFENSES_MOD).modifyMult(getID(),(1+(0.25f*tier)),"Service Guarantees Citizenship");
         }
         x.getStats().getDynamic().getMod(Stats.COMBAT_FLEET_SIZE_MULT).modifyFlat(getID(),(10+(15*tier))/100f,"Service Guarantees Citizenship");
         x.getStability().modifyFlat(getID(), (float) Math.floor(1+(0.5f*tier)),"Service Guarantees Citizenship");
