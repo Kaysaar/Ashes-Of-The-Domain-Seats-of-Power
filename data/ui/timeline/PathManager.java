@@ -1,24 +1,21 @@
 package data.ui.timeline;
 
+import data.plugins.AoDCapitalsModPlugin;
+
 public class PathManager {
     public static String getTimelineScreenshotsPath() {
         try {
             // Path to starfarer.api.jar inside starsector-core
-            String jarPath = com.fs.starfarer.api.Global.class
-                    .getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .toURI()
-                    .getPath()
-                    .replace('\\', '/');
+            String jarPath = AoDCapitalsModPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+
 
             // Strip off "starsector-core/starfarer.api.jar"
             String gameRoot;
-            if (jarPath.endsWith("starsector-core/starfarer.api.jar")) {
-                gameRoot = jarPath.substring(0, jarPath.length() - "starsector-core/starfarer.api.jar".length());
+            if (jarPath.endsWith("jars/AodCapitals.jar")) {
+                gameRoot = jarPath.substring(0, jarPath.length() - "jars/AodCapitals.jar".length());
             } else {
                 // Fallback: just go two directories up from the JAR
-                int coreIndex = jarPath.indexOf("/starsector-core/");
+                int coreIndex = jarPath.indexOf("/jars/");
                 if (coreIndex > 0) {
                     gameRoot = jarPath.substring(0, coreIndex + 1);
                 } else {
@@ -27,7 +24,7 @@ public class PathManager {
             }
 
             // Construct path to your mod’s subfolder
-            String modFolder = "mods/Ashes of  The Domain -Seats Of Power/timeline_screenshots/";
+            String modFolder = "timeline_screenshots/";
             return gameRoot + modFolder;
         } catch (Exception e) {
             return "";
