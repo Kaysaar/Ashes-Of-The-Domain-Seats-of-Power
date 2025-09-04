@@ -25,7 +25,7 @@ public class ReflectionUtilis {
     private static final MethodHandle getModifiersHandle;
     private static final MethodHandle  getParameterTypesHandle;
     private static final MethodHandle  getFieldTypeHandle;
-
+    private static final Class<?>  fileclass;
     static {
         try {
             fieldClass = Class.forName("java.lang.reflect.Field", false, Class.class.getClassLoader());
@@ -41,11 +41,22 @@ public class ReflectionUtilis {
             setMethodAccessable = lookup.findVirtual(methodClass, "setAccessible", MethodType.methodType(Void.TYPE, boolean.class));
             getModifiersHandle = lookup.findVirtual(methodClass, "getModifiers", MethodType.methodType(int.class));
             getParameterTypesHandle = lookup.findVirtual(methodClass, "getParameterTypes", MethodType.methodType(Class[].class));
+            fileclass = Class.forName("java.io.File",false,Class.class.getClassLoader());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static Object getFile(String pathAbsolute){
+        try {
+            MethodHandle mh = lookup.findConstructor(fileclass, MethodType.methodType(Void.TYPE, String.class));
+            Object fileObj = mh.invoke(pathAbsolute);
+            return fileObj;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+
+    }
     public static Object getPrivateVariable(String fieldName, Object instanceToGetFrom) {
         try {
             Class<?> instances = instanceToGetFrom.getClass();
@@ -248,6 +259,16 @@ public class ReflectionUtilis {
         if (clazz == void.class) return Void.class;
 
         return clazz; // fallback
+    }
+    public static Object invokeStaticExact(Class<?> targetClass, String methodName,
+                                           Class<?>[] paramTypes, Object... args) {
+        try {
+            Object method = targetClass.getDeclaredMethod(methodName, paramTypes);
+            setMethodAccessable.invoke(method, true);
+            return invokeMethodHandle.invoke(method, null, args);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Object invokeStaticMethodWithAutoProjection(Class<?> targetClass, String methodName, Object... arguments) {

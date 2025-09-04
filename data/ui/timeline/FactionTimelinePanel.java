@@ -9,6 +9,7 @@ import data.ui.basecomps.FactionBonusPanel;
 import data.ui.basecomps.FactionFlagButtonComponent;
 import data.ui.basecomps.FactionXPPanel;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 public class FactionTimelinePanel implements ExtendUIPanelPlugin {
@@ -27,6 +28,7 @@ public class FactionTimelinePanel implements ExtendUIPanelPlugin {
         float widthT = width * 0.5f - 10f;
         float heightT = height - 160;
          component = new FactionTimelineViewerComponent(width-410,height-160);
+
         mainPanel.addComponent(component.getMainPanel()).inTL(405, 0);
 
         mainPanel.addComponent(new FactionTimelineGoalsPanel(400, height - 160).getMainPanel()).inTL(0, 0);

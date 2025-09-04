@@ -74,10 +74,12 @@ public class ChooseCapitalListener extends BaseIndustryOptionProvider {
                 @Override
                 public void customDialogConfirm() {
                     AoTDFactionManager.getInstance().setCapitalID(opt.ind.getMarket().getPrimaryEntity().getId());
+                    SpecialItemData data = opt.ind.getMarket().getIndustry(Industries.POPULATION).getSpecialItem();
+                    opt.ind.setSpecialItem(null);
                     opt.ind.getMarket().removeIndustry(Industries.POPULATION, MarketAPI.MarketInteractionMode.REMOTE,false);
                     opt.ind.getMarket().addIndustry("aotd_capital_complex");
                     Industry ind = opt.ind.getMarket().getIndustry(Industries.POPULATION);
-                    ind.setSpecialItem(opt.ind.getSpecialItem());
+                    ind.setSpecialItem(data);
                     ind.setImproved(opt.ind.isImproved());
                     ind.setAICoreId(opt.ind.getAICoreId());
                     PlanetAPI planet = ind.getMarket().getPlanetEntity();
