@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FactionPanel implements CustomUIPanelPlugin {
+public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
     CustomPanelAPI mainPanel;
     CustomPanelAPI panelForPlugins = null;
     CustomPanelAPI buttonPanel = null;
@@ -127,7 +127,6 @@ public class FactionPanel implements CustomUIPanelPlugin {
         }
         currentlyChosen = newButton;
         this.panelForPlugins.addComponent(panelMap.get(currentlyChosen)).inTL(0, 0);
-        playSound(currentlyChosen);
     }
 
     @Override
@@ -137,6 +136,12 @@ public class FactionPanel implements CustomUIPanelPlugin {
 
     @Override
     public void buttonPressed(Object buttonId) {
+
+    }
+
+    @Override
+    public void playSound() {
+        Global.getSoundPlayer().playCustomMusic(1, 1, "aotd_faction", true);
 
     }
 
@@ -198,8 +203,6 @@ public class FactionPanel implements CustomUIPanelPlugin {
         panelMap.put(tiedButton, overviewPanel.getMainPanel());
     }
     public void playSound(ButtonAPI button) {
-        if (button.getText().toLowerCase().contains("policies")) {
-            policyPanel.playSound();
-        }
+
     }
 }

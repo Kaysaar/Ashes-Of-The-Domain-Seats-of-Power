@@ -185,9 +185,8 @@ public class CoreUITrackerScript implements EveryFrameScript {
         if(currentTab.getText().toLowerCase().contains(getStringForCoreTabFaction())){
             if(!tunedMusicOnce){
                 tunedMusicOnce = true;
-//                if(coreUiTech.getCurrentlyChosen()!=null){
-//                    coreUiTech.playSound(coreUiTech.getCurrentlyChosen());
-//                }
+                coreUiTech.playSound();
+
             }
         }
         else{
