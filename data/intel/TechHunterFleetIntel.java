@@ -51,12 +51,23 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
         return successful;
     }
 
+    boolean canBeDeleted = false;
     @Override
     protected void notifyEnded() {
         target = null;
         getCargo().clear();
         savedCargo = null;
-        Global.getSector().getIntelManager().removeIntel(this);
+        if (canBeDeleted) {
+            Global.getSector().getIntelManager().removeIntel(this);
+        }
+    }
+    @Override
+    protected void addDeleteButton(TooltipMakerAPI info, float width) {
+        addDeleteButton(info, width, "Delete Nova Exploraria log entry");
+    }
+    @Override
+    protected void createDeleteConfirmationPrompt(TooltipMakerAPI prompt) {
+        prompt.addPara("Are you sure you want to permanently delete this Nova Exploraria log entry?", Misc.getTextColor(), 0f);
     }
 
     @Override
@@ -67,6 +78,7 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
     public boolean shouldRemoveIntel() {
         return isEnded();
     }
+
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
         Color h = Misc.getHighlightColor();
@@ -87,8 +99,12 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
             else{
                 info.addPara("Tech Hunters fleet was destroyed during operation, probably result of hostile actions of third parties",Misc.getTooltipTitleAndLightHighlightColor(),opad);
             }
+            canBeDeleted = true;
         }
-
+        if (canBeDeleted) {
+            addDeleteButton(info,width-10);
+            info.addSpacer(5f);
+        }
 
     }
     @Override
