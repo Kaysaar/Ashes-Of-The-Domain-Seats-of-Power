@@ -20,6 +20,9 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static data.scripts.patrolfleet.utilis.FleetPointUtilis.printStats;
+
+
 public class AoTDFactionManager {
     public ArrayList<BaseFactionPolicy> currentFactionPolicies = new ArrayList<>();
     public HashSet<String> copyOfPolicies = new HashSet<>();
@@ -365,6 +368,7 @@ public class AoTDFactionManager {
     public int getNextLevelForPolicySlot(int level) {
         int effectiveLevel = level+1;
         int lev = getMaxLevel();
+        printStats();
         for (Integer object : intervalsForEachPolicySlot) {
             if (object>=effectiveLevel) {
                 return object;

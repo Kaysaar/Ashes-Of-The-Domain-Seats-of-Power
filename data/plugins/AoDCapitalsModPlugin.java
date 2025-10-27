@@ -3,11 +3,10 @@ package data.plugins;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
-import data.industry.NovaExploraria;
+import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import data.industry.AoTDMilitaryBase;
 import data.listeners.ChooseCapitalListener;
-import data.listeners.NovaExploMonthListener;
 import data.listeners.timeline.*;
 import data.listeners.timeline.models.FirstIncomeColonyListener;
 import data.listeners.timeline.models.FirstIndustryListener;
@@ -22,6 +21,7 @@ import data.scripts.listeners.FactionHistoryUpdateListener;
 import data.scripts.listeners.FactionMonthlyUpdateListenner;
 import data.scripts.managers.*;
 import data.scripts.models.TimelineEventType;
+import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.scripts.timelineevents.military.*;
 import data.scripts.timelineevents.prosperity.*;
 import data.scripts.timelineevents.research_explo.MildConditionEvent;
@@ -29,6 +29,7 @@ import data.scripts.timelineevents.special.*;
 import data.scripts.timelineevents.research_explo.FirstVastRuins;
 import data.scripts.timelineevents.templates.FactionExpansionEvent;
 import data.scripts.timelineevents.templates.GroundDefenceModifierEvent;
+
 
 public class AoDCapitalsModPlugin extends BaseModPlugin {
     @Override
@@ -44,7 +45,6 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         if (!Global.getSector().hasScript(FactionAdvance.class)) {
             Global.getSector().addScript(new FactionAdvance());
         }
-
         Global.getSector().getListenerManager().addListener(new FactionMonthlyUpdateListenner(), true);
         if (!Global.getSector().getListenerManager().hasListenerOfClass(FactionHistoryUpdateListener.class)) {
             Global.getSector().getListenerManager().addListener(new FactionHistoryUpdateListener());
@@ -59,6 +59,19 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
             AoTDFactionManager.getInstance().addXP(100000);
         }
         AoTDFactionManager.getInstance().advance(0f);
+
+
+        PatrolTemplateManager.loadAllExistingTemplates();
+
+
+
+    }
+
+    @Override
+    public void onAboutToStartGeneratingCodex() {
+        Global.getSettings().getIndustrySpec(Industries.PATROLHQ).setPluginClass(AoTDMilitaryBase.class.getName());
+        Global.getSettings().getIndustrySpec(Industries.MILITARYBASE).setPluginClass(AoTDMilitaryBase.class.getName());
+        Global.getSettings().getIndustrySpec(Industries.HIGHCOMMAND).setPluginClass(AoTDMilitaryBase.class.getName());
     }
 
     public void addTransientScripts() {

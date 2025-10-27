@@ -26,6 +26,7 @@ public class ReflectionUtilis {
     private static final MethodHandle  getParameterTypesHandle;
     private static final MethodHandle  getFieldTypeHandle;
     private static final Class<?>  fileclass;
+    private static final Class<?>  fileWriterClass;
     static {
         try {
             fieldClass = Class.forName("java.lang.reflect.Field", false, Class.class.getClassLoader());
@@ -42,6 +43,8 @@ public class ReflectionUtilis {
             getModifiersHandle = lookup.findVirtual(methodClass, "getModifiers", MethodType.methodType(int.class));
             getParameterTypesHandle = lookup.findVirtual(methodClass, "getParameterTypes", MethodType.methodType(Class[].class));
             fileclass = Class.forName("java.io.File",false,Class.class.getClassLoader());
+            fileWriterClass = Class.forName("java.io.FileWriter",false,Class.class.getClassLoader());
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -51,6 +54,16 @@ public class ReflectionUtilis {
         try {
             MethodHandle mh = lookup.findConstructor(fileclass, MethodType.methodType(Void.TYPE, String.class));
             Object fileObj = mh.invoke(pathAbsolute);
+            return fileObj;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    public static Object getFileWriter(String pathAbsolute,boolean append){
+        try {
+            MethodHandle mh = lookup.findConstructor(fileWriterClass, MethodType.methodType(Void.TYPE, String.class, boolean.class));
+            Object fileObj = mh.invoke(pathAbsolute,append);
             return fileObj;
         } catch (Throwable e) {
             throw new RuntimeException(e);

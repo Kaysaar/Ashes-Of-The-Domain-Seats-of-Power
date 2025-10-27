@@ -38,11 +38,15 @@ public class CoreUITrackerScript implements EveryFrameScript {
     public static boolean sendSignalToOpenCore = false;
     public static final String memFlag = "$aotd_outpost_state";
     public static final String memFlag2 = "$aotd_faction_tab_state";
+    public static final String memFlag3 = "$aotd_patrol_tab_state";
     public static void setMemFlag(String value) {
         Global.getSector().getMemory().set(memFlag, value);
     }
     public static void setMemFlagForFactionTab(String value) {
         Global.getSector().getMemory().set(memFlag2, value);
+    }
+    public static void setMemFlagForPatrolTab(String value) {
+        Global.getSector().getMemory().set(memFlag3, value);
     }
     public static String getMemFlagForTechTab(){
         String s = null;

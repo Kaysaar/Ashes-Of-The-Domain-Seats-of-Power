@@ -1,0 +1,232 @@
+package data.industry;
+
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignEventListener;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.DebugFlags;
+import com.fs.starfarer.api.impl.campaign.econ.impl.MilitaryBase;
+import com.fs.starfarer.api.impl.campaign.fleets.*;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
+import com.fs.starfarer.api.impl.campaign.ids.Ranks;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
+import data.ai.PatrolAssigmentAIV5;
+import data.scripts.patrolfleet.managers.FactionPatrolsManager;
+import data.scripts.patrolfleet.models.AoTDPatrolFleetData;
+import data.scripts.patrolfleet.models.BasePatrolFleet;
+import data.scripts.patrolfleet.utilis.PatrolFleetFactory;
+
+import java.util.Random;
+
+public class AoTDMilitaryBase extends MilitaryBase {
+
+    @Override
+    public void advance(float amount) {
+        if(market.getFaction()==null||!market.getFaction().isPlayerFaction()){
+            super.advance(amount);
+            return;
+        }
+        boolean disrupted = isDisrupted();
+        if (!disrupted && wasDisrupted) {
+            disruptionFinished();
+        }
+        wasDisrupted = disrupted;
+
+//		if (disrupted) {
+//			//if (DebugFlags.COLONY_DEBUG) {
+//				String key = getDisruptedKey();
+//				market.getMemoryWithoutUpdate().unset(key);
+//			//}
+//		}
+
+        if (building && !disrupted) {
+            float days = Global.getSector().getClock().convertToDays(amount);
+            //DebugFlags.COLONY_DEBUG = true;
+            if (DebugFlags.COLONY_DEBUG) {
+                days *= 100f;
+            }
+            buildProgress += days;
+
+            if (buildProgress >= buildTime) {
+                finishBuildingOrUpgrading();
+            }
+        }
+
+        if (Global.getSector().getEconomy().isSimMode()) return;
+
+        if (!isFunctional()) return;
+
+        float days = Global.getSector().getClock().convertToDays(amount);
+
+//		float stability = market.getPrevStability();
+//		float spawnRate = 1f + (stability - 5) * 0.2f;
+//		if (spawnRate < 0.5f) spawnRate = 0.5f;
+
+        float spawnRate = 1f;
+        float rateMult = market.getStats().getDynamic().getStat(Stats.COMBAT_FLEET_SPAWN_RATE_MULT).getModifiedValue();
+        spawnRate *= rateMult;
+
+        if (Global.getSector().isInNewGameAdvance()) {
+            spawnRate *= 3f;
+        }
+
+        float extraTime = 0f;
+        if (returningPatrolValue > 0) {
+            // apply "returned patrols" to spawn rate, at a maximum rate of 1 interval per day
+            float interval = tracker.getIntervalDuration();
+            extraTime = interval * days;
+            returningPatrolValue -= days;
+            if (returningPatrolValue < 0) returningPatrolValue = 0;
+        }
+        tracker.advance(days * spawnRate + extraTime);
+        boolean noPatrols = true;
+        for (BasePatrolFleet fleet : FactionPatrolsManager.getInstance().getAssignedFleetsForMarket(market)) {
+            if(isPatroling(fleet.getId(),market)){
+                noPatrols =false;
+                break;
+            }
+        }
+        if(noPatrols){
+            tracker.advance(days*100);
+        }
+
+        if (tracker.intervalElapsed()) {
+//			if (market.isPlayerOwned()) {
+//				System.out.println("ewfwefew");
+//			}
+//			if (market.getName().equals("Jangala")) {
+//				System.out.println("wefwefe");
+//			}
+            String sid = getRouteSourceId();
+
+
+
+
+            WeightedRandomPicker<BasePatrolFleet> picker = new WeightedRandomPicker<BasePatrolFleet>();
+
+            for (BasePatrolFleet fleet : FactionPatrolsManager.getInstance().getAssignedFleetsForMarket(market)) {
+                if(!isPatroling(fleet.getId(),market))picker.add(fleet,fleet.getFPTaken());
+            }
+
+
+            if (picker.isEmpty()) return;
+
+            BasePatrolFleet type = picker.pick();
+            AoTDPatrolFleetData custom = new AoTDPatrolFleetData();
+            custom.setId(type.getId());
+
+            RouteManager.OptionalFleetData extra = new RouteManager.OptionalFleetData(market);
+
+            RouteManager.RouteData route = RouteManager.getInstance().addRoute(sid, market, Misc.genRandomSeed(), extra, this, custom);
+            extra.strength = (float) type.getFPTaken();
+            extra.strength = Misc.getAdjustedStrength(extra.strength, market);
+
+
+            float patrolDays = 35f + (float) Math.random() * 10f;
+            route.addSegment(new RouteManager.RouteSegment(patrolDays, market.getPrimaryEntity()));
+        }
+
+    }
+    public void reportFleetDespawnedToListener(CampaignFleetAPI fleet, CampaignEventListener.FleetDespawnReason reason, Object param) {
+        RouteManager.RouteData route = RouteManager.getInstance().getRoute(getRouteSourceId(), fleet);
+        if(reason.equals(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION)){
+            AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
+            BasePatrolFleet fleetData = FactionPatrolsManager.getInstance().getFleet(data.getId());
+            returningPatrolValue+= (float) fleet.getFleetPoints() /fleetData.getFPTaken();
+        }
+
+    }
+    public static String getRouteSourceId(MarketAPI market) {
+        return market.getId() + "_" + "military";
+    }
+    public static boolean isPatroling(String id, MarketAPI market) {
+        int count = 0;
+        for (RouteManager.RouteData data : RouteManager.getInstance().getRoutesForSource(getRouteSourceId(market))) {
+            if (data.getCustom() instanceof AoTDPatrolFleetData daten) {
+                if(daten.getId().equals(id))return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public CampaignFleetAPI spawnFleet(RouteManager.RouteData route) {
+        if(market.getFaction()!=null&&!market.getFaction().isPlayerFaction())return super.spawnFleet(route);
+        AoTDPatrolFleetData custom = (AoTDPatrolFleetData) route.getCustom();
+        CampaignFleetAPI fleet = createPatrol(custom.getId(),route);
+        if (fleet == null || fleet.isEmpty()) return null;
+
+        fleet.addEventListener(this);
+
+        market.getContainingLocation().addEntity(fleet);
+        fleet.setFacing((float) Math.random() * 360f);
+        // this will get overridden by the patrol assignment AI, depending on route-time elapsed etc
+        fleet.setLocation(market.getPrimaryEntity().getLocation().x, market.getPrimaryEntity().getLocation().y);
+
+        fleet.addScript(new PatrolAssigmentAIV5(fleet, route));
+        fleet.setTransponderOn(true);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true, 0.3f);
+
+        //market.getContainingLocation().addEntity(fleet);
+        //fleet.setLocation(market.getPrimaryEntity().getLocation().x, market.getPrimaryEntity().getLocation().y);
+        return fleet;
+
+    }
+    public CampaignFleetAPI createPatrol(String id,RouteManager.RouteData route) {
+        BasePatrolFleet fleets = FactionPatrolsManager.getInstance().getFleet(id);
+        FleetParamsV3 params = new FleetParamsV3(
+                market,
+                null,
+                market.getFactionId(),
+                route == null ? null : route.getQualityOverride(),
+                null,
+                fleets.getFPTaken(), // combatPts
+                0f, // freighterPts
+                0f, // tankerPts
+                0f, // transportPts
+                0f, // linerPts
+                0f, // utilityPts
+                0f // qualityMod
+        );
+        params.random = route.getRandom();
+        CampaignFleetAPI fleet = PatrolFleetFactory.createFleetFromAssigned(fleets,params,market,params.random);
+        if (fleet == null || fleet.isEmpty()) return null;
+
+        if (!fleet.getFaction().getCustomBoolean(Factions.CUSTOM_PATROLS_HAVE_NO_PATROL_MEMORY_KEY)) {
+            fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_PATROL_FLEET, true);
+            if (fleets.getFPTaken()>=50) {
+                fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_CUSTOMS_INSPECTOR, true);
+            }
+        } else if (fleet.getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR)) {
+            fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_PIRATE, true);
+
+            // hidden pather and pirate bases
+            // make them raid so there's some consequence to just having a colony in a system with one of those
+            if (market != null && market.isHidden()) {
+                fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_RAIDER, true);
+            }
+        }
+
+        String postId = Ranks.POST_PATROL_COMMANDER;
+        String rankId = Ranks.SPACE_COMMANDER;
+        float fp = fleets.getFPTaken();
+        if(fp>=30){
+            rankId = Ranks.SPACE_LIEUTENANT;
+        }
+        if(fp>=50){
+            rankId = Ranks.SPACE_COMMANDER;
+
+        }
+        if(fp>=100){
+            rankId = Ranks.SPACE_CAPTAIN;
+        }
+        fleet.getCommander().setPostId(postId);
+        fleet.getCommander().setRankId(rankId);
+
+        return fleet;
+    }
+
+}

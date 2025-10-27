@@ -1,17 +1,15 @@
 package data.ui;
 
 import ashlib.data.plugins.misc.AshMisc;
+import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CustomUIPanelPlugin;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
-import data.misc.UIDataSop;
 import data.scripts.CoreUITrackerScript;
-import data.scripts.managers.AoTDFactionManager;
-import data.ui.factionpolicies.FactionPolicyPanel;
-import data.ui.overview.OverviewPanel;
-import data.ui.timeline.FactionTimelinePanel;
+import data.ui.patrolfleet.overview.OverviewPatrolPanel;
+import data.ui.patrolfleet.templates.TemplatePanel;
+import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -19,18 +17,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
+public class PatrolTabPanel implements ExtendedUIPanelPlugin, SoundUIManager {
     CustomPanelAPI mainPanel;
     CustomPanelAPI panelForPlugins = null;
     CustomPanelAPI buttonPanel = null;
     ButtonAPI currentlyChosen;
     SoundUIManager manager;
     UILinesRenderer renderer;
+    TemplatePanel panelForTemplates;
+    OverviewPatrolPanel patrolPanel;
     HashMap<ButtonAPI, CustomPanelAPI> panelMap = new HashMap<>();
     boolean pausedMusic = true;
-    FactionPolicyPanel policyPanel;
-    FactionTimelinePanel timelinePanel;
-    OverviewPanel overviewPanel;
     public static boolean sentSignalForUpdate = false;
     Object outpostPanel;
     public HashMap<ButtonAPI, CustomPanelAPI> getPanelMap() {
@@ -41,13 +38,22 @@ public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
         return mainPanel;
     }
 
+    @Override
+    public void createUI() {
+
+    }
+
+    @Override
+    public void clearUI() {
+
+    }
+
     public void init(CustomPanelAPI mainPanel, String panelToShowcase, Object data) {
         this.mainPanel = mainPanel;
         renderer = new UILinesRenderer(0f);
         this.panelForPlugins = mainPanel.createCustomPanel(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight() - 45, null);
-        AoTDFactionManager.getInstance().advance(0f);
         if (!AshMisc.isStringValid(panelToShowcase)) {
-            panelToShowcase = "timeline";
+            panelToShowcase = "templates";
         }
         this.outpostPanel = data;
         createButtonsAndMainPanels();
@@ -70,9 +76,7 @@ public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
     public void clearUI(boolean clearMusic) {
         ;
         panelMap.clear();
-        AoTDFactionManager.getInstance().applyChangesFromUI();
-        policyPanel.availablePoliciesListPanel.getPanels().clear();
-        policyPanel.currentPoliciesListPanel.getPanels().clear();
+
         mainPanel.removeComponent(panelForPlugins);
         if (clearMusic) {
             pauseSound();
@@ -98,8 +102,6 @@ public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
     public void advance(float amount) {
         if(sentSignalForUpdate){
             sentSignalForUpdate = false;
-            overviewPanel.createUI();
-            timelinePanel.reset();
         }
         for (Map.Entry<ButtonAPI, CustomPanelAPI> entry : panelMap.entrySet()) {
             entry.getKey().unhighlight();
@@ -107,7 +109,7 @@ public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
                 entry.getKey().setChecked(false);
                 if (!entry.getKey().equals(currentlyChosen)) {
                     resetCurrentPlugin(entry.getKey());
-                    CoreUITrackerScript.setMemFlagForFactionTab(entry.getKey().getText().toLowerCase());
+                    CoreUITrackerScript.setMemFlagForPatrolTab(entry.getKey().getText().toLowerCase());
                 }
 
 
@@ -153,53 +155,48 @@ public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
         ButtonAPI research, megastructures, customProd, sp;
         this.buttonPanel = this.mainPanel.createCustomPanel(mainPanel.getPosition().getWidth(), 25, null);
         UILinesRenderer renderer = new UILinesRenderer(0f);
-        CustomPanelAPI panelHelper = this.buttonPanel.createCustomPanel(490, 0.5f, renderer);
 //        renderer.setPanel(panelHelper);
         TooltipMakerAPI buttonTooltip = buttonPanel.createUIElement(mainPanel.getPosition().getWidth(), 20, false);
         Color base, bg;
         base = Global.getSector().getPlayerFaction().getBaseUIColor();
         bg = Global.getSector().getPlayerFaction().getDarkUIColor();
-        customProd = buttonTooltip.addButton("Policies", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
-        research = buttonTooltip.addButton("Timeline", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
+        customProd = buttonTooltip.addButton("Overview", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
+        research = buttonTooltip.addButton("Templates", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         ;
-        sp = buttonTooltip.addButton("Overview", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
+        sp = buttonTooltip.addButton("Armory", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         ;
+        sp.setEnabled(false);
         customProd.setShortcut(Keyboard.KEY_R, false);
         research.setShortcut(Keyboard.KEY_T, false);
-        sp.setShortcut(Keyboard.KEY_S, false);
+        sp.setShortcut(Keyboard.KEY_A, false);
         customProd.getPosition().inTL(0, 0);
         research.getPosition().inTL(141, 0);
         sp.getPosition().inTL(282, 0);
+        ShipPanelData.updateList();
+        ShipPanelData.populateShipInfo();
+        ShipPanelData.populateShipSizeInfo();
+        ShipPanelData.populateShipTypeInfo();
         buttonPanel.addUIElement(buttonTooltip).inTL(0, 0);
-        buttonPanel.addComponent(panelHelper).inTL(0, 20);
         mainPanel.addComponent(buttonPanel).inTL(0, 10);
-        insertPolicyPanel(customProd);
-        insertTimeLinePanel(research);
-        insertOverviewPanel(sp);
+        insertPatrolTemplatePanel(research);
+        insertOverviewPatrol(customProd);
     }
 
-    private void insertPolicyPanel(ButtonAPI tiedButton) {
-        if (policyPanel == null) {
-            policyPanel = new FactionPolicyPanel(panelForPlugins.getPosition().getWidth(), panelForPlugins.getPosition().getHeight());
+    private void insertPatrolTemplatePanel(ButtonAPI tiedButton) {
+        if (panelForTemplates == null) {
+            panelForTemplates = new TemplatePanel(panelForPlugins.getPosition().getWidth()-10, panelForPlugins.getPosition().getHeight());
         }
 
-        panelMap.put(tiedButton, policyPanel.getMainPanel());
+        panelMap.put(tiedButton, panelForTemplates.getMainPanel());
     }
-
-    private void insertTimeLinePanel(ButtonAPI tiedButton) {
-        if (timelinePanel == null) {
-            timelinePanel = new FactionTimelinePanel(panelForPlugins.getPosition().getWidth(), panelForPlugins.getPosition().getHeight());
+    private void insertOverviewPatrol(ButtonAPI tiedButton) {
+        if (patrolPanel == null) {
+            patrolPanel = new OverviewPatrolPanel(panelForPlugins.getPosition().getWidth()-10, panelForPlugins.getPosition().getHeight());
         }
 
-        panelMap.put(tiedButton, timelinePanel.getMainPanel());
+        panelMap.put(tiedButton, patrolPanel.getMainPanel());
     }
-    private void insertOverviewPanel(ButtonAPI tiedButton) {
-        if (overviewPanel == null) {
-            overviewPanel = new OverviewPanel(panelForPlugins.getPosition().getWidth(), panelForPlugins.getPosition().getHeight());
-        }
 
-        panelMap.put(tiedButton, overviewPanel.getMainPanel());
-    }
     public void playSound(ButtonAPI button) {
 
     }
