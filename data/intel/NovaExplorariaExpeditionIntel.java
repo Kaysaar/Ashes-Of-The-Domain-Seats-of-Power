@@ -63,6 +63,7 @@ public class NovaExplorariaExpeditionIntel extends BaseIntelPlugin {
         return Global.getSettings().getSpriteName("intel", "fleet_log");
     }
 
+    boolean canBeDeleted = false;
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
         Color h = Misc.getHighlightColor();
@@ -72,7 +73,6 @@ public class NovaExplorariaExpeditionIntel extends BaseIntelPlugin {
         float opad = 10f;
         if (!finished) {
             info.addPara("Currently fleet is conducting survey expedition, to unravel data about %s", pad, Color.ORANGE, target.getName());
-
         }
         else{
             if(successful){
@@ -103,11 +103,29 @@ public class NovaExplorariaExpeditionIntel extends BaseIntelPlugin {
             else{
                 info.addPara("Exploration fleet was destroyed during expedition, probably result of hostile actions of third parties",Misc.getTooltipTitleAndLightHighlightColor(),opad);
             }
+            canBeDeleted = true;
         }
-        if(finished){
+        if (canBeDeleted) {
             addDeleteButton(info,width-10);
+            info.addSpacer(5f);
         }
 
+    }
+
+    // 3 Methods regarding intel deletion upon button press
+    @Override
+    protected void notifyEnded() {
+        if (canBeDeleted) {
+            Global.getSector().getIntelManager().removeIntel(this);
+        }
+    }
+    @Override
+    protected void addDeleteButton(TooltipMakerAPI info, float width) {
+        addDeleteButton(info, width, "Delete Nova Exploraria log entry");
+    }
+    @Override
+    protected void createDeleteConfirmationPrompt(TooltipMakerAPI prompt) {
+        prompt.addPara("Are you sure you want to permanently delete this Nova Exploraria log entry?", Misc.getTextColor(), 0f);
     }
 
     public SectorEntityToken getMapLocation(SectorMapAPI map) {

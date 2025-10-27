@@ -67,12 +67,23 @@ public class AbyssDelversFleetIntel extends BaseIntelPlugin {
         return isEnded();
     }
 
+    boolean canBeDeleted = false;
     @Override
     protected void notifyEnded() {
         target = null;
         getCargo().clear();
         savedCargo = null;
-        Global.getSector().getIntelManager().removeIntel(this);
+        if (canBeDeleted) {
+            Global.getSector().getIntelManager().removeIntel(this);
+        }
+    }
+    @Override
+    protected void addDeleteButton(TooltipMakerAPI info, float width) {
+        addDeleteButton(info, width, "Delete Nova Exploraria log entry");
+    }
+    @Override
+    protected void createDeleteConfirmationPrompt(TooltipMakerAPI prompt) {
+        prompt.addPara("Are you sure you want to permanently delete this Nova Exploraria log entry?", Misc.getTextColor(), 0f);
     }
 
     @Override
@@ -90,13 +101,10 @@ public class AbyssDelversFleetIntel extends BaseIntelPlugin {
         if (!finished) {
             if(!enteredAbyss){
                 info.addPara("Currently fleet is on it's way, to dive into the Abyss, in hopes of finding valuable loot", pad, Color.ORANGE, target.getName());
-
             }
             else{
                 info.addPara("A signal from fleet has been received, about entering successfully the Abyss, currently there is no communication, aside fleet sending low frequency signal, as sort of proof they are still alive!", pad, Color.ORANGE, target.getName());
-
             }
-
         }
         else{
             if(successful){
@@ -117,8 +125,13 @@ public class AbyssDelversFleetIntel extends BaseIntelPlugin {
             else{
                 info.addPara("We have no data about Abyss Delvers, Nova Exploraria HQ was receiving traces of their signal until now. This fleet was deemed lost.",Misc.getTooltipTitleAndLightHighlightColor(),opad);
             }
+            canBeDeleted = true;
         }
 
+        if (canBeDeleted) {
+            addDeleteButton(info,width-10);
+            info.addSpacer(5f);
+        }
 
     }
 
