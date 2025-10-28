@@ -37,7 +37,14 @@ public class FleetOptions extends PopUpUI {
         change = tooltip.addButton("Edit fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
         relocate = tooltip.addButton("Relocate fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
         delete = tooltip.addButton("Delete fleet",null, pirates.getBaseUIColor(),pirates.getDarkUIColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
-
+        if(data.lastChecked.getData().isDecomisioned()){
+            change.setEnabled(false);
+            relocate.setEnabled(false);
+            delete.setEnabled(false);
+        }
+        if(Misc.getFactionMarkets(Factions.PLAYER).size()<=1){
+            relocate.setEnabled(false);
+        }
         tooltip.addSpacer(3f);
         mainPanel.getPosition().setSize(panelAPI.getPosition().getWidth(),tooltip.getHeightSoFar());
         mainPanel.addUIElement(tooltip).inTL(-3,0);

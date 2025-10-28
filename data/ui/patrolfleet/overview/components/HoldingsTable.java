@@ -43,7 +43,7 @@ public class HoldingsTable extends UITableImpl {
         float usableWidth = width-13;
         float section =usableWidth/3;
         buttonName = tooltipOfButtons.addAreaCheckbox("Name", SortingState.ASCENDING, base, bg, bright, section, 20, 0f);
-        buttonFPUsed = tooltipOfButtons.addAreaCheckbox("FP used", SortingState.NON_INITIALIZED, base, bg, bright, section, 20, 0f);
+        buttonFPUsed = tooltipOfButtons.addAreaCheckbox("FP allocated", SortingState.NON_INITIALIZED, base, bg, bright, section, 20, 0f);
         buttonFPGenerated = tooltipOfButtons.addAreaCheckbox("FP generated", SortingState.NON_INITIALIZED, base, bg, bright, section, 20, 0f);
         buttonName.getPosition().inTL(10, 0);
         buttonFPUsed.getPosition().inTL(section+1, 0);

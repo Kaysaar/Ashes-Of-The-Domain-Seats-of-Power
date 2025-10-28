@@ -8,14 +8,47 @@ import data.scripts.patrolfleet.utilis.FleetPointUtilis;
 import data.scripts.patrolfleet.utilis.TemplateUtilis;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 public class BasePatrolFleet extends BasePatrolFleetTemplate {
     MarketAPI tiedTo;
     String nameOfFleet;
     String id;
     boolean inTransit;
+
+    public boolean isInTransit() {
+        return inTransit;
+    }
+
+    public void setInTransit(boolean inTransit) {
+        this.inTransit = inTransit;
+    }
+
     float daysLeftForTransit;
+    LinkedHashMap<String,Integer>shipsForReplacementWhenInPrep = new LinkedHashMap<>();
+
+    public LinkedHashMap<String, Integer> getShipsForReplacementWhenInPrep() {
+        if(shipsForReplacementWhenInPrep==null)shipsForReplacementWhenInPrep = new LinkedHashMap<>();
+        return shipsForReplacementWhenInPrep;
+    }
+
+    public void performReplacement(){
+        if(!getShipsForReplacementWhenInPrep().isEmpty()){
+            assignedShipsThatShouldSpawn.clear();
+            assignedShipsThatShouldSpawn.putAll(getShipsForReplacementWhenInPrep());
+            getShipsForReplacementWhenInPrep().clear();
+        }
+    }
     boolean decomisioned;
+
+    public void setDecomisioned(boolean decomisioned) {
+        this.decomisioned = decomisioned;
+    }
+
+    public boolean isDecomisioned() {
+        return decomisioned;
+    }
+
     public BasePatrolFleet(BasePatrolFleetTemplate template) {
         super(new LinkedHashMap<>(template.assignedShipsThatShouldSpawn),template.nameOfTemplate);
         this.id = Misc.genUID();
@@ -27,6 +60,16 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
     }
     public int getFPTaken(){
         return (int) FleetPointUtilis.getFPOfAllShipsInFleet(assignedShipsThatShouldSpawn);
+    }
+    public int geTotalFpTaken(){
+        if(getFPTakenByReplacement()==0){
+            return getFPTaken();
+        }
+        int diff = getFPTaken()-getFPTakenByReplacement();
+        return getFPTaken()-diff;
+    }
+    public int getFPTakenByReplacement(){
+        return (int) FleetPointUtilis.getFPOfAllShipsInFleet(getShipsForReplacementWhenInPrep());
     }
     public void setFleetName(String nameOfFleet) {
         this.nameOfFleet = nameOfFleet;
@@ -40,7 +83,7 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
         }
         else{
             if(inTransit){
-                return "In Transit : "+ AshMisc.convertDaysToString((int) daysLeftForTransit);
+                return "In Transit to "+tiedTo.getName();
             }
             else{
                 if(AoTDMilitaryBase.isPatroling(id,tiedTo)){

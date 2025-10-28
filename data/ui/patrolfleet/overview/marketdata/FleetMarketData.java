@@ -8,13 +8,11 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.managers.FactionPatrolsManager;
-import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
-import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
-import data.ui.patrolfleet.overview.fleetview.AvailableTemplateList;
 import data.ui.patrolfleet.overview.fleetview.DeleteFleetDialog;
 import data.ui.patrolfleet.overview.fleetview.FleetButtonComponent;
 import data.ui.patrolfleet.overview.fleetview.FleetOptions;
+import data.ui.patrolfleet.overview.fleetview.fleetreloc.FleetRelocationDialog;
 import data.ui.patrolfleet.templates.shiplist.dialog.templatecretor.TemplateCreatorDialog;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -27,7 +25,7 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
     MarketAPI market;
     ButtonAPI add;
     ArrayList<FleetButtonComponent>components = new ArrayList<>();
-    FleetButtonComponent lastChecked;
+    public  FleetButtonComponent lastChecked;
     public boolean showEdit,showDelete,showReloc;
     public FleetMarketData(float width,float height) {
         mainPanel = Global.getSettings().createCustom(width,height,this);
@@ -53,9 +51,25 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
             buttonT.setButtonFontOrbitron20();
             add =buttonT.addButton("Add new fleet",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID, CutStyle.C2_MENU,300,30,0f);
             add.getPosition().inTL(componentPanel.getPosition().getWidth()-(add.getPosition().getWidth())-5,0);
+            ButtonAPI bt = tooltip.addAreaCheckbox("Name",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Misc.getBrightPlayerColor(),230,20,0f);
+            bt.getPosition().inTL(0,20);
+            bt.setClickable(false);
             componentPanel.addUIElement(buttonT).inTL(0,componentPanel.getPosition().getHeight()-30);
+            bt = tooltip.addAreaCheckbox("Fleet Composition",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Misc.getBrightPlayerColor(),mainPanel.getPosition().getWidth()-237-300,20,0f);
+            bt.getPosition().inTL(231,20);
+            bt.setClickable(false);
 
-            TooltipMakerAPI content = componentPanel.createUIElement(componentPanel.getPosition().getWidth(),componentPanel.getPosition().getHeight()-60,true);
+            bt = tooltip.addAreaCheckbox("Status",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Misc.getBrightPlayerColor(),200,20,0f);
+            componentPanel.addUIElement(buttonT).inTL(0,componentPanel.getPosition().getHeight()-30);
+            bt.setClickable(false);
+            bt.getPosition().inTL(mainPanel.getPosition().getWidth()-5-300,20);
+
+            bt = tooltip.addAreaCheckbox("FP",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Misc.getBrightPlayerColor(),99,20,0f);
+            componentPanel.addUIElement(buttonT).inTL(0,componentPanel.getPosition().getHeight()-30);
+            bt.setClickable(false);
+            bt.getPosition().inTL(mainPanel.getPosition().getWidth()-104,20);
+
+            TooltipMakerAPI content = componentPanel.createUIElement(componentPanel.getPosition().getWidth(),componentPanel.getPosition().getHeight()-75,true);
 
             content.addSpacer(0f).getPosition().inTL(0,0);
 //            int i =1;
@@ -75,7 +89,7 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
             }
 
 
-            componentPanel.addUIElement(content).inTL(0,25);
+            componentPanel.addUIElement(content).inTL(-5,40);
 
         }
 
@@ -125,7 +139,13 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
         }
         if(showDelete){
             showDelete = false;
-            AshMisc.initPopUpDialog(new DeleteFleetDialog(lastChecked.getData()),800,200);
+            AshMisc.initPopUpDialog(new DeleteFleetDialog(lastChecked.getData()),800,205);
+            lastChecked = null;
+
+        }
+        if(showReloc){
+            showReloc = false;
+            AshMisc.initPopUpDialog(new FleetRelocationDialog(lastChecked.getData()),700,400);
             lastChecked = null;
 
         }

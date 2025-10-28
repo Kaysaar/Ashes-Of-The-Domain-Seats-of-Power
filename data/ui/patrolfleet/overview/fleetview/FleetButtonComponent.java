@@ -38,6 +38,7 @@ public class FleetButtonComponent extends CustomButton {
         float y = 5;
         BasePatrolFleet data = getData();
         LabelAPI label =  tooltip.addPara(data.getNameOfFleet(),0f);
+        boolean replaceMode = false;
         float widthOfLabel = label.computeTextWidth(label.getText());
         float textHeight = label.computeTextHeight(label.getText());
         float scale = widthOfLabel/230;
@@ -56,6 +57,7 @@ public class FleetButtonComponent extends CustomButton {
             CustomPanelAPI custom = Global.getSettings().createCustom(available,maxHeight,null);
             TooltipMakerAPI customTooltip = custom.createUIElement(custom.getPosition().getWidth(),custom.getPosition().getHeight(),false);
             LinkedHashMap<String,Integer>ships =new LinkedHashMap<>(data.assignedShipsThatShouldSpawn);
+
             sortShipsByFPDescInPlace(ships);
             for (Map.Entry<String, Integer> e : ships.entrySet()) {
                 boolean reachedDest = false;
@@ -89,8 +91,19 @@ public class FleetButtonComponent extends CustomButton {
             float pointsFP = width-100;
             CustomPanelAPI custom = Global.getSettings().createCustom(available,maxHeight,null);
             TooltipMakerAPI customTooltip = custom.createUIElement(custom.getPosition().getWidth(),custom.getPosition().getHeight(),false);
-            LinkedHashMap<String,Integer>ships =new LinkedHashMap<>(data.assignedShipsThatShouldSpawn);
+            LinkedHashMap<String,Integer>ships =new LinkedHashMap<>();
+            if(!data.getShipsForReplacementWhenInPrep().isEmpty()){
+                replaceMode = true;
+                ships.putAll(data.getShipsForReplacementWhenInPrep());
+            }
+            else{
+                ships.putAll(data.assignedShipsThatShouldSpawn);
+            }
             sortShipsByFPDescInPlace(ships);
+            Color c = null;
+            if(replaceMode){
+                c = new Color(121, 120, 120);
+            }
             for (Map.Entry<String, Integer> e : ships.entrySet()) {
                 boolean reachedDest = false;
                 for (int i = 0; i < e.getValue(); i++) {
@@ -102,7 +115,8 @@ public class FleetButtonComponent extends CustomButton {
                         reachedDest =true;
                         break;
                     }
-                    CustomPanelAPI ship = ShipInfoGenerator.getShipImage(spec,boxSize,null).one;
+
+                    CustomPanelAPI ship = ShipInfoGenerator.getShipImage(spec,boxSize,c).one;
                     customTooltip.addCustom(ship,0f).getPosition().inTL(startX,(maxHeight-boxSize)/2);
                     startX+=boxSize+seperator;
                 }
@@ -119,7 +133,19 @@ public class FleetButtonComponent extends CustomButton {
             status.autoSizeToWidth(200);
             status.getPosition().inTL(statusPositionStart+100-(status.computeTextWidth(status.getText())/2),height/2-(status.computeTextHeight(status.getText())/2));
 
-            status = tooltip.addPara(""+data.getFPTaken(),Color.ORANGE,0f);
+            if(data.getShipsForReplacementWhenInPrep().isEmpty()){
+                status = tooltip.addPara(""+data.getFPTaken(),Color.ORANGE,0f);
+            }
+            else{
+                int fpDiff= data.getFPTakenByReplacement()-data.getFPTaken();
+                if(fpDiff>0){
+                    status = tooltip.addPara(""+data.getFPTaken()+"+"+fpDiff,Color.ORANGE,0f);
+                }
+                else if(fpDiff<0){
+                    status = tooltip.addPara(""+data.getFPTaken()+fpDiff,Color.ORANGE,0f);
+                }
+            }
+
             status.autoSizeToWidth(100);
             status.getPosition().inTL(pointsFP+50-(status.computeTextWidth(status.getText())/2),height/2-(status.computeTextHeight(status.getText())/2));
         }

@@ -48,6 +48,9 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
     public void addShip(String id){
         list.addNewShip(id);
     }
+    public void addShip(String id,int number){
+        list.addNewShip(id);
+    }
     public TemplateCreatorShowcase(float width, float height, BasePatrolFleetTemplate existingTemplate) {
         mainPanel = Global.getSettings().createCustom(width,height,this);
         this.existingTemplate = existingTemplate;
@@ -109,7 +112,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
             tooltip.addSectionHeading("Fleet data",Alignment.MID,0f);
             int available =  FactionPatrolsManager.getInstance().getAvailableFP();
             if(existingTemplate instanceof BasePatrolFleet fleet){
-                available+=fleet.getFPTaken();
+                available+=fleet.geTotalFpTaken();
             }
             tooltip.addPara("We currently can afford maximum of %s fleet points !",3f,Color.ORANGE,""+available);
         }

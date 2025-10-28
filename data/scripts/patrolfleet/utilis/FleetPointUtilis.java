@@ -45,7 +45,7 @@ public class FleetPointUtilis {
     public static float getFleetPointsConsumedByMarket(MarketAPI market){
         int am = 0;
         for (BasePatrolFleet fleet : FactionPatrolsManager.getInstance().getAssignedFleetsForMarket(market)) {
-            am+=fleet.getFPTaken();
+            am+=fleet.geTotalFpTaken();
         }
         return am;
     }

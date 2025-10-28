@@ -8,6 +8,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.CustomPanelAPI;
 import com.fs.starfarer.api.ui.PositionAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
 import data.scripts.patrolfleet.models.PatrolShipData;
 
@@ -37,6 +38,12 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
                 if (!datum.isShipPresent()) {
                     ships.remove(datum.shipId);
                 }
+            }
+        }
+        if(template instanceof BasePatrolFleet fleet){
+            if(!fleet.getShipsForReplacementWhenInPrep().isEmpty()){
+                ships.clear();
+                ships.putAll(fleet.getShipsForReplacementWhenInPrep());
             }
         }
         this.forProduction = forProduction;
@@ -71,7 +78,10 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
         ships.compute(id, (k, v) -> v == null ? 1 : v + 1);
         createUI();
     }
-
+    public void addNewShip(String id,int number) {
+        ships.compute(id, (k, v) -> v == null ? 1 : v +number);
+        createUI();
+    }
     public void removeShip(String id) {
         ships.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
         if (ships.get(id) != null && ships.get(id) <= 0) {

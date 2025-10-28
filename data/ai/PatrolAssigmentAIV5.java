@@ -9,6 +9,7 @@ import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.impl.campaign.fleets.PatrolAssignmentAIV4;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
+import com.fs.starfarer.api.impl.campaign.ids.Abilities;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.CountingMap;
@@ -27,6 +28,7 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
     }
     boolean initalizedRetreat = false;
     boolean retreatInitalized = false;
+
     public SectorEntityToken pickEntityToGuard() {
         Random random = route.getRandom(1);
 
@@ -152,20 +154,26 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
         super.advance(amount);
        AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
        BasePatrolFleet fleetData = FactionPatrolsManager.getInstance().getFleet(data.getId());
+       if(fleetData != null&& fleetData.isDecomisioned()&&!retreatInitalized) {
+           initRetreat();
+       }
+       if(fleetData!=null&&fleetData.isInTransit()&&!retreatInitalized){
+           initRetreat();
+       }
        if(fleetData!=null&&!retreatInitalized){
            if((float) fleet.getFleetPoints() /fleetData.getFPTaken()<=0.5f){
-               retreatInitalized = true;
-               fleet.clearAssignments();
-               fleet.addAssignment(FleetAssignment.GO_TO_LOCATION, route.getMarket().getPrimaryEntity(), 1000f, RETURN_STAGE);
-
-
-               // if there was no return stage, that means we spawned right in orbit, since
-               // here always justSpawned == true
-               fleet.addAssignment(FleetAssignment.ORBIT_PASSIVE, route.getMarket().getPrimaryEntity(),1f, STAND_DOWN_STAGE);
-               fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, route.getMarket().getPrimaryEntity(), 1000f,
-                       STAND_DOWN_STAGE, goNextScript(route.getCurrent()));
+               initRetreat();
            }
        }
 
+    }
+
+    private void initRetreat() {
+        retreatInitalized = true;
+        fleet.addAbility(Abilities.SUSTAINED_BURN);
+        fleet.getAbility(Abilities.SUSTAINED_BURN).activate();
+        fleet.clearAssignments();
+        fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, route.getMarket().getPrimaryEntity(), 1000f,
+                STAND_DOWN_STAGE, goNextScript(route.getCurrent()));
     }
 }

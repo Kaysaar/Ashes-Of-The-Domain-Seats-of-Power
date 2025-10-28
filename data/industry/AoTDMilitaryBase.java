@@ -1,16 +1,14 @@
 package data.industry;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignEventListener;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.listeners.FleetEventListener;
 import com.fs.starfarer.api.impl.campaign.DebugFlags;
 import com.fs.starfarer.api.impl.campaign.econ.impl.MilitaryBase;
 import com.fs.starfarer.api.impl.campaign.fleets.*;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
-import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
-import com.fs.starfarer.api.impl.campaign.ids.Ranks;
-import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.impl.campaign.ids.*;
+import com.fs.starfarer.api.util.DelayedActionScript;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import data.ai.PatrolAssigmentAIV5;
@@ -18,6 +16,7 @@ import data.scripts.patrolfleet.managers.FactionPatrolsManager;
 import data.scripts.patrolfleet.models.AoTDPatrolFleetData;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.utilis.PatrolFleetFactory;
+import org.lazywizard.lazylib.MathUtils;
 
 import java.util.Random;
 
@@ -25,7 +24,7 @@ public class AoTDMilitaryBase extends MilitaryBase {
 
     @Override
     public void advance(float amount) {
-        if(market.getFaction()==null||!market.getFaction().isPlayerFaction()){
+        if (market.getFaction() == null || !market.getFaction().isPlayerFaction()) {
             super.advance(amount);
             return;
         }
@@ -84,13 +83,13 @@ public class AoTDMilitaryBase extends MilitaryBase {
         tracker.advance(days * spawnRate + extraTime);
         boolean noPatrols = true;
         for (BasePatrolFleet fleet : FactionPatrolsManager.getInstance().getAssignedFleetsForMarket(market)) {
-            if(isPatroling(fleet.getId(),market)){
-                noPatrols =false;
+            if (isPatroling(fleet.getId(), market)) {
+                noPatrols = false;
                 break;
             }
         }
-        if(noPatrols){
-            tracker.advance(days*100);
+        if (noPatrols) {
+            tracker.advance(days * 100);
         }
 
         if (tracker.intervalElapsed()) {
@@ -103,12 +102,10 @@ public class AoTDMilitaryBase extends MilitaryBase {
             String sid = getRouteSourceId();
 
 
-
-
             WeightedRandomPicker<BasePatrolFleet> picker = new WeightedRandomPicker<BasePatrolFleet>();
 
             for (BasePatrolFleet fleet : FactionPatrolsManager.getInstance().getAssignedFleetsForMarket(market)) {
-                if(!isPatroling(fleet.getId(),market))picker.add(fleet,fleet.getFPTaken());
+                if (!isPatroling(fleet.getId(), market)) picker.add(fleet, fleet.getFPTaken());
             }
 
 
@@ -130,23 +127,81 @@ public class AoTDMilitaryBase extends MilitaryBase {
         }
 
     }
+
     public void reportFleetDespawnedToListener(CampaignFleetAPI fleet, CampaignEventListener.FleetDespawnReason reason, Object param) {
         RouteManager.RouteData route = RouteManager.getInstance().getRoute(getRouteSourceId(), fleet);
-        if(reason.equals(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION)){
-            AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
-            BasePatrolFleet fleetData = FactionPatrolsManager.getInstance().getFleet(data.getId());
-            returningPatrolValue+= (float) fleet.getFleetPoints() /fleetData.getFPTaken();
+
+        AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
+        BasePatrolFleet fleetData = FactionPatrolsManager.getInstance().getFleet(data.getId());
+        if (fleetData != null) {
+            if (fleetData.isDecomisioned()) {
+                FactionPatrolsManager.getInstance().removeFleet(fleetData.getId());
+                return;
+            }
+            fleetData.performReplacement();
+            if(fleetData.isInTransit()){
+              Global.getSector().addScript(new DelayedActionScript(MathUtils.getRandomNumberInRange(2,4)) {
+                  @Override
+                  public void doAction() {
+                      FleetParamsV3 params = new FleetParamsV3(
+                              market,
+                              null,
+                              market.getFactionId(),
+                              route.getQualityOverride(),
+                              null,
+                              fleetData.getFPTaken(), // combatPts
+                              0f, // freighterPts
+                              0f, // tankerPts
+                              0f, // transportPts
+                              0f, // linerPts
+                              0f, // utilityPts
+                              0f // qualityMod
+                      );
+                      CampaignFleetAPI fleetToSpawn = PatrolFleetFactory.createFleetFromAssigned(fleetData, params, market, params.random);
+                      market.getContainingLocation().addEntity(fleetToSpawn);
+                      fleetToSpawn.setFacing((float) Math.random() * 360f);
+                      // this will get overridden by the patrol assignment AI, depending on route-time elapsed etc
+                      fleetToSpawn.setLocation(market.getPrimaryEntity().getLocation().x, market.getPrimaryEntity().getLocation().y);
+                      fleetToSpawn.addEventListener(new FleetEventListener() {
+                          @Override
+                          public void reportFleetDespawnedToListener(CampaignFleetAPI fleet, CampaignEventListener.FleetDespawnReason reason, Object param) {
+                              fleetData.setInTransit(false);
+                          }
+
+                          @Override
+                          public void reportBattleOccurred(CampaignFleetAPI fleet, CampaignFleetAPI primaryWinner, BattleAPI battle) {
+
+                          }
+                      });
+                      fleetToSpawn.setTransponderOn(true);
+                      fleetToSpawn.addAbility(Abilities.SUSTAINED_BURN);
+                      fleetToSpawn.getAbility(Abilities.SUSTAINED_BURN).activate();
+                      fleetToSpawn.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
+                      fleetToSpawn.addAssignment(FleetAssignment.ORBIT_PASSIVE,market.getPrimaryEntity(),3f,"Preparing for re-location");
+                      fleetToSpawn.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN,fleetData.getTiedTo().getPrimaryEntity(),10000f,"Relocating to new market");
+                  }
+              });
+              return;
+            }
+
+            if (reason.equals(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION)) {
+                returningPatrolValue += (float) fleet.getFleetPoints() / fleetData.getFPTaken();
+            }
+
         }
 
+
     }
+
     public static String getRouteSourceId(MarketAPI market) {
         return market.getId() + "_" + "military";
     }
+
     public static boolean isPatroling(String id, MarketAPI market) {
         int count = 0;
         for (RouteManager.RouteData data : RouteManager.getInstance().getRoutesForSource(getRouteSourceId(market))) {
             if (data.getCustom() instanceof AoTDPatrolFleetData daten) {
-                if(daten.getId().equals(id))return true;
+                if (daten.getId().equals(id)) return true;
             }
         }
         return false;
@@ -154,9 +209,9 @@ public class AoTDMilitaryBase extends MilitaryBase {
 
     @Override
     public CampaignFleetAPI spawnFleet(RouteManager.RouteData route) {
-        if(market.getFaction()!=null&&!market.getFaction().isPlayerFaction())return super.spawnFleet(route);
+        if (market.getFaction() != null && !market.getFaction().isPlayerFaction()) return super.spawnFleet(route);
         AoTDPatrolFleetData custom = (AoTDPatrolFleetData) route.getCustom();
-        CampaignFleetAPI fleet = createPatrol(custom.getId(),route);
+        CampaignFleetAPI fleet = createPatrol(custom.getId(), route);
         if (fleet == null || fleet.isEmpty()) return null;
 
         fleet.addEventListener(this);
@@ -175,8 +230,10 @@ public class AoTDMilitaryBase extends MilitaryBase {
         return fleet;
 
     }
-    public CampaignFleetAPI createPatrol(String id,RouteManager.RouteData route) {
+
+    public CampaignFleetAPI createPatrol(String id, RouteManager.RouteData route) {
         BasePatrolFleet fleets = FactionPatrolsManager.getInstance().getFleet(id);
+
         FleetParamsV3 params = new FleetParamsV3(
                 market,
                 null,
@@ -192,12 +249,12 @@ public class AoTDMilitaryBase extends MilitaryBase {
                 0f // qualityMod
         );
         params.random = route.getRandom();
-        CampaignFleetAPI fleet = PatrolFleetFactory.createFleetFromAssigned(fleets,params,market,params.random);
+        CampaignFleetAPI fleet = PatrolFleetFactory.createFleetFromAssigned(fleets, params, market, params.random);
         if (fleet == null || fleet.isEmpty()) return null;
 
         if (!fleet.getFaction().getCustomBoolean(Factions.CUSTOM_PATROLS_HAVE_NO_PATROL_MEMORY_KEY)) {
             fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_PATROL_FLEET, true);
-            if (fleets.getFPTaken()>=50) {
+            if (fleets.getFPTaken() >= 50) {
                 fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_CUSTOMS_INSPECTOR, true);
             }
         } else if (fleet.getFaction().getCustomBoolean(Factions.CUSTOM_PIRATE_BEHAVIOR)) {
@@ -213,14 +270,14 @@ public class AoTDMilitaryBase extends MilitaryBase {
         String postId = Ranks.POST_PATROL_COMMANDER;
         String rankId = Ranks.SPACE_COMMANDER;
         float fp = fleets.getFPTaken();
-        if(fp>=30){
+        if (fp >= 30) {
             rankId = Ranks.SPACE_LIEUTENANT;
         }
-        if(fp>=50){
+        if (fp >= 50) {
             rankId = Ranks.SPACE_COMMANDER;
 
         }
-        if(fp>=100){
+        if (fp >= 100) {
             rankId = Ranks.SPACE_CAPTAIN;
         }
         fleet.getCommander().setPostId(postId);

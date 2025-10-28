@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
+import data.industry.AoTDMilitaryBase;
 import data.scripts.patrolfleet.managers.FactionPatrolsManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
@@ -109,7 +110,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                 additionalConfirm = showcase.list.getFleetPoints(false)<= FactionPatrolsManager.getInstance().getAvailableFP();
             }
             if(fleet!=null){
-                additionalConfirm = showcase.list.getFleetPoints(false)<= FactionPatrolsManager.getInstance().getAvailableFP()+fleet.getFPTaken();
+                additionalConfirm = showcase.list.getFleetPoints(false)<= FactionPatrolsManager.getInstance().getAvailableFP()+fleet.geTotalFpTaken();
             }
             if(confirmButton.isEnabled()!=(canConfirm&&additionalConfirm)){
                 confirmButton.setEnabled(canConfirm&&additionalConfirm);
@@ -161,15 +162,15 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
         TooltipMakerAPI tooltip = contentOfButtonPanel.createUIElement(buttonPanel.getPosition().getWidth(), 25.0F, false);
         tooltip.setButtonFontOrbitron20();
         if (!randomMode) {
-            toggleMode = tooltip.addButton("Toggle Random-Mode", "random", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, buttonConfirmWidth * 2, 25.0F, 0.0F);
+            toggleMode = tooltip.addButton("Toggle Random-Mode", "random", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, buttonConfirmWidth * 1.5F, 25.0F, 0.0F);
 
         } else {
-            toggleMode = tooltip.addButton("Toggle Normal-Mode", "normal", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, buttonConfirmWidth * 2, 25.0F, 0.0F);
+            toggleMode = tooltip.addButton("Toggle Normal-Mode", "normal", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, buttonConfirmWidth * 1.5F, 25.0F, 0.0F);
 
         }
         if(patrolFleetCreatorMode){
             templateList =tooltip.addButton("Pick available template", "normal", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.BL_TR, buttonConfirmWidth * 1.8f, 25.0F, 0.0F);
-            templateList.getPosition().inTL(buttonConfirmWidth*2+10,0);
+            templateList.getPosition().inTL(buttonConfirmWidth*1.5F+10,0);
         }
         contentOfButtonPanel.addUIElement(tooltip).inTL(0, 0);
         buttonPanel.addComponent(contentOfButtonPanel).inTL(0, 0);
@@ -187,13 +188,20 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                 OverviewPatrolPanel.forceRequestUpdate = true;
             }
             else{
-                fleet.assignedShipsThatShouldSpawn.clear();
-                fleet.data.clear();
-                BasePatrolFleet fleet = new BasePatrolFleet(showcase.list.getShips(),showcase.textForName.getText());
-                this.fleet.assignedShipsThatShouldSpawn.putAll(fleet.assignedShipsThatShouldSpawn);
-                this.fleet.data.putAll(fleet.data);
-                fleet.setFleetName(showcase.textForName.getText());
-                OverviewPatrolPanel.forceRequestUpdate = true;
+                if(AoTDMilitaryBase.isPatroling(fleet.getId(),fleet.getTiedTo())){
+                    fleet.getShipsForReplacementWhenInPrep().putAll(showcase.list.getShips());
+                    OverviewPatrolPanel.forceRequestUpdate = true;
+                }
+                else{
+                    fleet.assignedShipsThatShouldSpawn.clear();
+                    fleet.data.clear();
+                    BasePatrolFleet fleet = new BasePatrolFleet(showcase.list.getShips(),showcase.textForName.getText());
+                    this.fleet.assignedShipsThatShouldSpawn.putAll(fleet.assignedShipsThatShouldSpawn);
+                    this.fleet.data.putAll(fleet.data);
+                    fleet.setFleetName(showcase.textForName.getText());
+                    OverviewPatrolPanel.forceRequestUpdate = true;
+                }
+
             }
 
 

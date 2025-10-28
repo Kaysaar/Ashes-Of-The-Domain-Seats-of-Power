@@ -34,7 +34,7 @@ public class FactionPatrolsManager {
     public int getFPUsed() {
         int curr = 0;
         for (BasePatrolFleet basePatrolFleet : fleetsCurrentlyInField.values()) {
-            curr += basePatrolFleet.getFPTaken();
+            curr += basePatrolFleet.geTotalFpTaken();
         }
         return curr;
     }
@@ -42,7 +42,7 @@ public class FactionPatrolsManager {
     public int getFPUsedByMarket(MarketAPI market) {
         int curr = 0;
         for (BasePatrolFleet fleet : getAssignedFleetsForMarket(market)) {
-            curr += fleet.getFPTaken();
+            curr += fleet.geTotalFpTaken();
         }
         return curr;
     }
@@ -67,7 +67,11 @@ public class FactionPatrolsManager {
     }
 
     public void removeFleet(String id) {
+        BasePatrolFleet fleet = fleetsCurrentlyInField.get(id);
         fleetsCurrentlyInField.remove(id);
+        fleet.setTiedTo(null);
+        fleet.assignedShipsThatShouldSpawn.clear();
+        fleet.data.clear();
     }
     public BasePatrolFleet getFleet(String id){
         return fleetsCurrentlyInField.get(id);
