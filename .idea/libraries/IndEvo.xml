@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="IndEvo">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Industrial.Evolution4.1.b/jars/IndEvo.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -4,7 +4,7 @@ import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
-import data.scripts.patrolfleet.managers.FactionPatrolsManager;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
 import data.scripts.patrolfleet.utilis.TemplateUtilis;
@@ -96,6 +96,9 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         if(existingTemplate!=null){
             textForName.setText(existingTemplate.getNameOfTemplate());
         }
+        if(existingTemplate instanceof BasePatrolFleet fleet){
+            textForName.setText(fleet.getNameOfFleet());
+        }
         headerPanel.addUIElement(tooltip).inTL(0,0);
         componentPanel.addComponent(headerPanel).inTL(0,0);
 
@@ -110,7 +113,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
 
         if(patrolFleetCreatorMode){
             tooltip.addSectionHeading("Fleet data",Alignment.MID,0f);
-            int available =  FactionPatrolsManager.getInstance().getAvailableFP();
+            int available =  AoTDFactionPatrolsManager.getInstance().getAvailableFP();
             if(existingTemplate instanceof BasePatrolFleet fleet){
                 available+=fleet.geTotalFpTaken();
             }

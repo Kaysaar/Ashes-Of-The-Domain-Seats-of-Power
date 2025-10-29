@@ -44,7 +44,9 @@ public class PatrolFleetFactory {
             return null;
         }
         if (rng == null) rng = new Random();
-
+        if(template instanceof BasePatrolFleet fleet){
+            fleet.performReplacement();
+        }
         // Ensure params.source is set (vanilla inflaters/officer logic often rely on it)
         if (params.source == null) {
             params.source = source;

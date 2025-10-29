@@ -9,12 +9,10 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
-import data.kaysaar.aotd.vok.ui.basecomps.ImageViewer;
-import data.scripts.patrolfleet.managers.FactionPatrolsManager;
-import data.scripts.patrolfleet.utilis.FleetPointUtilis;
+import data.industry.AoTDMilitaryBase;
+import data.plugins.AoTDSopMisc;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
-import data.ui.patrolfleet.overview.components.EntityRenderer;
-import data.ui.patrolfleet.overview.components.EntityWithNameComponent;
 import data.ui.patrolfleet.overview.components.HoldingsTable;
 
 import java.awt.*;
@@ -51,13 +49,47 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         tooltip.addSectionHeading("Military Capabilities", Alignment.MID,0f);
         float width = componentPanel.getPosition().getWidth();
         Color[]colors = new Color[2];
-        colors[0] = Misc.getTextColor();
+        colors[0] = Misc.getPositiveHighlightColor();
         colors[1] = Color.ORANGE;
-        int total = FactionPatrolsManager.getInstance().getTotalFpGenerated();
-        int available = FactionPatrolsManager.getInstance().getAvailableFP();
-        ProgressBarComponent component = new ProgressBarComponent(width-15,25, (float) available /total, Misc.getDarkPlayerColor().brighter().brighter());
+        int total = AoTDFactionPatrolsManager.getInstance().getTotalFpGenerated();
+        int available = AoTDFactionPatrolsManager.getInstance().getAvailableFP();
+        int taken = AoTDFactionPatrolsManager.getInstance().getFPUsed(true);
+        if(taken>total){
+            colors[1]=Misc.getNegativeHighlightColor();
+        }
+        ProgressBarComponent component = new ProgressBarComponent(width-15,25,  Math.min(1f, (float) total /taken) ,Misc.getDarkPlayerColor().brighter().brighter());
         tooltip.addCustom(component.getRenderingPanel(),0f).getPosition().inTL(7,25);
-        LabelAPI labelAPI1 =   tooltip.addPara("Fleet points : %s / %s",5f,colors,""+available,""+total);
+        tooltip.addTooltipToPrevious(new TooltipMakerAPI.TooltipCreator() {
+            @Override
+            public boolean isTooltipExpandable(Object tooltipParam) {
+                return false;
+            }
+
+            @Override
+            public float getTooltipWidth(Object tooltipParam) {
+                return 400f;
+            }
+
+            @Override
+            public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                tooltip.addPara("Fleet points represent military capability of faction, to deploy fleets across your holdings.",3f);
+                tooltip.addPara("%s provide certain amount of FP points based on market size and fleet size multiplier",5f,Color.ORANGE, AoTDSopMisc.getAllIndustriesJoined(AoTDMilitaryBase.industriesValidForBase.stream().toList(),"and"));
+                int total = AoTDFactionPatrolsManager.getInstance().getTotalFpGenerated();
+                int taken = AoTDFactionPatrolsManager.getInstance().getFPUsed(true);
+                tooltip.addPara("Your faction generates %s FP points.",5f,Misc.getPositiveHighlightColor(),""+total);
+                if(taken>total){
+                    tooltip.addPara("Your faction consumes %s FP points.",3f,Misc.getNegativeHighlightColor(),""+taken);
+
+                }
+                else{
+                    tooltip.addPara("Your faction consumes %s FP points.",3f,Color.ORANGE,""+taken);
+
+                }
+                tooltip.addPara("If required FP will exceed FP generated, then some of patrols will become grounded and unable to perform patrol duties!",Misc.getNegativeHighlightColor(),10f);
+                tooltip.addPara("Note : Any other structure that spawn additional fleets can affect FP, based on spawned fleets and can't be controlled like fleets created by our faction directly!",Misc.getTooltipTitleAndLightHighlightColor(),10f);
+            }
+        }, TooltipMakerAPI.TooltipLocation.BELOW,false);
+        LabelAPI labelAPI1 =   tooltip.addPara("Fleet points : %s / %s",5f,colors,""+total,""+taken);
         labelAPI1.getPosition().inTL(width/2-(labelAPI1.computeTextWidth(labelAPI1.getText())/2),30);
         tooltip.addSpacer(0f).getPosition().inTL(5,50);
         tooltip.addPara("Admiralty level : %s",5f,Color.ORANGE,"1").setAlignment(Alignment.MID);

@@ -2,11 +2,13 @@ package data.ui.patrolfleet.overview;
 
 import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
+import com.fs.starfarer.api.DataAPI;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.CustomPanelAPI;
 import com.fs.starfarer.api.ui.PositionAPI;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.ui.patrolfleet.overview.marketdata.FleetMarketData;
 import data.ui.patrolfleet.overview.stats.OverviewStatPanel;
 import data.ui.patrolfleet.templates.TemplateShowcaseList;
@@ -41,9 +43,15 @@ public class OverviewPatrolPanel  implements ExtendedUIPanelPlugin {
         if(componentPanel!=null){
             mainPanel.removeComponent(componentPanel);
         }
+        AoTDFactionPatrolsManager.getInstance().advanceAfterFleets(0f);
         componentPanel = Global.getSettings().createCustom(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight(), null);
+        if(stats!=null){
+            stats.clearUI();
+        }
         stats = new OverviewStatPanel(OverviewStatPanelWidth,mainPanel.getPosition().getHeight());
-        if(data!=null){}
+        if(data!=null){
+            data.clearUI();
+        }
         data = new FleetMarketData(mainPanel.getPosition().getWidth()-OverviewStatPanelWidth-5,mainPanel.getPosition().getHeight());
         data.createUI();
         componentPanel.addComponent(stats.getMainPanel()).inTL(0,0);
@@ -87,8 +95,10 @@ public class OverviewPatrolPanel  implements ExtendedUIPanelPlugin {
         }
         if(forceRequestUpdate){
             forceRequestUpdate = false;
+            AoTDFactionPatrolsManager.getInstance().advanceAfterFleets(0f);
             data.createUI();
             stats.createUI();
+
 
         }
 

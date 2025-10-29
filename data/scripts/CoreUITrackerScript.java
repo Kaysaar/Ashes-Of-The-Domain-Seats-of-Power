@@ -12,6 +12,7 @@ import data.misc.ReflectionUtilis;
 import data.misc.UIDataSop;
 import data.scripts.managers.AoTDFactionManager;
 import data.ui.FactionPanel;
+import data.ui.PatrolTabPanel;
 import de.unkrig.commons.nullanalysis.NotNull;
 import org.lwjgl.input.Keyboard;
 
@@ -30,7 +31,7 @@ public class CoreUITrackerScript implements EveryFrameScript {
     public boolean isDone() {
         return false;
     }
-
+    PatrolTabPanel patrolPanel;
     HashMap<ButtonAPI, Object> panelMap = null;
     ButtonAPI currentTab = null;
     String nameOfCurrentTab;
@@ -52,6 +53,16 @@ public class CoreUITrackerScript implements EveryFrameScript {
         String s = null;
         try {
             s = Global.getSector().getMemory().getString(memFlag2);
+
+        } catch (Exception e) {
+
+        }
+        return s;
+    }
+    public static String getMemFlagForPatrolTab(){
+        String s = null;
+        try {
+            s = Global.getSector().getMemory().getString(memFlag3);
 
         } catch (Exception e) {
 
@@ -84,6 +95,11 @@ public class CoreUITrackerScript implements EveryFrameScript {
             if(coreUiTech!=null){
                 coreUiTech.clearUI(tunedMusicOnce);
                 coreUiTech = null;
+
+            }
+            if(patrolPanel!=null){
+                patrolPanel.clearUI(tunedMusicOnce);
+                patrolPanel = null;
 
             }
             tunedMusicOnce = false;
@@ -127,6 +143,26 @@ public class CoreUITrackerScript implements EveryFrameScript {
             mainParent.removeComponent(toRemove2);
             tryToGetButtonProd("income").getPosition().rightOfMid(tryToGetButtonProd("faction"),1f);
             tryToGetButtonProd("faction").setEnabled(!AoTDFactionManager.getMarketsUnderPlayer().isEmpty());
+            mainParent.removeComponent(tryToGetButtonProd("doctrine & blueprints"));
+            insertButton(button, mainParent, "Military", new TooltipMakerAPI.TooltipCreator() {
+                @Override
+                public boolean isTooltipExpandable(Object tooltipParam) {
+                    return false;
+                }
+
+                @Override
+                public float getTooltipWidth(Object tooltipParam) {
+                    return 500f;
+                }
+
+                @Override
+                public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                    tooltip.addSectionHeading("Ashes of the Domain : Seats of Power", Alignment.MID,0f);
+                    tooltip.addPara("In this tabs you will be able to design patrol fleets and control your forces, to guard your assets.",5f);
+                }
+            }, tryToGetButtonProd("colonies"), 150, Keyboard.KEY_4, false);
+            tryToGetButtonProd("custom production").getPosition().rightOfMid(tryToGetButtonProd("military"),1f);
+
         }
 
         if (shouldHandleReset()) {
@@ -166,7 +202,7 @@ public class CoreUITrackerScript implements EveryFrameScript {
             }
             removePanels((ArrayList<UIComponentAPI>) ReflectionUtilis.getChildrenCopy(mainParent), mainParent, null);
             insertNewPanel(tryToGetButtonProd(getStringForCoreTabFaction()));
-
+            insertNewPatrolTab(tryToGetButtonProd(getStringForPatrolFleet()));
 
 
         }
@@ -212,6 +248,9 @@ public class CoreUITrackerScript implements EveryFrameScript {
 
     public static @NotNull String getStringForCoreTabFaction() {
         return "faction";
+    }
+    public static @NotNull String getStringForPatrolFleet() {
+        return "military";
     }
     private static void removePanels(ArrayList<UIComponentAPI> componentAPIS, UIPanelAPI mainParent, UIComponentAPI panelToIgnore) {
         for (UIComponentAPI componentAPI : componentAPIS) {
@@ -305,5 +344,15 @@ public class CoreUITrackerScript implements EveryFrameScript {
         }
 
         panelMap.put(tiedButton, coreUiTech.getMainPanel());
+    }
+    private void insertNewPatrolTab(ButtonAPI tiedButton) {
+        if (patrolPanel == null) {
+            patrolPanel = new PatrolTabPanel();
+            float width = UIDataSop.WIDTH;
+            float height = UIDataSop.HEIGHT;
+            patrolPanel.init(Global.getSettings().createCustom(width, height, patrolPanel), getMemFlagForPatrolTab(), panelMap.get(tryToGetButtonProd("colonies")));
+        }
+
+        panelMap.put(tiedButton, patrolPanel.getMainPanel());
     }
 }

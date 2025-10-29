@@ -1,17 +1,24 @@
 package data.ui.patrolfleet.overview.fleetview;
 
+import ashlib.data.plugins.info.ShipInfoGenerator;
+import ashlib.data.plugins.misc.AshMisc;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.CustomPanelAPI;
+import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
+import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static data.ui.patrolfleet.overview.fleetview.FleetButtonComponent.buttonScale;
 
 public class FleetOnHoverTooltip implements TooltipMakerAPI.TooltipCreator {
     BasePatrolFleet fleet;
@@ -31,21 +38,69 @@ public class FleetOnHoverTooltip implements TooltipMakerAPI.TooltipCreator {
 
     @Override
     public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
-        tooltip.addTitle(fleet.getNameOfFleet()).setAlignment(Alignment.MID);
-        tooltip.addSectionHeading("Currently assigned ships to fleet",Alignment.MID,5f);
-        LinkedHashMap<String,Integer>ships =new LinkedHashMap<>();
-        ships.putAll(fleet.assignedShipsThatShouldSpawn);
+        tooltip.setTitleOrbitronVeryLarge();
+        tooltip.addTitle("Fleet - "+fleet.getNameOfFleet()).setAlignment(Alignment.MID);
+        tooltip.addSectionHeading("Current composition of fleet",Alignment.MID,5f);
+
+        CustomPanelAPI mainRow =null;
+        if(!fleet.isStartedProcessOfDecom()){
+            mainRow= getRowPanel(getTooltipWidth(tooltipParam),new LinkedHashMap<>(fleet.assignedShipsThatShouldSpawn));
+        }
+        else{
+            mainRow= getRowPanel(getTooltipWidth(tooltipParam),new LinkedHashMap<>(fleet.getShipsInDecomFleet()));
+
+        }
+        tooltip.addCustom(mainRow,5f);
+        if(!fleet.getShipsForReplacementWhenInPrep().isEmpty()){
+            tooltip.addSectionHeading("Scheduled composition of fleet for next patrol",Alignment.MID,5f);
+            mainRow = getRowPanel(getTooltipWidth(tooltipParam),new LinkedHashMap<>(fleet.getShipsForReplacementWhenInPrep()));
+            tooltip.addCustom(mainRow,5f);
+        }
+        tooltip.addPara("Fp used by fleet %s",5f,Color.ORANGE,""+fleet.getFPTaken());
+        if(!fleet.getShipsForReplacementWhenInPrep().isEmpty()){
+            tooltip.addPara("Fp used by fleet after change of composition %s",5f,Color.ORANGE,""+fleet.geTotalFpTaken());
+        }
+        tooltip.addPara("Current status : %s",5f,Color.ORANGE,fleet.getCurrentStatus());
+        if(fleet.isStartedProcessOfDecom()){
+            tooltip.addPara("Days left till de-commission - %s",3f,Color.ORANGE, AshMisc.convertDaysToString(Math.round(fleet.getDaysTillSomething())));
+        }
+
+
+    }
+
+    @NotNull
+    public CustomPanelAPI getRowPanel(float width,LinkedHashMap<String,Integer>ships) {
         float startX =5;
-        float width =getTooltipWidth(tooltipParam);
         float maxHeight = 55;
+        float seperator = -7f;
+        float currY = 0;
+        CustomPanelAPI mainRow = Global.getSettings().createCustom(width,700,null);
         CustomPanelAPI row = Global.getSettings().createCustom(width,maxHeight,null);
         for (Map.Entry<String, Integer> entry : ships.entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-
+                ShipHullSpecAPI spec = Global.getSettings().getHullSpec(entry.getKey());
+                int boxSize = (int) Math.floor(maxHeight*buttonScale.get(spec.getHullSize()));
+                if(startX+boxSize>=width){
+                    mainRow.addComponent(row).inTL(Math.max(0,(width-startX)/2),currY);
+                    startX = 5;
+                    currY+=maxHeight+5;
+                    row = null;
+                }
+                if(row==null){
+                    row = Global.getSettings().createCustom(width,maxHeight,null);
+                }
+                CustomPanelAPI ship = ShipInfoGenerator.getShipImage(spec,boxSize,null).one;
+                row.addComponent(ship).inTL(startX,(maxHeight-boxSize)/2);
+                startX+=boxSize+seperator;
             }
         }
-
+        if(row!=null){
+            mainRow.addComponent(row).inTL(Math.max(0,(width-startX)/2),currY);
+        }
+        mainRow.getPosition().setSize(width,currY+maxHeight);
+        return mainRow;
     }
+
     public void sortShipsByFPDescInPlace(LinkedHashMap<String,Integer> ships) {
         if (ships == null || ships.isEmpty()) return;
 

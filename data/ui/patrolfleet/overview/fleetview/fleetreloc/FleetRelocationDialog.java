@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
+import data.plugins.AoTDSopMisc;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
 import data.ui.patrolfleet.overview.components.HoldingsButton;
@@ -51,6 +52,7 @@ public class FleetRelocationDialog extends BasePopUpDialog {
         panelInfo = Global.getSettings().createCustom(width-10,100,null);
         tooltip.addCustom(panelInfo,5f);
         tooltip.setHeightSoFar(0f);
+        updateInfo();
     }
     public void updateInfo(){
         if(panelInfoContent!=null){
@@ -59,8 +61,15 @@ public class FleetRelocationDialog extends BasePopUpDialog {
         panelInfoContent = Global.getSettings().createCustom(panelInfo.getPosition().getWidth(),panelInfo.getPosition().getHeight(),null);
         TooltipMakerAPI tooltip = panelInfoContent.createUIElement(panelInfoContent.getPosition().getWidth(),panelInfo.getPosition().getHeight(),false);
         tooltip.setParaFont(Fonts.ORBITRON_20AABOLD);
-        MarketAPI market = (MarketAPI) currChosen.buttonData;
-        tooltip.addPara("Re-location of this fleet to %s will take around %s",3f,Color.ORANGE,market.getName(), AshMisc.convertDaysToString(Math.round(RouteLocationCalculator.getTravelDays(fleet.getTiedTo().getPrimaryEntity(),market.getPrimaryEntity())))).setAlignment(Alignment.MID);
+
+        if(!FleetRelocMarketList.doesPlayerFactionMeetCriteriaForInterstellarReloc()){
+            tooltip.addPara("For relocation between star systems %s must be under control of faction",3f,Color.ORANGE, AoTDSopMisc.getAllIndustriesJoined(FleetRelocMarketList.industriesAllowingInterstellarTransition.stream().toList(),"or")).setAlignment(Alignment.MID);
+        }
+        if(currChosen!=null){
+            MarketAPI market = (MarketAPI) currChosen.buttonData;
+            tooltip.addPara("Re-location of this fleet to %s will take around %s",3f,Color.ORANGE,market.getName(), AshMisc.convertDaysToString(Math.round(RouteLocationCalculator.getTravelDays(fleet.getTiedTo().getPrimaryEntity(),market.getPrimaryEntity())))).setAlignment(Alignment.MID);
+        }
+
         panelInfoContent.addUIElement(tooltip).inTL(0,0);
         panelInfo.addComponent(panelInfoContent);
     }
@@ -92,8 +101,11 @@ public class FleetRelocationDialog extends BasePopUpDialog {
 
     @Override
     public void applyConfirmScript() {
-        fleet.setInTransit(true);
-        fleet.setTiedTo((MarketAPI) currChosen.buttonData);
+        MarketAPI curr = (MarketAPI) currChosen.buttonData;
+        float days = RouteLocationCalculator.getTravelDays(curr.getPrimaryEntity(),fleet.getTiedTo().getPrimaryEntity());
+        fleet.setInTransit(true,days);
+
+        fleet.setTiedTo(curr);
         OverviewPatrolPanel.forceRequestUpdate = true;
     }
 

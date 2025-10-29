@@ -28,7 +28,6 @@ public class HoldingsTable extends UITableImpl {
             ArrayList<StarSystemAPI>systems = HoldingsUtilis.getSystemsWithPlayerFactionColonies();
             for (StarSystemAPI system : systems) {
                 HoldingsDropDownButton button = new HoldingsDropDownButton(this,width+9,60,0,0,false,system,HoldingsUtilis.getFactionMarketsInSystem(Global.getSector().getPlayerFaction(),system));
-                button.isDropped = true;
                 dropDownButtons.add(button);
             }
 

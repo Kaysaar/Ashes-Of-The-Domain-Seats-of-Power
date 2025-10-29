@@ -3,11 +3,14 @@ package data.ui.patrolfleet.overview.marketdata;
 import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
-import data.scripts.patrolfleet.managers.FactionPatrolsManager;
+import data.industry.AoTDMilitaryBase;
+import data.plugins.AoTDSopMisc;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.ui.patrolfleet.overview.fleetview.DeleteFleetDialog;
 import data.ui.patrolfleet.overview.fleetview.FleetButtonComponent;
@@ -16,6 +19,7 @@ import data.ui.patrolfleet.overview.fleetview.fleetreloc.FleetRelocationDialog;
 import data.ui.patrolfleet.templates.shiplist.dialog.templatecretor.TemplateCreatorDialog;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +55,32 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
             buttonT.setButtonFontOrbitron20();
             add =buttonT.addButton("Add new fleet",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID, CutStyle.C2_MENU,300,30,0f);
             add.getPosition().inTL(componentPanel.getPosition().getWidth()-(add.getPosition().getWidth())-5,0);
+            boolean hasInd = false;
+            for (Industry industry : market.getIndustries()) {
+               if(AoTDMilitaryBase.industriesValidForBase.contains(industry.getSpec().getId())){
+                   hasInd = true;
+                   break;
+               }
+            }
+            if(!hasInd){
+                add.setEnabled(false);
+                buttonT.addTooltipTo(new TooltipMakerAPI.TooltipCreator() {
+                    @Override
+                    public boolean isTooltipExpandable(Object tooltipParam) {
+                        return false;
+                    }
+
+                    @Override
+                    public float getTooltipWidth(Object tooltipParam) {
+                        return 400;
+                    }
+
+                    @Override
+                    public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                        tooltip.addPara("To assign fleets to this market we need %s built!",3f, Color.ORANGE, AoTDSopMisc.getAllIndustriesJoined(AoTDMilitaryBase.industriesValidForBase.stream().toList(),"or"));
+                    }
+                },add, TooltipMakerAPI.TooltipLocation.LEFT,false);
+            }
             ButtonAPI bt = tooltip.addAreaCheckbox("Name",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Misc.getBrightPlayerColor(),230,20,0f);
             bt.getPosition().inTL(0,20);
             bt.setClickable(false);
@@ -81,7 +111,7 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
 //                content.addCustom(test.getMainPanel(),5f);
 //                i++;
 //            }
-            for (BasePatrolFleet fleet : FactionPatrolsManager.getInstance().getAssignedFleetsForMarket(market)) {
+            for (BasePatrolFleet fleet : AoTDFactionPatrolsManager.getInstance().getAssignedFleetsForMarket(market)) {
                 FleetButtonComponent test = new FleetButtonComponent(componentPanel.getPosition().getWidth()-5,60,fleet,false);
                 test.createUI();
                 content.addCustom(test.getMainPanel(),5f);
@@ -139,7 +169,7 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
         }
         if(showDelete){
             showDelete = false;
-            AshMisc.initPopUpDialog(new DeleteFleetDialog(lastChecked.getData()),800,205);
+            AshMisc.initPopUpDialog(new DeleteFleetDialog(lastChecked.getData()),800,235);
             lastChecked = null;
 
         }

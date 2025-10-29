@@ -6,6 +6,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import data.industry.AoTDMilitaryBase;
+import data.industry.AoTDRelay;
 import data.listeners.ChooseCapitalListener;
 import data.listeners.timeline.*;
 import data.listeners.timeline.models.FirstIncomeColonyListener;
@@ -21,6 +22,8 @@ import data.scripts.listeners.FactionHistoryUpdateListener;
 import data.scripts.listeners.FactionMonthlyUpdateListenner;
 import data.scripts.managers.*;
 import data.scripts.models.TimelineEventType;
+import data.scripts.patrolfleet.everyframe.AoTDPatrolManagerMover;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.scripts.timelineevents.military.*;
 import data.scripts.timelineevents.prosperity.*;
@@ -29,6 +32,7 @@ import data.scripts.timelineevents.special.*;
 import data.scripts.timelineevents.research_explo.FirstVastRuins;
 import data.scripts.timelineevents.templates.FactionExpansionEvent;
 import data.scripts.timelineevents.templates.GroundDefenceModifierEvent;
+import kaysaar.bmo.buildingmenu.additionalreq.AdditionalReqManager;
 
 
 public class AoDCapitalsModPlugin extends BaseModPlugin {
@@ -44,6 +48,9 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         FactionPolicySpecManager.loadSpecs();
         if (!Global.getSector().hasScript(FactionAdvance.class)) {
             Global.getSector().addScript(new FactionAdvance());
+        }
+        if (!Global.getSector().hasScript(AoTDPatrolManagerMover.class)) {
+            Global.getSector().addScript(new AoTDPatrolManagerMover());
         }
         Global.getSector().getListenerManager().addListener(new FactionMonthlyUpdateListenner(), true);
         if (!Global.getSector().getListenerManager().hasListenerOfClass(FactionHistoryUpdateListener.class)) {
@@ -61,9 +68,8 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         AoTDFactionManager.getInstance().advance(0f);
 
 
+
         PatrolTemplateManager.loadAllExistingTemplates();
-
-
 
     }
 
@@ -72,6 +78,17 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         Global.getSettings().getIndustrySpec(Industries.PATROLHQ).setPluginClass(AoTDMilitaryBase.class.getName());
         Global.getSettings().getIndustrySpec(Industries.MILITARYBASE).setPluginClass(AoTDMilitaryBase.class.getName());
         Global.getSettings().getIndustrySpec(Industries.HIGHCOMMAND).setPluginClass(AoTDMilitaryBase.class.getName());
+        AoTDMilitaryBase.industriesValidForBase.add(Industries.PATROLHQ);
+        AoTDMilitaryBase.industriesValidForBase.add(Industries.MILITARYBASE);
+        AoTDMilitaryBase.industriesValidForBase.add(Industries.HIGHCOMMAND);
+        if(Global.getSettings().getModManager().isModEnabled("IndEvo")){
+            Global.getSettings().getIndustrySpec("IndEvo_ComArray").setPluginClass(AoTDRelay.class.getName());
+            Global.getSettings().getIndustrySpec("IndEvo_IntArray").setPluginClass(AoTDRelay.class.getName());
+            AoTDMilitaryBase.industriesValidForBase.add("IndEvo_ComArray");
+            AoTDMilitaryBase.industriesValidForBase.add("IndEvo_IntArray");
+        }
+
+
     }
 
     public void addTransientScripts() {

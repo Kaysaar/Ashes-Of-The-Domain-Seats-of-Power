@@ -1,5 +1,6 @@
 package data.ui.patrolfleet.overview.fleetview;
 
+import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import ashlib.data.plugins.ui.models.PopUpUI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -75,7 +76,10 @@ public class AvailableTemplateList extends PopUpUI {
         if(chosenFleet!=null){
             dialog.getShowcase().getList().getShips().clear();
             dialog.getShowcase().getList().getShips().putAll(chosenFleet.assignedShipsThatShouldSpawn);
-            dialog.getShowcase().getTextForName().setText(chosenFleet.getNameOfFleet());
+            if(!AshMisc.isStringValid(dialog.getShowcase().getTextForName().getText())){
+                dialog.getShowcase().getTextForName().setText(chosenFleet.getNameOfFleet());
+            }
+
             dialog.getShowcase().getList().createUI();
         }
 

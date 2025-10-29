@@ -3,22 +3,31 @@ package data.ui.patrolfleet.overview.fleetview;
 import ashlib.data.plugins.ui.models.PopUpUI;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
+import data.industry.AoTDMilitaryBase;
+import data.plugins.AoTDSopMisc;
+import data.scripts.managers.AoTDFactionManager;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
 import data.ui.patrolfleet.overview.marketdata.FleetMarketData;
 import data.ui.patrolfleet.templates.shiplist.dialog.templatecretor.TemplateCreatorDialog;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 public class FleetOptions extends PopUpUI {
     CustomPanelAPI mainPanel;
     ButtonAPI change,delete,relocate;
     FleetMarketData data;
+
     public FleetOptions(FleetMarketData fleet) {
         this.data = fleet;
     }
@@ -37,13 +46,42 @@ public class FleetOptions extends PopUpUI {
         change = tooltip.addButton("Edit fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
         relocate = tooltip.addButton("Relocate fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
         delete = tooltip.addButton("Delete fleet",null, pirates.getBaseUIColor(),pirates.getDarkUIColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
-        if(data.lastChecked.getData().isDecomisioned()){
+        BasePatrolFleet fleet = data.lastChecked.getData();
+        if(fleet.isDecomisioned()||fleet.isInTransit()){
             change.setEnabled(false);
             relocate.setEnabled(false);
             delete.setEnabled(false);
         }
-        if(Misc.getFactionMarkets(Factions.PLAYER).size()<=1){
+        if(fleet.isGrounded()){
             relocate.setEnabled(false);
+        }
+        int count = 0;
+        for (MarketAPI marketAPI : AoTDFactionManager.getMarketsUnderPlayer()) {
+            for (Industry industry : marketAPI.getIndustries()) {
+                if(AoTDMilitaryBase.industriesValidForBase.contains(industry.getSpec().getId())){
+                    count++;
+                    break;
+                }
+            }
+        }
+        if(count<=1){
+            relocate.setEnabled(false);
+            tooltip.addTooltipTo(new TooltipMakerAPI.TooltipCreator() {
+                @Override
+                public boolean isTooltipExpandable(Object tooltipParam) {
+                    return false;
+                }
+
+                @Override
+                public float getTooltipWidth(Object tooltipParam) {
+                    return 400;
+                }
+
+                @Override
+                public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                    tooltip.addPara("To relocate fleet you need to have at least two markets with %s",3f, Color.ORANGE, AoTDSopMisc.getAllIndustriesJoined(AoTDMilitaryBase.industriesValidForBase.stream().toList(),"or"));
+                }
+            },relocate, TooltipMakerAPI.TooltipLocation.BELOW,false);
         }
         tooltip.addSpacer(3f);
         mainPanel.getPosition().setSize(panelAPI.getPosition().getWidth(),tooltip.getHeightSoFar());

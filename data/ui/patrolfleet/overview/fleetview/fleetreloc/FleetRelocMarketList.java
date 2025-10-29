@@ -4,15 +4,20 @@ import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.CustomPanelAPI;
 import com.fs.starfarer.api.ui.PositionAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.industry.AoTDMilitaryBase;
+import data.scripts.managers.AoTDFactionManager;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +26,20 @@ public class FleetRelocMarketList implements ExtendedUIPanelPlugin {
     FactionAPI faction;
     ArrayList<FleetLocationData>data = new ArrayList<>();
     MarketAPI marketOrigin;
+    public static LinkedHashSet<String> industriesAllowingInterstellarTransition = new LinkedHashSet<>();
+    static {
+        industriesAllowingInterstellarTransition.add(Industries.HIGHCOMMAND);
+    }
+    public static boolean doesPlayerFactionMeetCriteriaForInterstellarReloc(){
+        boolean met = false;
+        for (MarketAPI marketAPI : AoTDFactionManager.getMarketsUnderPlayer()) {
+            if(industriesAllowingInterstellarTransition.stream().anyMatch(marketAPI::hasIndustry)) {
+                met = true;
+                break;
+            }
+        }
+        return met;
+    }
     public FleetRelocMarketList(float width, float height, FactionAPI faction,MarketAPI marketOrigin){
         mainPanel = Global.getSettings().createCustom(width,height,this);
         this.faction = faction;
@@ -40,8 +59,18 @@ public class FleetRelocMarketList implements ExtendedUIPanelPlugin {
         componentPanel = Global.getSettings().createCustom(mainPanel.getPosition().getWidth(),mainPanel.getPosition().getHeight(),null);
         TooltipMakerAPI tooltip = componentPanel.createUIElement(componentPanel.getPosition().getWidth(),componentPanel.getPosition().getHeight(),true);
         ArrayList<MarketAPI>markets = sortMarketsByDistance(Misc.getFactionMarkets(faction),marketOrigin);
+
         for (MarketAPI market : markets) {
+            boolean hasInd = false;
+            for (Industry industry : market.getIndustries()) {
+                if(AoTDMilitaryBase.industriesValidForBase.contains(industry.getSpec().getId())){
+                    hasInd = true;
+                    break;
+                }
+            }
+            if(!hasInd)continue;
             if(market.getId().equals(marketOrigin.getId()))continue;
+            if(!market.getContainingLocation().equals(marketOrigin.getContainingLocation())&&!doesPlayerFactionMeetCriteriaForInterstellarReloc())continue;
             FleetLocationData data = new FleetLocationData(componentPanel.getPosition().getWidth()-10,50,market,0f,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Misc.getBrightPlayerColor(),false,Misc.getDistanceLY(marketOrigin.getPrimaryEntity(),market.getPrimaryEntity()));
             data.createUI();
             this.data.add(data);

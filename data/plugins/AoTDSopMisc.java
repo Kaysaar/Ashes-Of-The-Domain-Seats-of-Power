@@ -14,8 +14,11 @@ import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
+import com.fs.starfarer.api.util.Misc;
 import data.intel.HelldiversRaidIntel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class AoTDSopMisc {
@@ -64,5 +67,12 @@ public class AoTDSopMisc {
         raid.setListener(listener);
         Global.getSector().getIntelManager().addIntel(raid);
         return true;
+    }
+    public static String getAllIndustriesJoined(List<String> specs,String joiner){
+        ArrayList<String>names =new ArrayList<>();
+        for (String spec : specs) {
+            names.add(Global.getSettings().getIndustrySpec(spec).getName());
+        }
+        return Misc.getJoined(joiner,names);
     }
 }

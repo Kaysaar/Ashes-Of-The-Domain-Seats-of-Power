@@ -1,13 +1,10 @@
 package data.ai;
 
-import com.fs.starfarer.api.Script;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.ai.FleetAssignmentDataAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.econ.impl.MilitaryBase;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.impl.campaign.fleets.PatrolAssignmentAIV4;
-import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.Abilities;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
@@ -15,7 +12,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.CountingMap;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
-import data.scripts.patrolfleet.managers.FactionPatrolsManager;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.models.AoTDPatrolFleetData;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 
@@ -33,7 +30,7 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
         Random random = route.getRandom(1);
 
         AoTDPatrolFleetData daten = (AoTDPatrolFleetData) route.getCustom();
-        BasePatrolFleet fleets = FactionPatrolsManager.getInstance().getFleet(daten.getId());
+        BasePatrolFleet fleets = AoTDFactionPatrolsManager.getInstance().getFleet(daten.getId());
         FleetFactory.PatrolType type = FleetFactory.PatrolType.FAST;
         if(fleets.getFPTaken()>=50){
             type = FleetFactory.PatrolType.COMBAT;
@@ -153,19 +150,15 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
     public void advance(float amount) {
         super.advance(amount);
        AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
-       BasePatrolFleet fleetData = FactionPatrolsManager.getInstance().getFleet(data.getId());
-       if(fleetData != null&& fleetData.isDecomisioned()&&!retreatInitalized) {
-           initRetreat();
-       }
-       if(fleetData!=null&&fleetData.isInTransit()&&!retreatInitalized){
-           initRetreat();
-       }
-       if(fleetData!=null&&!retreatInitalized){
-           if((float) fleet.getFleetPoints() /fleetData.getFPTaken()<=0.5f){
-               initRetreat();
-           }
-       }
-
+       BasePatrolFleet fleetData = AoTDFactionPatrolsManager.getInstance().getFleet(data.getId());
+        if(fleetData!=null&&!retreatInitalized){
+            if(fleetData.isDecomisioned()||fleetData.isInTransit()||fleetData.isGrounded()){
+                initRetreat();
+            }
+            if((float) fleet.getFleetPoints() /fleetData.getFPTaken()<=0.5f){
+                initRetreat();
+            }
+        }
     }
 
     private void initRetreat() {

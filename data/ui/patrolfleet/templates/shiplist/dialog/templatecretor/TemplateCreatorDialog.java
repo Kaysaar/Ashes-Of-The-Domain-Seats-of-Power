@@ -8,7 +8,7 @@ import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
 import data.industry.AoTDMilitaryBase;
-import data.scripts.patrolfleet.managers.FactionPatrolsManager;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
@@ -107,10 +107,10 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
             boolean canConfirm  =AshMisc.isStringValid(showcase.textForName.getText())&&showcase.list.getCountOfShips()<=30&&showcase.list.getCountOfShips()>0;
             boolean additionalConfirm = true;
             if(patrolFleetCreatorMode){
-                additionalConfirm = showcase.list.getFleetPoints(false)<= FactionPatrolsManager.getInstance().getAvailableFP();
+                additionalConfirm = showcase.list.getFleetPoints(false)<= AoTDFactionPatrolsManager.getInstance().getAvailableFP();
             }
             if(fleet!=null){
-                additionalConfirm = showcase.list.getFleetPoints(false)<= FactionPatrolsManager.getInstance().getAvailableFP()+fleet.geTotalFpTaken();
+                additionalConfirm = showcase.list.getFleetPoints(false)<= AoTDFactionPatrolsManager.getInstance().getAvailableFP()+fleet.geTotalFpTaken();
             }
             if(confirmButton.isEnabled()!=(canConfirm&&additionalConfirm)){
                 confirmButton.setEnabled(canConfirm&&additionalConfirm);
@@ -184,7 +184,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                 BasePatrolFleet fleet = new BasePatrolFleet(showcase.list.getShips(),showcase.textForName.getText());
                 fleet.setTiedTo(market);
                 fleet.setFleetName(showcase.textForName.getText());
-                FactionPatrolsManager.getInstance().addNewFleet(fleet);
+                AoTDFactionPatrolsManager.getInstance().addNewFleet(fleet);
                 OverviewPatrolPanel.forceRequestUpdate = true;
             }
             else{
