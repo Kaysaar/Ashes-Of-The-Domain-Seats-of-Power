@@ -18,7 +18,6 @@ import java.util.List;
 
 public class AvailableTemplateList extends PopUpUI {
     CustomPanelAPI mainPanel;
-    MarketAPI market;
     ArrayList<FleetButtonComponent>components = new ArrayList<>();
     TemplateCreatorDialog dialog;
     BasePatrolFleet chosenFleet= null;

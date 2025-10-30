@@ -151,14 +151,18 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
         super.advance(amount);
        AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
        BasePatrolFleet fleetData = AoTDFactionPatrolsManager.getInstance().getFleet(data.getId());
-        if(fleetData!=null&&!retreatInitalized){
-            if(fleetData.isDecomisioned()||fleetData.isInTransit()||fleetData.isGrounded()){
-                initRetreat();
-            }
-            if((float) fleet.getFleetPoints() /fleetData.getFPTaken()<=0.5f){
-                initRetreat();
+        if(fleetData!=null) {
+            this.fleet.setName(fleetData.getNameOfFleet());
+            if(!retreatInitalized){
+                if(fleetData.isDecomisioned()||fleetData.isInTransit()||fleetData.isGrounded()){
+                    initRetreat();
+                }
+                if((float) fleet.getFleetPoints() /fleetData.getFPTaken()<=0.5f){
+                    initRetreat();
+                }
             }
         }
+
     }
 
     private void initRetreat() {

@@ -13,6 +13,8 @@ import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflaterParams;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
+import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.loading.VariantSource;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
@@ -171,7 +173,15 @@ public class PatrolFleetFactory {
         float requestedPoints = params.getTotalPts();
         float actualPoints = fleet.getFleetPoints();
         Misc.setSpawnFPMult(fleet, actualPoints / Math.max(1f, requestedPoints));
-
+        if(template.getTotalFleetPoints()>=25){
+            fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_TYPE, FleetTypes.PATROL_SMALL);
+        }
+        if(template.getTotalFleetPoints()>=50){
+            fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_TYPE, FleetTypes.PATROL_MEDIUM);
+        }
+        if(template.getTotalFleetPoints()>=75){
+            fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_TYPE, FleetTypes.PATROL_LARGE);
+        }
         return fleet;
     }
 
