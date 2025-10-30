@@ -10,8 +10,27 @@ import java.util.*;
 
 public class AoTDFactionPatrolsManager {
     public static String keyToData = "$aotd_patrol_fleet_man_instance";
+    public static int MAX_ADMIRALTY_LEV = 6;
+    public static LinkedHashMap<Integer,Integer>levels = new LinkedHashMap<>();
+    static {
+        levels.put(6,50);
+        levels.put(5,100);
+        levels.put(4,200);
+        levels.put(3,300);
+        levels.put(2,350);
+        levels.put(1,400);
+    }
+
+
     public LinkedHashMap<String, BasePatrolFleet> fleetsCurrentlyInField = new LinkedHashMap<>();
     public MutableStat daysPerFP = new MutableStat(5f);
+    public MutableStat admiralty = new MutableStat(0f);
+
+    public MutableStat getAdmiralty() {
+        return admiralty;
+    }
+
+
     public ArrayList<BasePatrolFleet> getAssignedFleetsForMarket(MarketAPI market) {
         ArrayList<BasePatrolFleet> fleets = new ArrayList<>();
         if (market == null) return fleets;

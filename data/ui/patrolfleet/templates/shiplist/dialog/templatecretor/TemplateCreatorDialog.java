@@ -189,7 +189,29 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
             }
             else{
                 if(AoTDMilitaryBase.isPatroling(fleet.getId(),fleet.getTiedTo())){
-                    fleet.getShipsForReplacementWhenInPrep().putAll(showcase.list.getShips());
+                    boolean matching = true;
+                    for (Map.Entry<String, Integer> entry : showcase.getList().getShips().entrySet()) {
+                        if(fleet.assignedShipsThatShouldSpawn.get(entry.getKey())==null||!fleet.assignedShipsThatShouldSpawn.get(entry.getKey()).equals(entry.getValue())){
+                            matching= false;
+                            break;
+                        }
+                    }
+                    for (Map.Entry<String, Integer> entry : fleet.assignedShipsThatShouldSpawn.entrySet()) {
+                        if( showcase.getList().getShips().get(entry.getKey())==null||! showcase.getList().getShips().get(entry.getKey()).equals(entry.getValue())){
+                            matching= false;
+                            break;
+                        }
+                    }
+
+                    if(!matching){
+                        fleet.getShipsForReplacementWhenInPrep().putAll(showcase.list.getShips());
+
+                    }
+                    else{
+                        fleet.getShipsForReplacementWhenInPrep().clear();
+
+                    }
+                    fleet.setFleetName(showcase.textForName.getText());
                     OverviewPatrolPanel.forceRequestUpdate = true;
                 }
                 else{

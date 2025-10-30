@@ -86,9 +86,9 @@ public class FleetButtonComponent extends CustomButton {
 
         }
         else{
-            float available = width-startXPerm-295;
+            float available = width-startXPerm-290;
             float statusPositionStart = startXPerm+available+10;
-            float pointsFP = statusPositionStart+190;
+            float pointsFP = statusPositionStart+185;
             CustomPanelAPI custom = Global.getSettings().createCustom(available,maxHeight,null);
             TooltipMakerAPI customTooltip = custom.createUIElement(custom.getPosition().getWidth(),custom.getPosition().getHeight(),false);
             LinkedHashMap<String,Integer>ships =new LinkedHashMap<>();
@@ -130,8 +130,7 @@ public class FleetButtonComponent extends CustomButton {
                 }
                 ;
             }
-            float rest = available-startX;
-            if(rest<=0)rest=0;
+
             custom.addUIElement(customTooltip).inTL(-5,0);
             tooltip.addCustom(custom,0f).getPosition().inTL((startXPerm+(available/2))-((startX)/2),y);
             LabelAPI status = tooltip.addPara(data.getCurrentStatus(),Misc.getTooltipTitleAndLightHighlightColor(),0f);
