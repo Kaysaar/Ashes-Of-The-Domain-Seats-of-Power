@@ -133,6 +133,10 @@ public class AoTDMilitaryBase extends MilitaryBase {
     }
 @Override
     public void reportFleetDespawnedToListener(CampaignFleetAPI fleet, CampaignEventListener.FleetDespawnReason reason, Object param) {
+        if(market.getFaction()==null||!market.getFaction().isPlayerFaction()){
+            super.reportFleetDespawnedToListener(fleet, reason, param);
+            return;
+        }
         RouteManager.RouteData route = RouteManager.getInstance().getRoute(getRouteSourceId(), fleet);
 
         AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
@@ -246,6 +250,9 @@ public class AoTDMilitaryBase extends MilitaryBase {
 
     public CampaignFleetAPI createPatrol(String id, RouteManager.RouteData route) {
         BasePatrolFleet fleets = AoTDFactionPatrolsManager.getInstance().getFleet(id);
+        if(fleets==null){
+
+        }
         fleets.performReplacement();
         FleetParamsV3 params = new FleetParamsV3(
                 market,

@@ -11,14 +11,15 @@ import java.util.*;
 public class AoTDFactionPatrolsManager {
     public static String keyToData = "$aotd_patrol_fleet_man_instance";
     public static int MAX_ADMIRALTY_LEV = 6;
-    public static LinkedHashMap<Integer,Integer>levels = new LinkedHashMap<>();
+    public static LinkedHashMap<Integer, Integer> levels = new LinkedHashMap<>();
+
     static {
-        levels.put(6,50);
-        levels.put(5,100);
-        levels.put(4,200);
-        levels.put(3,300);
-        levels.put(2,350);
-        levels.put(1,400);
+        levels.put(6, 50);
+        levels.put(5, 100);
+        levels.put(4, 200);
+        levels.put(3, 300);
+        levels.put(2, 350);
+        levels.put(1, 400);
     }
 
 
@@ -54,100 +55,102 @@ public class AoTDFactionPatrolsManager {
         return daysPerFP;
     }
 
-    public void advanceFleets(float amount){
+    public void advanceFleets(float amount) {
 
-        fleetsCurrentlyInField.values().forEach(x->x.advance(amount));
+        fleetsCurrentlyInField.values().forEach(x -> x.advance(amount));
         //Logic for grounding and un-groudning
 
 
     }
-    public void advanceAfterFleets(float amount){
+
+    public void advanceAfterFleets(float amount) {
         int currFp = getAvailableFP();
-        List<BasePatrolFleet>fleets = fleetsCurrentlyInField.values().stream().sorted(new Comparator<BasePatrolFleet>() {
+        List<BasePatrolFleet> fleets = fleetsCurrentlyInField.values().stream().sorted(new Comparator<BasePatrolFleet>() {
             @Override
             public int compare(BasePatrolFleet o1, BasePatrolFleet o2) {
                 return Integer.compare(o1.getFPTaken(), o2.getFPTaken());
             }
         }).toList();
-        if(currFp<0){
+        if (currFp < 0) {
             for (BasePatrolFleet fleet : fleets) {
-                if(fleet.isGrounded())continue;
+                if (fleet.isGrounded()) continue;
                 fleet.setGrounded(true);
-                currFp+=fleet.geTotalFpTaken();
-                if(currFp>=0){
+                currFp += fleet.geTotalFpTaken();
+                if (currFp >= 0) {
                     break;
                 }
 
             }
         }
-        else{
-            for (BasePatrolFleet fleet : fleets) {
-                if(!fleet.isGrounded())continue;
-                currFp-=fleet.geTotalFpTaken();
-                if(currFp>=0){
-                    fleet.setGrounded(false);
-                }
-                else{
-                    //If smallest fleet makes counter go minus there is no point to go further
-                    break;
-                }
-
+        currFp = getAvailableFP();
+        if(currFp>0){
+        for (BasePatrolFleet fleet : fleets) {
+            if (!fleet.isGrounded()) continue;
+            currFp -= fleet.geTotalFpTaken();
+            if (currFp >= 0) {
+                fleet.setGrounded(false);
+            } else {
+                //If smallest fleet makes counter go minus there is no point to go further
+                break;
             }
+
         }
-
     }
 
+}
 
-    public int getFPUsed(boolean ignoreGrounded) {
-        int curr = 0;
-        for (BasePatrolFleet basePatrolFleet : fleetsCurrentlyInField.values()) {
-            if(basePatrolFleet.isGrounded()&&!ignoreGrounded)continue;
-            curr += basePatrolFleet.geTotalFpTaken();
-        }
-        return curr;
+
+public int getFPUsed(boolean ignoreGrounded) {
+    int curr = 0;
+    for (BasePatrolFleet basePatrolFleet : fleetsCurrentlyInField.values()) {
+        if (basePatrolFleet.isGrounded() && !ignoreGrounded) continue;
+        curr += basePatrolFleet.geTotalFpTaken();
     }
+    return curr;
+}
 
 
-    public int getFPUsedByMarket(MarketAPI market) {
-        int curr = 0;
-        for (BasePatrolFleet fleet : getAssignedFleetsForMarket(market)) {
-            curr += fleet.geTotalFpTaken();
-        }
-        return curr;
+public int getFPUsedByMarket(MarketAPI market) {
+    int curr = 0;
+    for (BasePatrolFleet fleet : getAssignedFleetsForMarket(market)) {
+        curr += fleet.geTotalFpTaken();
     }
+    return curr;
+}
 
-    public int getTotalFpGenerated() {
+public int getTotalFpGenerated() {
 
-        return FleetPointUtilis.getFleetPointsGeneratedByFaction(Global.getSector().getPlayerFaction());
+    return FleetPointUtilis.getFleetPointsGeneratedByFaction(Global.getSector().getPlayerFaction());
+}
+
+public int getAvailableFP() {
+    return getTotalFpGenerated() - getFPUsed(false);
+}
+
+public static AoTDFactionPatrolsManager getInstance() {
+    if (!Global.getSector().getPersistentData().containsKey(keyToData)) {
+        setInstance();
     }
+    return (AoTDFactionPatrolsManager) Global.getSector().getPersistentData().get(keyToData);
+}
 
-    public int getAvailableFP() {
-        return getTotalFpGenerated() - getFPUsed(false);
-    }
+public void addNewFleet(BasePatrolFleet fleet) {
+    fleetsCurrentlyInField.put(fleet.getId(), fleet);
+}
 
-    public static AoTDFactionPatrolsManager getInstance() {
-        if (!Global.getSector().getPersistentData().containsKey(keyToData)) {
-            setInstance();
-        }
-        return (AoTDFactionPatrolsManager) Global.getSector().getPersistentData().get(keyToData);
-    }
+public void removeFleet(String id) {
+    BasePatrolFleet fleet = fleetsCurrentlyInField.get(id);
+    fleetsCurrentlyInField.remove(id);
+    fleet.setTiedTo(null);
 
-    public void addNewFleet(BasePatrolFleet fleet) {
-        fleetsCurrentlyInField.put(fleet.getId(), fleet);
-    }
+}
 
-    public void removeFleet(String id) {
-        BasePatrolFleet fleet = fleetsCurrentlyInField.get(id);
-        fleetsCurrentlyInField.remove(id);
-        fleet.setTiedTo(null);
+public BasePatrolFleet getFleet(String id) {
+    return fleetsCurrentlyInField.get(id);
+}
 
-    }
-    public BasePatrolFleet getFleet(String id){
-        return fleetsCurrentlyInField.get(id);
-    }
-
-    public static void setInstance() {
-        AoTDFactionPatrolsManager instance = new AoTDFactionPatrolsManager();
-        Global.getSector().getPersistentData().put(keyToData, instance);
-    }
+public static void setInstance() {
+    AoTDFactionPatrolsManager instance = new AoTDFactionPatrolsManager();
+    Global.getSector().getPersistentData().put(keyToData, instance);
+}
 }

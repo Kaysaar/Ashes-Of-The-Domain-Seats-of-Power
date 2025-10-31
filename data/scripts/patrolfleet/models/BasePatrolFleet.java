@@ -3,6 +3,7 @@ package data.scripts.patrolfleet.models;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.util.Misc;
 import data.industry.AoTDMilitaryBase;
 import data.scripts.patrolfleet.utilis.FleetPointUtilis;
@@ -22,6 +23,32 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
     boolean decomisioned;
     boolean forcedTransitDays = false;
     boolean grounded = false;
+    FleetFactory.PatrolType patrolType;
+
+    public FleetFactory.PatrolType getPatrolType() {
+        if(patrolType==null)setPatrolType(FleetFactory.PatrolType.COMBAT);
+        return patrolType;
+    }
+
+    public void setPatrolType(FleetFactory.PatrolType patrolType) {
+        this.patrolType = patrolType;
+    }
+    public static String getRole(FleetFactory.PatrolType patrolType){
+        if(patrolType!=null){
+            if(patrolType.equals(FleetFactory.PatrolType.FAST)){
+                return "Recon";
+            }
+            if(patrolType.equals(FleetFactory.PatrolType.COMBAT)){
+                return "Homeguard";
+            }
+            if(patrolType.equals(FleetFactory.PatrolType.HEAVY)){
+                return "System defence";
+            }
+        }
+        return "";
+    }
+
+
     public void clear(){
         getShipsInDecomFleet().clear();
         getShipsForReplacementWhenInPrep().clear();

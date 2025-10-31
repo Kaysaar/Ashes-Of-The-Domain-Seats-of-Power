@@ -179,6 +179,8 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
             float startingY = 5;
             float startingX = admiralShipSize + seperatorX + 5;
             if (forProduction) {
+                seperatorX = 10;
+                 startingX = admiralShipSize + seperatorX + 5;
                 for (Map.Entry<String, Integer> entry : alreadyPlaced.entrySet()) {
                     for (int i = 0; i < entry.getValue(); i++) {
                         if (startingX + normalShipSize >= componentPanel.getPosition().getWidth()) {
@@ -290,8 +292,6 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
         if (ships == null) return 0;
         int value = 0;
         for (Map.Entry<String, Integer> entry : ships.entrySet()) {
-            if (Global.getSettings().getHullSpec(entry.getKey()).getHints().contains(ShipHullSpecAPI.ShipTypeHints.CIVILIAN) && !civilian)
-                continue;
             value += (int) (entry.getValue() * getHullFP(entry.getKey()));
         }
         return value;

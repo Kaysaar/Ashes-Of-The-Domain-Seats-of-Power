@@ -32,7 +32,6 @@ import data.scripts.timelineevents.special.*;
 import data.scripts.timelineevents.research_explo.FirstVastRuins;
 import data.scripts.timelineevents.templates.FactionExpansionEvent;
 import data.scripts.timelineevents.templates.GroundDefenceModifierEvent;
-import kaysaar.bmo.buildingmenu.additionalreq.AdditionalReqManager;
 
 
 public class AoDCapitalsModPlugin extends BaseModPlugin {

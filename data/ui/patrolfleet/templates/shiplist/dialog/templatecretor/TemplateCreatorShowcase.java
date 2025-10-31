@@ -2,8 +2,10 @@ package data.ui.patrolfleet.templates.shiplist.dialog.templatecretor;
 
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
+import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
@@ -22,14 +24,18 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
     CustomPanelAPI headerPanel;
     TextFieldAPI textForName;
     CustomPanelAPI dataAboutFleetPanel;
+    public ButtonAPI recon,home,star;
     boolean patrolFleetCreatorMode = false;
-
+    FleetFactory.PatrolType type;
     public TextFieldAPI getTextForName() {
         return textForName;
     }
 
     public void setExistingTemplate(BasePatrolFleetTemplate existingTemplate) {
         this.existingTemplate = existingTemplate;
+        if(existingTemplate instanceof BasePatrolFleet fleet){
+            type = fleet.getPatrolType();
+        }
     }
 
     public TemplateShipList getList() {
@@ -44,6 +50,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         mainPanel = Global.getSettings().createCustom(width,height,this);
         this.patrolFleetCreatorMode = patrolFleetCreatorMode;
 
+
     }
     public void addShip(String id){
         list.addNewShip(id);
@@ -54,6 +61,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
     public TemplateCreatorShowcase(float width, float height, BasePatrolFleetTemplate existingTemplate) {
         mainPanel = Global.getSettings().createCustom(width,height,this);
         this.existingTemplate = existingTemplate;
+
 
     }
     @Override
@@ -68,7 +76,11 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         }
         componentPanel = Global.getSettings().createCustom(mainPanel.getPosition().getWidth(),mainPanel.getPosition().getHeight(),null);
         updateHeader();
-        list  = new TemplateShipList(componentPanel.getPosition().getWidth(), componentPanel.getPosition().getHeight() - headerPanel.getPosition().getHeight()-105,existingTemplate,true);
+        float height  =  componentPanel.getPosition().getHeight() - headerPanel.getPosition().getHeight()-105;
+        if(patrolFleetCreatorMode){
+            height = componentPanel.getPosition().getHeight() - headerPanel.getPosition().getHeight()-155;
+        }
+        list  = new TemplateShipList(componentPanel.getPosition().getWidth(), height,existingTemplate,true);
         list.createUI();
         componentPanel.addComponent(list.getMainPanel()).inTL(0,50);
         createInfo();
@@ -108,7 +120,11 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         if(dataAboutFleetPanel!=null) {
             componentPanel.removeComponent(dataAboutFleetPanel);
         }
-        dataAboutFleetPanel = Global.getSettings().createCustom(componentPanel.getPosition().getWidth(),100,null);
+        float height = 100;
+        if(patrolFleetCreatorMode){
+            height = 150;
+        }
+        dataAboutFleetPanel = Global.getSettings().createCustom(componentPanel.getPosition().getWidth(),height,null);
         TooltipMakerAPI tooltip = dataAboutFleetPanel.createUIElement(dataAboutFleetPanel.getPosition().getWidth(),dataAboutFleetPanel.getPosition().getHeight(),false);
 
         if(patrolFleetCreatorMode){
@@ -125,8 +141,23 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         tooltip.addPara("Fleet points used by combat vessels : %s",5f, Color.ORANGE,""+list.getFleetPoints(false));
 
         tooltip.addPara("Ships used : %s / %s",5f, Color.ORANGE,""+list.getCountOfShips(),""+TemplateUtilis.numOfShipsPerFleet);
+        if(patrolFleetCreatorMode){
+            tooltip.addPara("Current designated role : %s",3f,Color.ORANGE,BasePatrolFleet.getRole(type)).setAlignment(Alignment.MID);
+            float y = tooltip.getHeightSoFar()+10;
+            float rest = height-y;
+            float heightButtons = 30;
+            float widthOfButton = (dataAboutFleetPanel.getPosition().getWidth()/3-15);
+            recon = tooltip.addButton("Recon","recon", Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID,CutStyle.NONE,widthOfButton,heightButtons,0f);
+            home = tooltip.addButton("Home-guard","recon", Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID,CutStyle.NONE,widthOfButton,heightButtons,0f);
+            star = tooltip.addButton("System Defence","recon", Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID,CutStyle.NONE,widthOfButton,heightButtons,0f);
+            star.getPosition().inTL(dataAboutFleetPanel.getPosition().getWidth()-widthOfButton,y);
+            home.getPosition().inTL(dataAboutFleetPanel.getPosition().getWidth()/2-(widthOfButton/2),y);
+            recon.getPosition().inTL(0,y);
+            tooltip.addPara("Roles are set only before a fleet begins patrol duty",3f).getPosition().inTL(5,y+heightButtons+3);
+
+        }
         dataAboutFleetPanel.addUIElement(tooltip).inTL(0,0);
-        componentPanel.addComponent(dataAboutFleetPanel).inTL(0,componentPanel.getPosition().getHeight()-100);
+        componentPanel.addComponent(dataAboutFleetPanel).inTL(0,componentPanel.getPosition().getHeight()-height);
     }
 
 

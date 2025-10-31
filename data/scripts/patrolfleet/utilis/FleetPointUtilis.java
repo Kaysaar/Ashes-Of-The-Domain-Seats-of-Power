@@ -34,7 +34,6 @@ public class FleetPointUtilis {
     public static float getHullFP(String hullId) {
         try {
             ShipHullSpecAPI spec = Global.getSettings().getHullSpec(hullId);
-            if (spec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.CIVILIAN)) return 0f;
             return spec != null ? spec.getFleetPoints() : 0f;
         } catch (Throwable t) {
             return 0f;

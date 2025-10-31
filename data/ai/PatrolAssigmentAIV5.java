@@ -1,10 +1,12 @@
 package data.ai;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.ai.FleetAssignmentDataAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.impl.campaign.fleets.PatrolAssignmentAIV4;
+import com.fs.starfarer.api.impl.campaign.fleets.RouteLocationCalculator;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.Abilities;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
@@ -25,20 +27,14 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
     }
     boolean initalizedRetreat = false;
     boolean retreatInitalized = false;
-
+    float daysMAX =0f;
+    float days = 0f;
     public SectorEntityToken pickEntityToGuard() {
         Random random = route.getRandom(1);
 
         AoTDPatrolFleetData daten = (AoTDPatrolFleetData) route.getCustom();
         BasePatrolFleet fleets = AoTDFactionPatrolsManager.getInstance().getFleet(daten.getId());
-        FleetFactory.PatrolType type = FleetFactory.PatrolType.FAST;
-        if(fleets.getFPTaken()>=50){
-            type = FleetFactory.PatrolType.COMBAT;
-        }
-        if(fleets.getFPTaken()>=75){
-            type = FleetFactory.PatrolType.HEAVY;
-        }
-
+        FleetFactory.PatrolType type = fleets.getPatrolType();
         LocationAPI loc = fleet.getContainingLocation();
         if (loc == null) return null;
 
@@ -162,6 +158,14 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
                 }
             }
         }
+        if(retreatInitalized){
+            days= Global.getSector().getClock().convertToDays(amount);
+            if(days>=daysMAX){
+                fleet.despawn(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION,null);
+                return;
+            }
+        }
+
 
     }
 
@@ -170,7 +174,8 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
         fleet.addAbility(Abilities.SUSTAINED_BURN);
         fleet.getAbility(Abilities.SUSTAINED_BURN).activate();
         fleet.clearAssignments();
-        fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, route.getMarket().getPrimaryEntity(), 1000f,
+       daysMAX =  RouteLocationCalculator.getTravelDays(fleet,route.getMarket().getPrimaryEntity())*1.5f;
+        fleet.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN, route.getMarket().getPrimaryEntity(), 10000f,
                 STAND_DOWN_STAGE, goNextScript(route.getCurrent()));
     }
 }

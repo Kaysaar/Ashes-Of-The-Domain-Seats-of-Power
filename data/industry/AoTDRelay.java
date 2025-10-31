@@ -120,6 +120,10 @@ public class AoTDRelay extends MilitaryRelay {
     }
     @Override
     public void reportFleetDespawnedToListener(CampaignFleetAPI fleet, CampaignEventListener.FleetDespawnReason reason, Object param) {
+        if(market.getFaction()==null||!market.getFaction().isPlayerFaction()){
+            super.reportFleetDespawnedToListener(fleet, reason, param);
+            return;
+        }
         RouteManager.RouteData route = RouteManager.getInstance().getRoute(getRouteSourceId(), fleet);
 
         AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();

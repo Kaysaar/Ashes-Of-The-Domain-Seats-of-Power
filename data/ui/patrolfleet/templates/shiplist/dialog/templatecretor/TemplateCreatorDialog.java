@@ -5,6 +5,7 @@ import ashlib.data.plugins.ui.models.BasePopUpDialog;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
 import data.industry.AoTDMilitaryBase;
@@ -36,6 +37,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
     CustomPanelAPI content;
     MarketAPI market;
     BasePatrolFleet fleet;
+    FleetFactory.PatrolType type;
     public TemplateCreatorShowcase getShowcase() {
         return showcase;
     }
@@ -57,6 +59,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
         super(headerTitle);
         this.market = market;
         this.fleet = fleet;
+        this.type = fleet.getPatrolType();
         this.patrolFleetCreatorMode = patrolFleetCreator;
     }
     public TemplateCreatorDialog(String headerTitle, TemplateShowcase referencePanel) {
@@ -106,8 +109,23 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
         if(showcase!=null){
             boolean canConfirm  =AshMisc.isStringValid(showcase.textForName.getText())&&showcase.list.getCountOfShips()<=30&&showcase.list.getCountOfShips()>0;
             boolean additionalConfirm = true;
+            if(showcase.home!=null&&showcase.home.isChecked()){
+                type = FleetFactory.PatrolType.COMBAT;
+                showcase.type = type;
+                showcase.createInfo();
+            }
+            if(showcase.recon!=null&&showcase.recon.isChecked()){
+                type = FleetFactory.PatrolType.FAST;
+                showcase.type = type;
+                showcase.createInfo();
+            }
+            if(showcase.star!=null&&showcase.star.isChecked()){
+                type = FleetFactory.PatrolType.HEAVY;
+                showcase.type = type;
+                showcase.createInfo();
+            }
             if(patrolFleetCreatorMode){
-                additionalConfirm = showcase.list.getFleetPoints(false)<= AoTDFactionPatrolsManager.getInstance().getAvailableFP();
+                additionalConfirm = showcase.list.getFleetPoints(false)<= AoTDFactionPatrolsManager.getInstance().getAvailableFP()&&type!=null;
             }
             if(fleet!=null){
                 additionalConfirm = showcase.list.getFleetPoints(false)<= AoTDFactionPatrolsManager.getInstance().getAvailableFP()+fleet.geTotalFpTaken();
@@ -138,7 +156,9 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
         }
         if(fleet!=null){
             showcase.setExistingTemplate(fleet);
+            type = fleet.getPatrolType();
         }
+
         showcase.createUI();
         content.addComponent(showcase.getMainPanel()).inTL(775, -1);
         tooltip.addCustom(content, 2f);
@@ -183,6 +203,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
             if(fleet==null){
                 BasePatrolFleet fleet = new BasePatrolFleet(showcase.list.getShips(),showcase.textForName.getText());
                 fleet.setTiedTo(market);
+                fleet.setPatrolType(type);
                 fleet.setFleetName(showcase.textForName.getText());
                 AoTDFactionPatrolsManager.getInstance().addNewFleet(fleet);
                 OverviewPatrolPanel.forceRequestUpdate = true;
@@ -212,6 +233,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
 
                     }
                     fleet.setFleetName(showcase.textForName.getText());
+                    fleet.setPatrolType(type);
                     OverviewPatrolPanel.forceRequestUpdate = true;
                 }
                 else{
@@ -220,6 +242,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                     BasePatrolFleet fleet = new BasePatrolFleet(showcase.list.getShips(),showcase.textForName.getText());
                     this.fleet.assignedShipsThatShouldSpawn.putAll(fleet.assignedShipsThatShouldSpawn);
                     this.fleet.data.putAll(fleet.data);
+                    fleet.setPatrolType(type);
                     fleet.setFleetName(showcase.textForName.getText());
                     OverviewPatrolPanel.forceRequestUpdate = true;
                 }
