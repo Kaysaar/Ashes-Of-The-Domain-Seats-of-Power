@@ -211,11 +211,37 @@ public class TemplateFilterPanel implements ExtendedUIPanelPlugin {
                             template.assignedShipsThatShouldSpawn.put(parts[0], amounts);
                             template.data.put(parts[0], dataa);
                         }
+                        if(modsReq==null||modsReq.equals("null")){
+                            return template;
+                        }
                         ArrayList<String> entriesMod = AshMisc.loadEntries(modsReq, ";");
                         for (String string : entriesMod) {
                             String[] sp = string.split("<&>");
                             template.modsReq.put(sp[0],sp[1]);
                         }
+
+                        return template;
+                    }
+
+
+                }
+                if(splitted.length==2){
+                    String name  = splitted[0];
+                    String data = splitted[1];
+                    String modsReq = null;
+
+                    if (AshMisc.isStringValid(name)){
+                        BasePatrolFleetTemplate template = new BasePatrolFleetTemplate();
+                        template.nameOfTemplate = name;
+                        ArrayList<String> entries = AshMisc.loadEntries(data ,";");
+                        for (String entry : entries) {
+                            String[] parts = entry.split(":");
+                            PatrolShipData dataa = new PatrolShipData(parts[0]);
+                            int amounts = Integer.parseInt(parts[1]);
+                            template.assignedShipsThatShouldSpawn.put(parts[0], amounts);
+                            template.data.put(parts[0], dataa);
+                        }
+
 
                         return template;
                     }

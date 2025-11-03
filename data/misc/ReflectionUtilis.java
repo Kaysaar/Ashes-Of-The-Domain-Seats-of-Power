@@ -3,11 +3,14 @@ package data.misc;
 import com.fs.starfarer.api.ui.UIComponentAPI;
 import com.fs.starfarer.api.ui.UIPanelAPI;
 import com.fs.starfarer.api.util.Pair;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReflectionUtilis {
@@ -27,6 +30,10 @@ public class ReflectionUtilis {
     private static final MethodHandle  getFieldTypeHandle;
     private static final Class<?>  fileclass;
     private static final Class<?>  fileWriterClass;
+    private static final Class<?> fileReaderClass;
+    private static final Class<?> bufferedReaderClass;
+    private static final Class<?> readerClass;
+
     static {
         try {
             fieldClass = Class.forName("java.lang.reflect.Field", false, Class.class.getClassLoader());
@@ -44,6 +51,10 @@ public class ReflectionUtilis {
             getParameterTypesHandle = lookup.findVirtual(methodClass, "getParameterTypes", MethodType.methodType(Class[].class));
             fileclass = Class.forName("java.io.File",false,Class.class.getClassLoader());
             fileWriterClass = Class.forName("java.io.FileWriter",false,Class.class.getClassLoader());
+            fileReaderClass = Class.forName("java.io.FileReader", false, Class.class.getClassLoader());
+            bufferedReaderClass = Class.forName("java.io.BufferedReader", false, Class.class.getClassLoader());
+            readerClass = Class.forName("java.io.Reader", false, Class.class.getClassLoader());
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -70,6 +81,127 @@ public class ReflectionUtilis {
         }
 
     }
+    public static Object getFileReader(String pathAbsolute) {
+        try {
+            MethodHandle ctor = lookup.findConstructor(fileReaderClass,
+                    MethodType.methodType(Void.TYPE, String.class));
+            return ctor.invoke(pathAbsolute);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object getBufferedReader(Object reader) {
+        try {
+            MethodHandle ctor = lookup.findConstructor(bufferedReaderClass,
+                    MethodType.methodType(Void.TYPE, readerClass));
+            return ctor.invoke(reader);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Generic close() for any Closeable/Reader/Writer
+    public static void closeQuiet(Object closeable) {
+        try {
+            invokeMethodWithAutoProjection("close", closeable);
+        } catch (Throwable ignored) {}
+    }
+    public static JSONArray readCsvAsJsonArrayReflect(String csvPath)throws Exception {
+        JSONArray array = new JSONArray();
+
+        Object fr = null, br = null;
+        try {
+            fr = ReflectionUtilis.getFileReader(csvPath);
+            br = ReflectionUtilis.getBufferedReader(fr);
+
+            List<String> headers = null;
+            while (true) {
+                Object lineObj = ReflectionUtilis.invokeMethodWithAutoProjection("readLine", br);
+                if (lineObj == null) break; // EOF
+                String line = (String) lineObj;
+                if (line.isEmpty() || line.startsWith("#")) continue;
+
+                List<String> cells = parseCsvLine(line);
+                if (headers == null) {
+                    headers = cells;
+                    continue;
+                }
+
+                JSONObject row = new JSONObject();
+                for (int i = 0; i < headers.size(); i++) {
+                    String key = headers.get(i);
+                    String val = (i < cells.size()) ? cells.get(i) : "";
+                    row.put(key, val);
+                }
+                array.put(row);
+            }
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed reading CSV: " + csvPath, e);
+        } finally {
+            ReflectionUtilis.closeQuiet(br);
+            ReflectionUtilis.closeQuiet(fr);
+        }
+
+        return array;
+    }
+    private static List<String> parseCsvLine(String line) {
+        ArrayList<String> out = new ArrayList<>();
+        if (line == null) return out;
+        StringBuilder cell = new StringBuilder();
+        boolean inQuotes = false;
+        int i = 0, n = line.length();
+        while (i < n) {
+            char c = line.charAt(i);
+            if (inQuotes) {
+                if (c == '"') {
+                    if (i + 1 < n && line.charAt(i + 1) == '"') {
+                        cell.append('"');
+                        i += 2;
+                    } else {
+                        inQuotes = false;
+                        i++;
+                    }
+                } else {
+                    cell.append(c);
+                    i++;
+                }
+            } else {
+                if (c == ',') {
+                    out.add(cell.toString());
+                    cell.setLength(0);
+                    i++;
+                } else if (c == '"') {
+                    inQuotes = true;
+                    i++;
+                } else {
+                    cell.append(c);
+                    i++;
+                }
+            }
+        }
+        out.add(cell.toString());
+        return out;
+    }
+
+    public static boolean createDirectory(String pathAbsolute) {
+        try {
+            // Create a java.io.File instance via MethodHandle
+            MethodHandle fileCtor = lookup.findConstructor(fileclass,
+                    MethodType.methodType(Void.TYPE, String.class));
+            Object fileObj = fileCtor.invoke(pathAbsolute);
+
+            // Get the mkdirs() method handle
+            MethodHandle mkdirsMH = lookup.findVirtual(fileclass, "mkdirs",
+                    MethodType.methodType(boolean.class));
+
+            // Call mkdirs() to create the directory (and parents)
+            return (boolean) mkdirsMH.invoke(fileObj);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Object getPrivateVariable(String fieldName, Object instanceToGetFrom) {
         try {
             Class<?> instances = instanceToGetFrom.getClass();

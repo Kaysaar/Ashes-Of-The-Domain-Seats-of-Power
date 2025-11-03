@@ -64,7 +64,10 @@ public class FleetOnHoverTooltip implements TooltipMakerAPI.TooltipCreator {
         if(fleet.isStartedProcessOfDecom()){
             tooltip.addPara("Days left till de-commission - %s",3f,Color.ORANGE, AshMisc.convertDaysToString(Math.round(fleet.getDaysTillSomething())));
         }
-        tooltip.addPara("Current designated role : %s",3f,Color.ORANGE,BasePatrolFleet.getRole(fleet.getPatrolType())).setAlignment(Alignment.MID);
+        else{
+            tooltip.addPara("Current designated role : %s",3f,Color.ORANGE,BasePatrolFleet.getRole(fleet.getPatrolType()));
+
+        }
 
 
     }

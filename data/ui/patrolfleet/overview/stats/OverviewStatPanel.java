@@ -7,6 +7,7 @@ import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionDoctrineAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.combat.MutableStat;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
@@ -14,6 +15,7 @@ import com.fs.starfarer.api.util.Misc;
 import data.industry.AoTDMilitaryBase;
 import data.plugins.AoTDSopMisc;
 import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
+import data.scripts.patrolfleet.utilis.PatrolFleetFactory;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
 import data.ui.patrolfleet.overview.components.HoldingsTable;
 
@@ -68,7 +70,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         tooltip.addTooltipToPrevious(new TooltipMakerAPI.TooltipCreator() {
             @Override
             public boolean isTooltipExpandable(Object tooltipParam) {
-                return false;
+                return true;
             }
 
             @Override
@@ -83,17 +85,33 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
                 int total = AoTDFactionPatrolsManager.getInstance().getTotalFpGenerated();
                 int taken = AoTDFactionPatrolsManager.getInstance().getFPUsed(true);
                 tooltip.addPara("Your faction generates %s FP points.", 5f, Misc.getPositiveHighlightColor(), "" + total);
+                MutableStat stat = AoTDFactionPatrolsManager.getInstance().getAdditionalFpGranted();
+                if(expanded){
+                    if(!stat.getFlatMods().isEmpty()&&stat.getModifiedInt()>0){
+                        tooltip.addPara("From which %s is generated additionally from:",3f,Color.ORANGE,""+stat.getModifiedInt());
+                        tooltip.setBulletedListMode(BaseIntelPlugin.BULLET);
+                        for (MutableStat.StatMod object : stat.getFlatMods().values()) {
+                            tooltip.addPara("%s : %s",3f,new Color[]{Misc.getPositiveHighlightColor(),Misc.getTextColor()},Misc.getRoundedValue(object.getValue()),object.getDesc());
+                        }
+                        tooltip.setBulletedListMode(null);
+                    }
+                }
+
                 if (taken > total) {
-                    tooltip.addPara("Your faction consumes %s FP points.", 3f, Misc.getNegativeHighlightColor(), "" + taken);
+                    tooltip.addPara("Your faction consumes %s FP points.", 5f, Misc.getNegativeHighlightColor(), "" + taken);
+                    createAddditonalCost(tooltip, expanded);
+
 
                 } else {
-                    tooltip.addPara("Your faction consumes %s FP points.", 3f, Color.ORANGE, "" + taken);
+                    tooltip.addPara("Your faction consumes %s FP points.", 5f, Color.ORANGE, "" + taken);
+                    createAddditonalCost(tooltip, expanded);
+
 
                 }
                 tooltip.addPara("If required FP will exceed FP generated, then some of patrols will become grounded and unable to perform patrol duties!", Misc.getNegativeHighlightColor(), 10f);
                 tooltip.addPara("Note : Any other structure that spawn additional fleets can affect FP, based on spawned fleets and can't be controlled like fleets created by our faction directly!", Misc.getTooltipTitleAndLightHighlightColor(), 10f);
             }
-        }, TooltipMakerAPI.TooltipLocation.BELOW, false);
+        }, TooltipMakerAPI.TooltipLocation.RIGHT, false);
         LabelAPI labelAPI1 = tooltip.addPara("Fleet points : %s / %s", 5f, colors, "" + total, "" + taken);
         labelAPI1.getPosition().inTL(width / 2 - (labelAPI1.computeTextWidth(labelAPI1.getText()) / 2), 30);
         tooltip.addSpacer(0f).getPosition().inTL(5, 50);
@@ -111,38 +129,37 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
 
             @Override
             public float getTooltipWidth(Object tooltipParam) {
-                return 500f;
+                return 400f;
             }
 
             @Override
             public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
-                tooltip.addPara("Note : WIP Mechanic for now its hard set to lev 2 !",Misc.getTooltipTitleAndLightHighlightColor(),3f).setAlignment(Alignment.MID);
-                tooltip.addPara("Admiralty decides on quality, as well as number of officers spawning in your patrol fleets",10f);
-                tooltip.addPara("Admiralty level is based on how much admiralty points are generated compared to fleet points",5f);
+                tooltip.addPara("Admiralty decides on quality, as well as number of officers spawning in your patrol fleets",3f);
+                tooltip.addPara("To achieve admiralty level you need to spent this amount of FP!",5f);
                 tooltip.addSpacer(5f);
-                tooltip.setBulletedListMode(BaseIntelPlugin.INDENT);
                 for (Map.Entry<Integer, Integer> entry : AoTDFactionPatrolsManager.levels.entrySet()) {
-                    tooltip.addPara("Level %s : 1 admiral point per %s fleet points generated",4f,Color.ORANGE,""+entry.getKey(),""+entry.getValue());
+                    tooltip.addPara("Level %s :%s FP required to spent",4f,Color.ORANGE,""+entry.getKey(),""+entry.getValue());
                 }
-                tooltip.setBulletedListMode(null);
+                tooltip.addPara("If FP won't be met, then level will be decreased!",Misc.getNegativeHighlightColor(),3f);
+                int typicalCombatShips = Math.round(Global.getSettings().getFloat("baseCombatShipsForMaxOfficerLevel"));
+                PatrolFleetFactory.addMiniForCurrentQuality(tooltip,5f,Global.getSector().getPlayerFaction(),typicalCombatShips);
+
                 int total = AoTDFactionPatrolsManager.getInstance().getTotalFpGenerated();
                 int points = AoTDFactionPatrolsManager.levels.get(AoTDFactionPatrolsManager.MAX_ADMIRALTY_LEV);
                 int needed = total/points;
                 tooltip.addSpacer(5f);
-                tooltip.addPara("Based on this formula currently we need %s points to get highest level",5f,Color.ORANGE,""+needed);
 
 
             }
         }, TooltipMakerAPI.TooltipLocation.BELOW, false);
         LabelAPI lab = tl.addPara("Aggression", 0f, Color.ORANGE, "" + doctrine.getOfficerQuality());
-        if (aggressionMeter != null) {
-            aggressionMeter.clearUI();
+        if (aggressionMeter == null) {
+            aggressionMeter = new AggressivenessChangerComponent();
         }
-        if (levelComponent != null) {
-            levelComponent.clearUI();
+        if (levelComponent== null) {
+            levelComponent = new AdmiraltyLevelComponent();
         }
-        aggressionMeter = new AggressivenessChangerComponent();
-        levelComponent = new AdmiraltyLevelComponent();
+
         tl.addCustomDoNotSetPosition(aggressionMeter.getMainPanel()).getPosition().setLocation(0,0).inTL(width - aggressionMeter.getMainPanel().getPosition().getWidth() - 10f, 20);
         tl.addCustomDoNotSetPosition(levelComponent.getMainPanel()).getPosition().setLocation(0,0).inTL(0, 20);
 
@@ -158,21 +175,41 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
 
         tooltip.addSectionHeading("Faction Holdings", Alignment.MID, 5f);
         CustomPanelAPI panelInDenial = Global.getSettings().createCustom(width, componentPanel.getPosition().getHeight() - tooltip.getHeightSoFar() - 25, null);
-        CustomPanelAPI panel = Global.getSettings().createCustom(width + 3, panelInDenial.getPosition().getHeight(), null);
+
+        float offsetY;
         if (table != null) {
-            table.dropDownButtons.forEach(DropDownButton::clear);
-            table.dropDownButtons.clear();
+            table.recreateTable();
+        }
+        else{
+            CustomPanelAPI panel = Global.getSettings().createCustom(width + 3, panelInDenial.getPosition().getHeight(), null);
+            table = new HoldingsTable(panel.getPosition().getWidth(), panel.getPosition().getHeight(), panel, true, 0, 0);
+            table.createSections();
+            table.createTable();
+            table.currentlyChosenMarket = currentMarket;
         }
 
-        table = new HoldingsTable(panel.getPosition().getWidth(), panel.getPosition().getHeight(), panel, true, 0, 0);
-        table.createSections();
-        table.createTable();
-        table.currentlyChosenMarket = currentMarket;
-        panelInDenial.addComponent(panel).inTL(-8, 0);
+   ;
+
+        panelInDenial.addComponent(table.mainPanel).inTL(-8, 0);
         tooltip.addCustom(panelInDenial, 5f);
 
         componentPanel.addUIElement(tooltip).inTL(0, 0);
         mainPanel.addComponent(componentPanel).inTL(0, 0);
+    }
+
+    private void createAddditonalCost(TooltipMakerAPI tooltip, boolean expanded) {
+        MutableStat stat;
+        if(expanded){
+            stat = AoTDFactionPatrolsManager.getInstance().getAdditionalFPConsumed();
+            if(!stat.getFlatMods().isEmpty()&&stat.getModifiedInt()>0){
+                tooltip.addPara("From which %s is consumed on :",3f, Color.ORANGE,""+stat.getModifiedInt());
+                tooltip.setBulletedListMode(BaseIntelPlugin.BULLET);
+                for (MutableStat.StatMod object : stat.getFlatMods().values()) {
+                    tooltip.addPara("%s : %s",3f,new Color[]{Misc.getNegativeHighlightColor(),Misc.getTextColor()},Misc.getRoundedValue(object.getValue()),object.getDesc());
+                }
+                tooltip.setBulletedListMode(null);
+            }
+        }
     }
 
     @Override

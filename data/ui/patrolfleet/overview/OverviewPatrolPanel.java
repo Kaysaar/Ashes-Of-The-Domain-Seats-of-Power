@@ -25,7 +25,7 @@ public class OverviewPatrolPanel  implements ExtendedUIPanelPlugin {
     public static float OverviewStatPanelWidth = 430f;
     public static boolean forceRequestUpdate = false;
     public static boolean forceRequestUpdateListOnly = false;
-
+    public static boolean forceRequestUpdateStatsOnly = false;
 
     @Override
     public CustomPanelAPI getMainPanel() {
@@ -101,7 +101,11 @@ public class OverviewPatrolPanel  implements ExtendedUIPanelPlugin {
 
 
         }
-
+        if(forceRequestUpdateStatsOnly){
+            forceRequestUpdateStatsOnly = false;
+            AoTDFactionPatrolsManager.getInstance().advanceAfterFleets(0f);
+            stats.createUI();
+        }
     }
 
     @Override

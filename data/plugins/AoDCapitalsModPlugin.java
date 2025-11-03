@@ -13,10 +13,11 @@ import data.listeners.timeline.models.FirstIncomeColonyListener;
 import data.listeners.timeline.models.FirstIndustryListener;
 import data.listeners.timeline.models.FirstMarketConditionListener;
 import data.listeners.timeline.models.FirstSizeColonyListener;
+import data.plugins.coreui.FactionTabListener;
+import data.plugins.coreui.PatrolTabListener;
 import data.scripts.listeners.CrisisReplacer;
 import data.scripts.managers.TimelineListenerManager;
 import data.memory.AoTDSopMemFlags;
-import data.scripts.CoreUITrackerScript;
 import data.scripts.listeners.FactionAdvance;
 import data.scripts.listeners.FactionHistoryUpdateListener;
 import data.scripts.listeners.FactionMonthlyUpdateListenner;
@@ -32,6 +33,11 @@ import data.scripts.timelineevents.special.*;
 import data.scripts.timelineevents.research_explo.FirstVastRuins;
 import data.scripts.timelineevents.templates.FactionExpansionEvent;
 import data.scripts.timelineevents.templates.GroundDefenceModifierEvent;
+import kaysaar.bmo.buildingmenu.upgradepaths.CustomUpgradePath;
+import kaysaar.bmo.buildingmenu.upgradepaths.UpgradePathManager;
+import org.lwjgl.util.vector.Vector2f;
+
+import java.util.LinkedHashMap;
 
 
 public class AoDCapitalsModPlugin extends BaseModPlugin {
@@ -41,9 +47,6 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
     }
 
     public void onGameLoad(boolean newGame) {
-        if (!Global.getSettings().getModManager().isModEnabled("aotd_vok")) {
-            Global.getSector().addTransientScript(new CoreUITrackerScript());
-        }
         FactionPolicySpecManager.loadSpecs();
         if (!Global.getSector().hasScript(FactionAdvance.class)) {
             Global.getSector().addScript(new FactionAdvance());
@@ -65,11 +68,25 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
             AoTDFactionManager.getInstance().addXP(100000);
         }
         AoTDFactionManager.getInstance().advance(0f);
-
-
-
         PatrolTemplateManager.loadAllExistingTemplates();
+        if(newGame){
+            AoTDFactionPatrolsManager.getInstance().advanceAfterFleets(-1f);
+        }
+        CustomUpgradePath path = new CustomUpgradePath(1,4);
+        LinkedHashMap<String, Vector2f> map = new LinkedHashMap<>();
+        map.put(Industries.PATROLHQ, new Vector2f(1,0));
+        map.put(Industries.MILITARYBASE, new Vector2f(0,1));
+        map.put(Industries.HIGHCOMMAND, new Vector2f(0,2));
+        map.put("aotd_hexagon", new Vector2f(0,3));
+        path.setIndustryCoordinates(map);
+        UpgradePathManager.getInstance().addNewCustomPath(path,Industries.PATROLHQ);
+        Global.getSector().getListenerManager().addListener(new FactionTabListener(),true);
+        Global.getSector().getListenerManager().addListener(new PatrolTabListener(),true);
+    }
 
+    @Override
+    public void onApplicationLoad() throws Exception {
+        PatrolTemplateManager.ensureFileExists();
     }
 
     @Override
@@ -80,11 +97,13 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         AoTDMilitaryBase.industriesValidForBase.add(Industries.PATROLHQ);
         AoTDMilitaryBase.industriesValidForBase.add(Industries.MILITARYBASE);
         AoTDMilitaryBase.industriesValidForBase.add(Industries.HIGHCOMMAND);
+        AoTDMilitaryBase.industriesValidForBase.add("aotd_hexagon");
         if(Global.getSettings().getModManager().isModEnabled("IndEvo")){
             Global.getSettings().getIndustrySpec("IndEvo_ComArray").setPluginClass(AoTDRelay.class.getName());
             Global.getSettings().getIndustrySpec("IndEvo_IntArray").setPluginClass(AoTDRelay.class.getName());
             AoTDMilitaryBase.industriesValidForBase.add("IndEvo_ComArray");
             AoTDMilitaryBase.industriesValidForBase.add("IndEvo_IntArray");
+
         }
 
 

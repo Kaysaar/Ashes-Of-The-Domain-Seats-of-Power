@@ -12,5 +12,6 @@
     <orderEntry type="library" name="LazyLib" level="project" />
     <orderEntry type="library" name="Vok" level="project" />
     <orderEntry type="library" name="IndEvo" level="project" />
+    <orderEntry type="library" name="bmo" level="project" />
   </component>
 </module>

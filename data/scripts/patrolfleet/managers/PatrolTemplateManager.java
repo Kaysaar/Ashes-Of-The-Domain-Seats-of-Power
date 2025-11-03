@@ -13,33 +13,65 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static data.misc.ReflectionUtilis.readCsvAsJsonArrayReflect;
+
 public class PatrolTemplateManager {
     public static LinkedHashMap<String, BasePatrolFleetTemplate> templates = new LinkedHashMap<>();
-    public static final String directoryForTemplates = "data/patrol_templates/patrol_fleet_template_data.csv";
+    public static final String directoryForTemplates = "patrol_fleet_template_data.csv";
     public static boolean updatedList = false;
 
     public static void loadAllExistingTemplates() {
-        if (templates == null) {
-            templates = new LinkedHashMap<>();
-
-        }
+        if (templates == null) templates = new LinkedHashMap<>();
         templates.clear();
+        ensureFileExists();
+        String csvPath = PathManager.getPatrolFleetDataPath();
         try {
-            JSONArray resArray = Global.getSettings().getMergedSpreadsheetDataForMod("name", directoryForTemplates, "aotd_sop");
+            JSONArray resArray = readCsvAsJsonArrayReflect(csvPath);
             for (int i = 0; i < resArray.length(); i++) {
                 JSONObject obj = resArray.getJSONObject(i);
                 BasePatrolFleetTemplate template = BasePatrolFleetTemplate.loadFromJsonFile(obj);
-
-                if (template != null) {
-                    templates.put(template.nameOfTemplate, template);
-                }
-
+                if (template != null) templates.put(template.nameOfTemplate, template);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+
+    }
+    public static void ensureFileExists() {
+        // May be a dir (…/someFolder/) OR a file path (…/patrol_fleet_template_data.csv)
+        String base = PathManager.getPatrolFleetDataPath();
+        String filePath;
+        String dirPath;
+
+        // 1) Decide if base is a file or a directory
+        String norm = base.replace('\\','/');
+        boolean looksLikeFile = norm.toLowerCase().endsWith(".csv");
+
+        if (looksLikeFile) {
+            // base is a file path
+            filePath = base;
+            int cut = Math.max(norm.lastIndexOf('/'), norm.lastIndexOf('\\'));
+            dirPath = (cut >= 0) ? base.substring(0, cut + 1) : "";
+        } else {
+            // base is a directory
+            String sep = norm.endsWith("/") ? "" : "/";
+            filePath = base + sep + directoryForTemplates;
+            dirPath = base;
+        }
+
+
+        ReflectionUtilis.createDirectory(dirPath);
+
+
+        Object fileObj = ReflectionUtilis.getFile(filePath);
+        Boolean exists = (Boolean) ReflectionUtilis.invokeMethodWithAutoProjection("exists", fileObj);
+        if (Boolean.TRUE.equals(exists)) return;
+
+        Object w = ReflectionUtilis.getFileWriter(filePath, /*append=*/false);
+        writeCsvRow(w, "name", "data", "modsReq");
+        ReflectionUtilis.invokeMethodWithAutoProjection("flush", w);
+        ReflectionUtilis.invokeMethodWithAutoProjection("close", w);
     }
 
     public static boolean saveAllExistingTemplates() {

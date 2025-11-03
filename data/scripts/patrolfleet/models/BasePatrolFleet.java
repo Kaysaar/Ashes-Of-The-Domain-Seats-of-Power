@@ -6,6 +6,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.util.Misc;
 import data.industry.AoTDMilitaryBase;
+import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.utilis.FleetPointUtilis;
 
 import java.util.*;
@@ -153,6 +154,11 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
             shouldRemove = true;
             return;
         }
+        if(isDecomisioned()&&!AoTDMilitaryBase.isPatroling(id,getTiedTo())&&!startedProcessOfDecom){
+            float days = getFPTaken()/ AoTDFactionPatrolsManager.getInstance().getDaysPerFP().getModifiedValue();
+            startProcessOfDecom(days);
+            return;
+        }
         if(isInTransit()||isStartedProcessOfDecom()){
             days+= Global.getSector().getClock().convertToDays(amount);
             int fpPointsSupposued = getFpTakenWithoutDecomDuringDecom();
@@ -275,7 +281,7 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
             return "Preparing for de-commission";
         }
         if(tiedTo==null){
-            return "On stand-by, ready to be assigned";
+            return "On stand-by";
         }
         else{
             if(inTransit){
@@ -302,7 +308,7 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
                     return "Currently on Patrol Duty";
                 }
                 else{
-                    return "In-preparation for patrol duty";
+                    return "Preparing for Patrol";
                 }
             }
         }

@@ -13,6 +13,7 @@ import java.util.Iterator;
 
 public class AoTDPatrolManagerMover implements EveryFrameScript {
     IntervalUtil util = new IntervalUtil(Global.getSector().getClock().getSecondsPerDay(),Global.getSector().getClock().getSecondsPerDay());
+
     @Override
     public boolean isDone() {
         return false;

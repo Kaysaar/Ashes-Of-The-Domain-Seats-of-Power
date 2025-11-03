@@ -161,7 +161,7 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
         if(retreatInitalized){
             days= Global.getSector().getClock().convertToDays(amount);
             if(days>=daysMAX){
-                fleet.despawn(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION,null);
+                fleet.despawn(CampaignEventListener.FleetDespawnReason.REACHED_DESTINATION,route);
                 return;
             }
         }

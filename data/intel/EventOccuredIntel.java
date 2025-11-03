@@ -1,5 +1,6 @@
 package data.intel;
 
+import ashlib.data.plugins.coreui.CommandTabMemoryManager;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CoreUITabId;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
@@ -8,7 +9,6 @@ import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.IntelUIAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
-import data.scripts.CoreUITrackerScript;
 import data.scripts.managers.AoTDFactionManager;
 import data.scripts.models.BaseFactionTimelineEvent;
 
@@ -96,8 +96,8 @@ public class EventOccuredIntel extends BaseIntelPlugin {
     @Override
     public void buttonPressConfirmed(Object buttonId, IntelUIAPI ui) {
         if(buttonId==Button_SHIP){
-            CoreUITrackerScript.setMemFlag(CoreUITrackerScript.getStringForCoreTabFaction());
-            CoreUITrackerScript.setMemFlagForFactionTab("timeline");
+            CommandTabMemoryManager.getInstance().setLastCheckedTab("faction");
+            CommandTabMemoryManager.getInstance().getTabStates().put("faction","timeline");
             Global.getSector().getCampaignUI().showCoreUITab(CoreUITabId.OUTPOSTS);
         }
 

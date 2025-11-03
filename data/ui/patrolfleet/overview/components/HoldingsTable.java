@@ -94,8 +94,8 @@ public class HoldingsTable extends UITableImpl {
 
         panelToWorkWith.addUIElement(tooltipOfImpl).inTL(0, 0);
         if (tooltipOfImpl.getExternalScroller() != null) {
-            if (currYPos + panelToWorkWith.getPosition().getHeight() - 22 >= tooltipOfImpl.getHeightSoFar()) {
-                currYPos = tooltipOfImpl.getHeightSoFar() - panelToWorkWith.getPosition().getHeight() + 22;
+            if (currYPos + panelToWorkWith.getPosition().getHeight() - 2 >= tooltipOfImpl.getHeightSoFar()) {
+                currYPos = tooltipOfImpl.getHeightSoFar() - panelToWorkWith.getPosition().getHeight() + 2;
             }
             if(currYPos<=0){
                 currYPos = 0;

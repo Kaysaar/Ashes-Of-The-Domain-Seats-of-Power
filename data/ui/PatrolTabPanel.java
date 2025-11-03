@@ -1,12 +1,13 @@
 package data.ui;
 
+import ashlib.data.plugins.coreui.CommandTabMemoryManager;
+import ashlib.data.plugins.coreui.CommandUIPlugin;
 import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
-import data.scripts.CoreUITrackerScript;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
 import data.ui.patrolfleet.templates.TemplatePanel;
 import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
@@ -17,19 +18,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PatrolTabPanel implements ExtendedUIPanelPlugin, SoundUIManager {
-    CustomPanelAPI mainPanel;
-    CustomPanelAPI panelForPlugins = null;
-    CustomPanelAPI buttonPanel = null;
-    ButtonAPI currentlyChosen;
-    SoundUIManager manager;
+public class PatrolTabPanel  extends CommandUIPlugin {
     UILinesRenderer renderer;
     TemplatePanel panelForTemplates;
     OverviewPatrolPanel patrolPanel;
-    HashMap<ButtonAPI, CustomPanelAPI> panelMap = new HashMap<>();
     boolean pausedMusic = true;
     public static boolean sentSignalForUpdate = false;
     Object outpostPanel;
+
+    public PatrolTabPanel(float width, float height) {
+        super(width, height);
+    }
+
     public HashMap<ButtonAPI, CustomPanelAPI> getPanelMap() {
         return panelMap;
     }
@@ -48,8 +48,7 @@ public class PatrolTabPanel implements ExtendedUIPanelPlugin, SoundUIManager {
 
     }
 
-    public void init(CustomPanelAPI mainPanel, String panelToShowcase, Object data) {
-        this.mainPanel = mainPanel;
+    public void init(String panelToShowcase, Object data) {
         renderer = new UILinesRenderer(0f);
         this.panelForPlugins = mainPanel.createCustomPanel(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight() - 45, null);
         if (!AshMisc.isStringValid(panelToShowcase)) {
@@ -85,6 +84,11 @@ public class PatrolTabPanel implements ExtendedUIPanelPlugin, SoundUIManager {
     }
 
     @Override
+    public String getTabStateId() {
+        return "military";
+    }
+
+    @Override
     public void positionChanged(PositionAPI position) {
 
     }
@@ -109,7 +113,7 @@ public class PatrolTabPanel implements ExtendedUIPanelPlugin, SoundUIManager {
                 entry.getKey().setChecked(false);
                 if (!entry.getKey().equals(currentlyChosen)) {
                     resetCurrentPlugin(entry.getKey());
-                    CoreUITrackerScript.setMemFlagForPatrolTab(entry.getKey().getText().toLowerCase());
+                    CommandTabMemoryManager.getInstance().getTabStates().put(getTabStateId(),entry.getKey().getText().toLowerCase());
                 }
 
 

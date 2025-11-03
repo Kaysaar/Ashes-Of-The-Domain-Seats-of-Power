@@ -18,57 +18,71 @@ public class BasePatrolFleetTemplate {
     public String nameOfTemplate;
     public LinkedHashMap<String, Integer> assignedShipsThatShouldSpawn = new LinkedHashMap<>();
     public LinkedHashMap<String, PatrolShipData> data = new LinkedHashMap<>();
-    public LinkedHashMap<String,String> modsReq = new LinkedHashMap<>();
+    public LinkedHashMap<String, String> modsReq = new LinkedHashMap<>();
 
     public String getNameOfTemplate() {
         return nameOfTemplate;
     }
 
-   public PatrolTemplateDataPackage getPackage(){
-       String name = this.nameOfTemplate;
-       StringBuilder builder = new StringBuilder();
-       StringBuilder builder1 = new StringBuilder();
-       if(this.data.isEmpty())return null;
-       for (PatrolShipData entry : this.data.values()) {
-           builder.append(entry.shipId);
-           builder.append(":");
-           builder.append(this.assignedShipsThatShouldSpawn.get(entry.shipId));
-           builder.append(";");
+    public PatrolTemplateDataPackage getPackage() {
+        String name = this.nameOfTemplate;
+        StringBuilder builder = new StringBuilder();
+        StringBuilder builder1 = new StringBuilder();
+        if (this.data.isEmpty()) return null;
+        boolean appendedDataB = false;
+        boolean appendedData1B = false;
+        for (PatrolShipData entry : this.data.values()) {
+            builder.append(entry.shipId);
+            builder.append(":");
+            builder.append(this.assignedShipsThatShouldSpawn.get(entry.shipId));
+            builder.append(";");
+            appendedDataB = true;
 
-       }
-       for (Map.Entry<String, String> entry :this.modsReq.entrySet()) {
-           builder1.append(entry.getKey());
-           builder1.append("<&>");
-           builder1.append(entry.getValue());
-           builder1.append(";");
-       }
-       String data = builder.toString();
-       String prunedData =  data.substring(0,data.length()-1);
-       String data1 = builder1.toString();
-       String prunedData1 =  data1.substring(0,data1.length()-1);
-       return new PatrolTemplateDataPackage(name,prunedData,prunedData1);
 
-   }
+        }
+        for (Map.Entry<String, String> entry : this.modsReq.entrySet()) {
+            builder1.append(entry.getKey());
+            builder1.append("<&>");
+            builder1.append(entry.getValue());
+            builder1.append(";");
+            appendedData1B = true;
+        }
+        String data = builder.toString();
+
+        String data1 = builder1.toString();
+
+        String prunedData1 = null;
+        String prunedData = null;
+        if (appendedData1B) {
+            prunedData1 = data1.substring(0, data1.length() - 1);
+        }
+        prunedData = data.substring(0, data.length() - 1);
+
+
+        return new PatrolTemplateDataPackage(name, prunedData, prunedData1);
+
+    }
 
     public float getTotalFleetPoints() {
         float value = 0;
         for (Map.Entry<String, Integer> entry : assignedShipsThatShouldSpawn.entrySet()) {
-            value += (entry.getValue() *getHullFP(entry.getKey()));
+            value += (entry.getValue() * getHullFP(entry.getKey()));
         }
         return value;
     }
-    public LinkedHashSet<String>getManufactures(){
+
+    public LinkedHashSet<String> getManufactures() {
         LinkedHashSet<String> manufactures = new LinkedHashSet<>();
-        for (PatrolShipData object :data.values() ) {
-            if(!object.isShipPresent()){
+        for (PatrolShipData object : data.values()) {
+            if (!object.isShipPresent()) {
                 manufactures.add("Data error");
-            }
-            else{
+            } else {
                 manufactures.add(Global.getSettings().getHullSpec(object.shipId).getManufacturer());
             }
         }
         return manufactures;
     }
+
     public void sortShipsByFPDescInPlace() {
         if (assignedShipsThatShouldSpawn == null || assignedShipsThatShouldSpawn.isEmpty()) return;
 
@@ -92,6 +106,7 @@ public class BasePatrolFleetTemplate {
         assignedShipsThatShouldSpawn.clear();
         assignedShipsThatShouldSpawn.putAll(reordered);
     }
+
     public String getShipWithHighestFP() {
         if (assignedShipsThatShouldSpawn == null || assignedShipsThatShouldSpawn.isEmpty()) return null;
 
@@ -108,14 +123,15 @@ public class BasePatrolFleetTemplate {
         return bestId;
     }
 
-    public boolean doesKnowAllShips(){
-        if(!isTemplateValidForModList())return false;
+    public boolean doesKnowAllShips() {
+        if (!isTemplateValidForModList()) return false;
         for (PatrolShipData value : data.values()) {
-            if(!ShipPanelData.learnedShips.contains(Global.getSettings().getHullSpec(value.shipId)))return false;
+            if (!ShipPanelData.learnedShips.contains(Global.getSettings().getHullSpec(value.shipId))) return false;
         }
         return true;
     }
-    public BasePatrolFleetTemplate(LinkedHashMap<String,Integer>shipsInFleet,String nameOfTemplate) {
+
+    public BasePatrolFleetTemplate(LinkedHashMap<String, Integer> shipsInFleet, String nameOfTemplate) {
         this.nameOfTemplate = nameOfTemplate;
         this.assignedShipsThatShouldSpawn = shipsInFleet;
         for (String entry : shipsInFleet.keySet()) {
@@ -123,13 +139,13 @@ public class BasePatrolFleetTemplate {
             data.put(entry, shipData);
         }
         for (PatrolShipData value : data.values()) {
-            if(!AshMisc.isStringValid(value.modID)||"vanilla".equals(value.modID))continue;
-            modsReq.put(value.modID,Global.getSettings().getModManager().getModSpec(value.modID).getName());
+            if (!AshMisc.isStringValid(value.modID) || "vanilla".equals(value.modID)) continue;
+            modsReq.put(value.modID, Global.getSettings().getModManager().getModSpec(value.modID).getName());
         }
 
     }
 
-    public BasePatrolFleetTemplate(){
+    public BasePatrolFleetTemplate() {
     }
 
     public static BasePatrolFleetTemplate loadFromJsonFile(JSONObject object) throws JSONException {
@@ -148,14 +164,13 @@ public class BasePatrolFleetTemplate {
         ArrayList<String> entriesMod = AshMisc.loadEntries(object.getString("modsReq"), ";");
         for (String string : entriesMod) {
             String[] sp = string.split("<&>");
-            template.modsReq.put(sp[0],sp[1]);
+            template.modsReq.put(sp[0], sp[1]);
             try {
                 ModSpecAPI spec = Global.getSettings().getModManager().getModSpec(sp[0]);
-                if(spec!=null){
-                    template.modsReq.replace(sp[0],spec.getName());
+                if (spec != null) {
+                    template.modsReq.replace(sp[0], spec.getName());
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
 
             }
 

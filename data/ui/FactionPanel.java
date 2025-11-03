@@ -1,13 +1,13 @@
 package data.ui;
 
+import ashlib.data.plugins.coreui.CommandTabMemoryManager;
+import ashlib.data.plugins.coreui.CommandUIPlugin;
 import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CustomUIPanelPlugin;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
-import data.misc.UIDataSop;
-import data.scripts.CoreUITrackerScript;
+
 import data.scripts.managers.AoTDFactionManager;
 import data.ui.factionpolicies.FactionPolicyPanel;
 import data.ui.overview.OverviewPanel;
@@ -19,37 +19,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
-    CustomPanelAPI mainPanel;
-    CustomPanelAPI panelForPlugins = null;
-    CustomPanelAPI buttonPanel = null;
-    ButtonAPI currentlyChosen;
-    SoundUIManager manager;
+public class FactionPanel extends CommandUIPlugin {
+
     UILinesRenderer renderer;
-    HashMap<ButtonAPI, CustomPanelAPI> panelMap = new HashMap<>();
-    boolean pausedMusic = true;
     FactionPolicyPanel policyPanel;
     FactionTimelinePanel timelinePanel;
     OverviewPanel overviewPanel;
     public static boolean sentSignalForUpdate = false;
-    Object outpostPanel;
-    public HashMap<ButtonAPI, CustomPanelAPI> getPanelMap() {
-        return panelMap;
+
+    public FactionPanel(float width, float height) {
+        super(width, height);
     }
 
+    @Override
+    public boolean doesPlayCustomSoundWhenEnteredEntireTab() {
+        return true;
+    }
+
+    @Override
+    public String getTabStateId() {
+        return "faction";
+    }
     public CustomPanelAPI getMainPanel() {
         return mainPanel;
     }
 
-    public void init(CustomPanelAPI mainPanel, String panelToShowcase, Object data) {
-        this.mainPanel = mainPanel;
+    public void init(String panelToShowcase, Object data) {
         renderer = new UILinesRenderer(0f);
         this.panelForPlugins = mainPanel.createCustomPanel(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight() - 45, null);
         AoTDFactionManager.getInstance().advance(0f);
         if (!AshMisc.isStringValid(panelToShowcase)) {
             panelToShowcase = "timeline";
         }
-        this.outpostPanel = data;
         createButtonsAndMainPanels();
         for (Map.Entry<ButtonAPI, CustomPanelAPI> buttons : panelMap.entrySet()) {
             if (buttons.getKey().getText().toLowerCase().contains(panelToShowcase)) {
@@ -107,7 +108,7 @@ public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
                 entry.getKey().setChecked(false);
                 if (!entry.getKey().equals(currentlyChosen)) {
                     resetCurrentPlugin(entry.getKey());
-                    CoreUITrackerScript.setMemFlagForFactionTab(entry.getKey().getText().toLowerCase());
+                    CommandTabMemoryManager.getInstance().getTabStates().put(getTabStateId(),entry.getKey().getText().toLowerCase());
                 }
 
 
@@ -138,9 +139,8 @@ public class FactionPanel implements CustomUIPanelPlugin,SoundUIManager {
     }
 
     @Override
-    public void playSound() {
+    public void playSound(Object data) {
         Global.getSoundPlayer().playCustomMusic(1, 1, "aotd_faction", true);
-
     }
 
     public void pauseSound() {

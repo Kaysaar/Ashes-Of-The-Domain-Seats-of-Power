@@ -5,6 +5,7 @@ import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 
 public class PathManager {
     public static String getTimelineScreenshotsPath() {
+
         try {
             // Path to starfarer.api.jar inside starsector-core
             String jarPath = AoDCapitalsModPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -31,6 +32,50 @@ public class PathManager {
             return "";
         }
     }
+    public static String getStarsectorRootPath() {
+        try {
+            String jarPath = AoDCapitalsModPlugin.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .getPath();
+
+            String p = jarPath;
+
+            String gameRoot;
+
+            // Prefer trimming at "starsector-core"
+            int coreIdx = p.indexOf("/starsector-core/");
+            if (coreIdx > 0) {
+                gameRoot = p.substring(0, coreIdx + 1); // keep trailing slash
+            } else {
+                // Otherwise, trim at "/mods/" (parent of mods) or "/jars/"
+                int modsIdx = p.indexOf("/mods/");
+                if (modsIdx > 0) {
+                    gameRoot = p.substring(0, modsIdx + 1);
+                } else {
+                    int jarsIdx = p.indexOf("/jars/");
+                    if (jarsIdx > 0) {
+                        gameRoot = p.substring(0, jarsIdx + 1);
+                    } else {
+                        gameRoot = p.endsWith("/") ? p : p + "/";
+                    }
+                }
+            }
+
+            // Optional: on Windows you might see a leading "/" before "C:/"
+            if (gameRoot.matches("^/[A-Za-z]:/.*")) {
+                gameRoot = gameRoot.substring(1);
+            }
+            if(gameRoot.charAt(0)=='/'){
+                gameRoot = gameRoot.substring(1);
+            }
+
+            return gameRoot;
+        } catch (Exception e) {
+            return "";
+        }
+    }
     public static String getPatrolFleetDataPath() {
         try {
             // Path to starfarer.api.jar inside starsector-core
@@ -53,7 +98,7 @@ public class PathManager {
 
             // Construct path to your mod’s subfolder
             String modFolder = PatrolTemplateManager.directoryForTemplates;
-            return gameRoot + modFolder;
+            return getStarsectorRootPath()+"saves/common/Aotd-sop-patrol-templates/" + modFolder;
         } catch (Exception e) {
             return "";
         }

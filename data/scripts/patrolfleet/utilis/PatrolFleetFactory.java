@@ -2,24 +2,26 @@ package data.scripts.patrolfleet.utilis;
 
 import ashlib.data.plugins.misc.AshMisc;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.FactionAPI;
-import com.fs.starfarer.api.campaign.FleetInflater;
-import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.impl.campaign.fleets.DefaultFleetInflaterParams;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
+import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.loading.VariantSource;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
 
+import java.awt.*;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -37,7 +39,7 @@ public class PatrolFleetFactory {
      * @param rng       optional RNG for officer creation/autofit; null -> new Random()
      */
     public static CampaignFleetAPI createFleetFromAssigned(
-            BasePatrolFleetTemplate template,
+            BasePatrolFleet template,
             FleetParamsV3 params,
             MarketAPI source,
             Random rng
@@ -46,9 +48,9 @@ public class PatrolFleetFactory {
             return null;
         }
         if (rng == null) rng = new Random();
-        if(template instanceof BasePatrolFleet fleet){
-            fleet.performReplacement();
-        }
+
+            template.performReplacement();
+
         // Ensure params.source is set (vanilla inflaters/officer logic often rely on it)
         if (params.source == null) {
             params.source = source;
@@ -68,7 +70,7 @@ public class PatrolFleetFactory {
         }
 
         // Create empty fleet
-        CampaignFleetAPI fleet = Global.getFactory().createEmptyFleet(factionId, params.fleetType, true);
+        CampaignFleetAPI fleet = FleetFactoryV3.createEmptyFleet(factionId, params.fleetType, source);
 
         // Name it
         if (template.getNameOfTemplate() != null) {
@@ -173,31 +175,55 @@ public class PatrolFleetFactory {
         float requestedPoints = params.getTotalPts();
         float actualPoints = fleet.getFleetPoints();
         Misc.setSpawnFPMult(fleet, actualPoints / Math.max(1f, requestedPoints));
-        if(template.getTotalFleetPoints()>=25){
+        if(template.getPatrolType().equals(FleetFactory.PatrolType.FAST)){
             fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_TYPE, FleetTypes.PATROL_SMALL);
         }
-        if(template.getTotalFleetPoints()>=50){
+        if(template.getPatrolType().equals(FleetFactory.PatrolType.COMBAT)){
             fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_TYPE, FleetTypes.PATROL_MEDIUM);
         }
-        if(template.getTotalFleetPoints()>=75){
+        if(template.getPatrolType().equals(FleetFactory.PatrolType.HEAVY)){
             fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_FLEET_TYPE, FleetTypes.PATROL_LARGE);
         }
         return fleet;
     }
+    public static void addMiniForCurrentQuality(TooltipMakerAPI tooltip, float pad, FactionAPI faction, int typicalCombatShips) {
+        final FactionDoctrineAPI doctrine = (faction != null ? faction.getDoctrine() : Global.getSector().getPlayerFaction().getDoctrine());
+        final int q = Math.max(1, doctrine.getOfficerQuality());
 
-    /**
-     * Overload: wrap BasePatrolFleet to a template and forward to the main builder.
-     */
-    public static CampaignFleetAPI createFleetFromAssigned(
-            BasePatrolFleet fleetModel,
-            FleetParamsV3 params,
-            MarketAPI source,
-            Random rng
-    ) {
-        BasePatrolFleetTemplate t = new BasePatrolFleetTemplate(
-                new java.util.LinkedHashMap<>(fleetModel.assignedShipsThatShouldSpawn),
-                fleetModel.getNameOfFleet()
-        );
-        return createFleetFromAssigned(t, params, source, rng);
+        final float mercMult           = Global.getSettings().getFloat("officerAIMaxMercsMult");
+        final int   baseMaxOfficerLvl  = Global.getSettings().getInt("officerMaxLevel");
+        final float baseShipsForMaxLvl = Global.getSettings().getFloat("baseCombatShipsForMaxOfficerLevel");
+
+        // +Officers (merc cap bump)
+        int extraOfficers = (int) Math.floor(q * mercMult);
+
+        // Coverage scaling (caps at Q=5)
+        float oqMult = Math.min(1f, (q - 1f) / 4f);
+
+        // Estimate average officer level for the given fleet size
+        float shipsNeededForCap = baseShipsForMaxLvl * (1f - 0.5f * oqMult);
+        float fleetFactor = Math.min(1f, typicalCombatShips / Math.max(1f, shipsNeededForCap));
+        int maxLvl = Math.round((q / 2f) + fleetFactor * baseMaxOfficerLvl);
+        if (maxLvl < 1) maxLvl = 1;
+        int avgLvl = Math.max(2, Math.min(maxLvl, Math.round(maxLvl * 0.75f)));
+
+        tooltip.addPara("Current level: %s",pad, Color.ORANGE,""+q);
+        tooltip.setBulletedListMode(BaseIntelPlugin.BULLET);
+        tooltip.addPara("Additional officers in fleet : %s",3f,Color.ORANGE,""+extraOfficers);
+        tooltip.addPara("Average officer level : %s",3f,Color.ORANGE,""+avgLvl);
+        tooltip.setBulletedListMode(null);
     }
+
+    /** Simple estimator: count non-fighter members; optionally exclude civilian hulls. */
+    private static int estimateCombatShips(CampaignFleetAPI fleet, boolean includeCivilians) {
+        if (fleet == null) return Math.round(Global.getSettings().getFloat("baseCombatShipsForMaxOfficerLevel"));
+        int n = 0;
+        for (FleetMemberAPI m : fleet.getFleetData().getMembersListCopy()) {
+            if (m.isFighterWing()) continue;
+            if (!includeCivilians && m.isCivilian()) continue;
+            n++;
+        }
+        return Math.max(1, n);
+    }
+
 }
