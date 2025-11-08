@@ -9,6 +9,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
 
 import data.scripts.managers.AoTDFactionManager;
+import data.ui.ambitions.AmbitionPanel;
 import data.ui.factionpolicies.FactionPolicyPanel;
 import data.ui.overview.OverviewPanel;
 import data.ui.timeline.FactionTimelinePanel;
@@ -25,6 +26,8 @@ public class FactionPanel extends CommandUIPlugin {
     FactionPolicyPanel policyPanel;
     FactionTimelinePanel timelinePanel;
     OverviewPanel overviewPanel;
+    AmbitionPanel ambitionPanel;
+
     public static boolean sentSignalForUpdate = false;
 
     public FactionPanel(float width, float height) {
@@ -164,6 +167,7 @@ public class FactionPanel extends CommandUIPlugin {
         ;
         sp = buttonTooltip.addButton("Overview", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         ;
+        ;
         customProd.setShortcut(Keyboard.KEY_R, false);
         research.setShortcut(Keyboard.KEY_T, false);
         sp.setShortcut(Keyboard.KEY_S, false);
@@ -185,6 +189,7 @@ public class FactionPanel extends CommandUIPlugin {
 
         panelMap.put(tiedButton, policyPanel.getMainPanel());
     }
+
 
     private void insertTimeLinePanel(ButtonAPI tiedButton) {
         if (timelinePanel == null) {

@@ -7,6 +7,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import data.industry.AoTDMilitaryBase;
 import data.industry.AoTDRelay;
+import data.listeners.CapitalReapplyListener;
 import data.listeners.ChooseCapitalListener;
 import data.listeners.timeline.*;
 import data.listeners.timeline.models.FirstIncomeColonyListener;
@@ -15,6 +16,7 @@ import data.listeners.timeline.models.FirstMarketConditionListener;
 import data.listeners.timeline.models.FirstSizeColonyListener;
 import data.plugins.coreui.FactionTabListener;
 import data.plugins.coreui.PatrolTabListener;
+import data.scripts.ambition.AmbitionSpecManager;
 import data.scripts.listeners.CrisisReplacer;
 import data.scripts.managers.TimelineListenerManager;
 import data.memory.AoTDSopMemFlags;
@@ -37,6 +39,7 @@ import kaysaar.bmo.buildingmenu.upgradepaths.CustomUpgradePath;
 import kaysaar.bmo.buildingmenu.upgradepaths.UpgradePathManager;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 
 
@@ -47,6 +50,12 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
     }
 
     public void onGameLoad(boolean newGame) {
+
+        try {
+            Global.getSettings().loadFont("graphics/fonts/orbitron16.fnt");
+        } catch (IOException e) {
+
+        }
         FactionPolicySpecManager.loadSpecs();
         if (!Global.getSector().hasScript(FactionAdvance.class)) {
             Global.getSector().addScript(new FactionAdvance());
@@ -58,6 +67,7 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         if (!Global.getSector().getListenerManager().hasListenerOfClass(FactionHistoryUpdateListener.class)) {
             Global.getSector().getListenerManager().addListener(new FactionHistoryUpdateListener());
         }
+        Global.getSector().getListenerManager().addListener(new CapitalReapplyListener(),true);
         addTransientScripts();
         TimelineListenerManager.getInstance().setNeedsResetAfterInterval(true);
         if (newGame) {
@@ -87,6 +97,7 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
     @Override
     public void onApplicationLoad() throws Exception {
         PatrolTemplateManager.ensureFileExists();
+        AmbitionSpecManager.loadSpecs();
     }
 
     @Override

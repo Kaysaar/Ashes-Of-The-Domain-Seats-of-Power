@@ -7,6 +7,7 @@ import com.fs.starfarer.api.ui.CustomPanelAPI;
 import com.fs.starfarer.api.ui.PositionAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import data.industry.NovaExploraria;
+import data.ui.ambitions.AmbitionPanel;
 import data.ui.basecomps.ExtendUIPanelPlugin;
 import data.ui.basecomps.FactionBonusPanel;
 import data.ui.basecomps.FactionFlagButtonComponent;
@@ -30,6 +31,7 @@ public class OverviewPanel implements ExtendUIPanelPlugin {
     CustomPanelAPI currentPanel;
     PopulationPanel populationPanel;
     FactionAllData  commodityData;
+    AmbitionPanel panel;
     public OverviewPanel(float width, float height) {
         mainPanel = Global.getSettings().createCustom(width, height, this);
         createUI();
@@ -42,14 +44,13 @@ public class OverviewPanel implements ExtendUIPanelPlugin {
         else{
             populationPanel =  new PopulationPanel(mainPanel.getPosition().getWidth() - 410, mainPanel.getPosition().getHeight());
             commodityData =  new FactionAllData(mainPanel.getPosition().getWidth() - 410, mainPanel.getPosition().getHeight());
-
-
+            panel =  new AmbitionPanel(mainPanel.getPosition().getWidth() - 415, mainPanel.getPosition().getHeight());
         }
         if (current.equals("pop")) {
             currentPanel =populationPanel.getMainPanel();
         }
-        if (current.equals("star")) {
-
+        if (current.equals("ambition")) {
+            currentPanel = panel.getMainPanel();
         }
         if (current.equals("colonies")) {
             BaseCapitalButton button = NovaExploraria.getNova().createButton(850,130);
@@ -59,6 +60,7 @@ public class OverviewPanel implements ExtendUIPanelPlugin {
         if (current.equals("commodities")) {
             currentPanel =commodityData.getMainPanel();
         }
+        panel.createUI();
         populationPanel.createUI();
         commodityData.createUI();
         mainPanel.addComponent(currentPanel).inTL(405, 0);

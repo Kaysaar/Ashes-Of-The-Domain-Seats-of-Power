@@ -7,6 +7,7 @@ import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.Pair;
 import data.industry.NovaExploraria;
+import data.scripts.ambition.AmbitionManager;
 import data.scripts.managers.AoTDFactionManager;
 import data.ui.basecomps.*;
 
@@ -76,7 +77,13 @@ public class OverviewShortInfoPanel implements ExtendUIPanelPlugin {
         buttons.add(tooltipSub.addButton("Global Market Data", "commodities", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, contentPanel.getPosition().getWidth() - 10, 30, 10f));
         tooltip.endSubTooltip();
 
-        tooltip.addCustom(new FactionBonusPanel(contentPanel.getPosition().getWidth(), contentPanel.getPosition().getHeight() - tooltipSub.getHeightSoFar() - tooltip.getHeightSoFar() - 110f, false).getMainPanel(), 5f);
+        tooltip.addCustom(new FactionBonusPanel(contentPanel.getPosition().getWidth(), contentPanel.getPosition().getHeight() - tooltipSub.getHeightSoFar() - tooltip.getHeightSoFar() - 205f, false).getMainPanel(), 5f);
+        tooltip.addSectionHeading("Ambition", Alignment.MID, 5f);
+        String amb = "Show Ambition Progress";
+        if(AmbitionManager.getInstance().getCurrentAmbition()==null){
+            amb = "Choose Ambition";
+        }
+        buttons.add(        tooltip.addButton(amb, "ambition", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, contentPanel.getPosition().getWidth() - 10, 30, 8f));
         float y = contentPanel.getPosition().getHeight() - tooltipSub.getHeightSoFar() - 5f;
         tooltip.addCustom(tooltipSub, 0f).getPosition().inTL(-5, y);
         tooltip.addCustom(createGatheringPointBar(contentPanel.getPosition().getWidth()), 5f).getPosition().inTL(-5, y - 105);

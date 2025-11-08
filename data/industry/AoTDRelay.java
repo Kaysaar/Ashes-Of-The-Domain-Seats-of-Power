@@ -125,7 +125,9 @@ public class AoTDRelay extends MilitaryRelay {
             return;
         }
         RouteManager.RouteData route = RouteManager.getInstance().getRoute(getRouteSourceId(), fleet);
-
+        if(route==null){
+            route = (RouteManager.RouteData) param;
+        }
         AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
         BasePatrolFleet fleetData = AoTDFactionPatrolsManager.getInstance().getFleet(data.getId());
         if (fleetData != null) {
@@ -137,6 +139,7 @@ public class AoTDRelay extends MilitaryRelay {
             }
 
             if(fleetData.isInTransit()){
+                RouteManager.RouteData finalRoute = route;
                 Global.getSector().addScript(new DelayedActionScript(MathUtils.getRandomNumberInRange(2,4)) {
                     @Override
                     public void doAction() {
@@ -144,7 +147,7 @@ public class AoTDRelay extends MilitaryRelay {
                                 market,
                                 null,
                                 market.getFactionId(),
-                                route.getQualityOverride(),
+                                finalRoute.getQualityOverride(),
                                 null,
                                 fleetData.getFPTaken(), // combatPts
                                 0f, // freighterPts
