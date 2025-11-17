@@ -21,11 +21,15 @@ public class OverviewShortInfoPanel implements ExtendUIPanelPlugin {
     ArrayList<ButtonAPI> buttons = new ArrayList<>();
     public boolean recreateUI = false;
     public String current = "pop";
-
+    public static boolean showAmbPanel = false;
     public OverviewShortInfoPanel(float width, float height) {
         mainPanel = Global.getSettings().createCustom(width, height, this);
         renderer = new UILinesRenderer(0f);
         renderer.setPanel(mainPanel);
+        if(showAmbPanel){
+            current = "ambition";
+            showAmbPanel = false;
+        }
         createUI();
     }
 
@@ -78,12 +82,12 @@ public class OverviewShortInfoPanel implements ExtendUIPanelPlugin {
         tooltip.endSubTooltip();
 
         tooltip.addCustom(new FactionBonusPanel(contentPanel.getPosition().getWidth(), contentPanel.getPosition().getHeight() - tooltipSub.getHeightSoFar() - tooltip.getHeightSoFar() - 205f, false).getMainPanel(), 5f);
-        tooltip.addSectionHeading("Ambition", Alignment.MID, 5f);
-        String amb = "Show Ambition Progress";
-        if(AmbitionManager.getInstance().getCurrentAmbition()==null){
-            amb = "Choose Ambition";
-        }
-        buttons.add(        tooltip.addButton(amb, "ambition", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, contentPanel.getPosition().getWidth() - 10, 30, 8f));
+//        tooltip.addSectionHeading("Ambition", Alignment.MID, 5f);
+//        String amb = "Show Ambition Progress";
+//        if(AmbitionManager.getInstance().getCurrentAmbition()==null){
+//            amb = "Choose Ambition";
+//        }
+//        buttons.add(        tooltip.addButton(amb, "ambition", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, contentPanel.getPosition().getWidth() - 10, 30, 8f));
         float y = contentPanel.getPosition().getHeight() - tooltipSub.getHeightSoFar() - 5f;
         tooltip.addCustom(tooltipSub, 0f).getPosition().inTL(-5, y);
         tooltip.addCustom(createGatheringPointBar(contentPanel.getPosition().getWidth()), 5f).getPosition().inTL(-5, y - 105);
@@ -127,6 +131,12 @@ public class OverviewShortInfoPanel implements ExtendUIPanelPlugin {
                 recreateUI = true;
                 break;
             }
+        }
+        if(current.equals("ambition")){
+            if(AmbitionManager.getInstance().getCurrentAmbition()!=null){
+                buttons.stream().filter(x->x.getCustomData().equals(current)).findFirst().ifPresent(x->x.setText("Check Ambition Progress"));
+            }
+
         }
     }
 

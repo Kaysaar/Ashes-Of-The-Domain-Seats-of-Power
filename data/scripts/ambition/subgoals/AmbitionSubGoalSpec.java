@@ -1,4 +1,4 @@
-package data.scripts.ambition;
+package data.scripts.ambition.subgoals;
 
 import ashlib.data.plugins.misc.AshMisc;
 import com.fs.starfarer.api.Global;
@@ -24,6 +24,11 @@ public class AmbitionSubGoalSpec {
     public int getWeight() {
         return weight;
     }
+    String taskToDo;
+
+    public String getTaskToDo() {
+        return taskToDo;
+    }
 
     public LinkedHashSet<String> getReqTasksForFirst() {
         return reqTasksForFirst;
@@ -39,11 +44,13 @@ public class AmbitionSubGoalSpec {
             reqTasksForFirst.addAll(AshMisc.loadEntries(rqTasks,","));
         }
         int weight = object.getInt("weightOfTask");
+        String taskName = object.optString("taskToDo");
         String className = object.optString("ambitionTaskScript");
         AmbitionSubGoalSpec spec = new AmbitionSubGoalSpec();
         spec.id = id;
         spec.name = name;
         spec.weight = weight;
+        spec.taskToDo = taskName;
         spec.ambitionTaskScript = className;
         spec.reqTasksForFirst.addAll(reqTasksForFirst);
         return spec;

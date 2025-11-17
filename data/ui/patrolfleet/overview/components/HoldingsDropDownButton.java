@@ -44,16 +44,16 @@ public class HoldingsDropDownButton extends DropDownButton {
             buttons = new ArrayList<>();
             if (droppableMode) {
                 for (MarketAPI subSpec : sub) {
-                    HoldingsButton button = new HoldingsButton(width - 40, height, subSpec, 10f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
+                    HoldingsButton button = new HoldingsButton(width-5f , height, subSpec, 5f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
                     button.createUI();
                     buttons.add(button);
                 }
             }
             if (droppableMode) {
-                mainButton = new HoldingsButton(width - 30, height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), true);
+                mainButton = new HoldingsButton(width , height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), true);
 
             } else {
-                mainButton = new HoldingsButton(width - 30, height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
+                mainButton = new HoldingsButton(width , height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
 
             }
             mainButton.createUI();

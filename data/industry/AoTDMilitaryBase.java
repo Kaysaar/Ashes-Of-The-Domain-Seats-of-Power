@@ -171,6 +171,9 @@ public class AoTDMilitaryBase extends MilitaryBase {
         if(route==null){
             route = (RouteManager.RouteData) param;
         }
+        if(route==null){
+            return;
+        }
         AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
         BasePatrolFleet fleetData = AoTDFactionPatrolsManager.getInstance().getFleet(data.getId());
         if (fleetData != null) {

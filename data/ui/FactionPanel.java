@@ -1,6 +1,7 @@
 package data.ui;
 
 import ashlib.data.plugins.coreui.CommandTabMemoryManager;
+import ashlib.data.plugins.coreui.CommandTabTracker;
 import ashlib.data.plugins.coreui.CommandUIPlugin;
 import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
@@ -111,6 +112,7 @@ public class FactionPanel extends CommandUIPlugin {
                 entry.getKey().setChecked(false);
                 if (!entry.getKey().equals(currentlyChosen)) {
                     resetCurrentPlugin(entry.getKey());
+
                     CommandTabMemoryManager.getInstance().getTabStates().put(getTabStateId(),entry.getKey().getText().toLowerCase());
                 }
 
@@ -133,7 +135,15 @@ public class FactionPanel extends CommandUIPlugin {
 
     @Override
     public void processInput(List<InputEventAPI> events) {
+        for (InputEventAPI event : events) {
+            if(CommandTabTracker.lockedState){
+                if(event.isConsumed())continue;
+                if(event.getEventValue()==Keyboard.KEY_ESCAPE&&!event.isMouseEvent()){
+                    event.consume();
+                }
+            }
 
+        }
     }
 
     @Override
@@ -189,6 +199,7 @@ public class FactionPanel extends CommandUIPlugin {
 
         panelMap.put(tiedButton, policyPanel.getMainPanel());
     }
+
 
 
     private void insertTimeLinePanel(ButtonAPI tiedButton) {

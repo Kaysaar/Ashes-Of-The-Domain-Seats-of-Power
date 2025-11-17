@@ -9,6 +9,5 @@ public class AdAstraPerAspera extends BaseAmbition {
     public void createFlavourTooltip(TooltipMakerAPI tooltip) {
         float progress = getProgress();
 
-        tooltip.addPara("Test",5f);
     }
 }

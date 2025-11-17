@@ -52,7 +52,7 @@ public class PatrolTabPanel  extends CommandUIPlugin {
         renderer = new UILinesRenderer(0f);
         this.panelForPlugins = mainPanel.createCustomPanel(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight() - 45, null);
         if (!AshMisc.isStringValid(panelToShowcase)) {
-            panelToShowcase = "templates";
+            panelToShowcase = "overview";
         }
         this.outpostPanel = data;
         createButtonsAndMainPanels();

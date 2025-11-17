@@ -51,9 +51,15 @@ public class NovaExploraria extends BaseCapitalIndustry {
         return abyssDivers;
     }
 
+    public static void setReachedThreshold(){
+        Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().set("$aotd_nova_av",true);
+    }
+    public static boolean reachedThresholdOfPoints(){
+        return Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().is("$aotd_nova_av",true);
+    }
     @Override
     public boolean isAvailableToBuild() {
-        return AoTDFactionManager.getInstance().doesControlCapital()&&AoTDFactionManager.getInstance().getCapitalMarket().getId().equals(market.getId());
+        return AoTDFactionManager.getInstance().doesControlCapital()&&AoTDFactionManager.getInstance().getCapitalMarket().getId().equals(market.getId())&&reachedThresholdOfPoints();
     }
 
     @Override

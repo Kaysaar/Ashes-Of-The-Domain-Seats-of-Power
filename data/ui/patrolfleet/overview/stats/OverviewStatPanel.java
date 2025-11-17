@@ -3,6 +3,7 @@ package data.ui.patrolfleet.overview.stats;
 import ashlib.data.plugins.ui.models.DropDownButton;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import ashlib.data.plugins.ui.models.ProgressBarComponent;
+import ashlib.data.plugins.ui.models.ProgressBarComponentV2;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionDoctrineAPI;
@@ -65,8 +66,14 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         if (taken > total) {
             colors[1] = Misc.getNegativeHighlightColor();
         }
-        ProgressBarComponent component = new ProgressBarComponent(width - 15, 25, Math.min(1f, (float) total / taken), Misc.getDarkPlayerColor().brighter().brighter());
-        tooltip.addCustom(component.getRenderingPanel(), 0f).getPosition().inTL(7, 25);
+        ProgressBarComponentV2 component = new ProgressBarComponentV2(width - 15, 25,"Fleet points "+total+" / "+taken,null, Misc.getDarkPlayerColor().brighter(),Misc.getBasePlayerColor(), Math.min(1f, (float) total / taken)){
+            @Override
+            public void influenceLabel() {
+                this.getProgressLabel().setHighlightColors(colors);
+                this.getProgressLabel().setHighlight(""+total,""+taken);
+            }
+        };
+        tooltip.addCustom(component.getMainPanel(), 0f).getPosition().inTL(7, 25);
         tooltip.addTooltipToPrevious(new TooltipMakerAPI.TooltipCreator() {
             @Override
             public boolean isTooltipExpandable(Object tooltipParam) {
@@ -112,9 +119,6 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
                 tooltip.addPara("Note : Any other structure that spawn additional fleets can affect FP, based on spawned fleets and can't be controlled like fleets created by our faction directly!", Misc.getTooltipTitleAndLightHighlightColor(), 10f);
             }
         }, TooltipMakerAPI.TooltipLocation.RIGHT, false);
-        LabelAPI labelAPI1 = tooltip.addPara("Fleet points : %s / %s", 5f, colors, "" + total, "" + taken);
-        labelAPI1.getPosition().inTL(width / 2 - (labelAPI1.computeTextWidth(labelAPI1.getText()) / 2), 30);
-        tooltip.addSpacer(0f).getPosition().inTL(5, 50);
         FactionDoctrineAPI doctrine = Global.getSector().getPlayerFaction().getDoctrine();
 
         CustomPanelAPI secondPanelInDenial = Global.getSettings().createCustom(width, 55, null);
@@ -181,7 +185,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
             table.recreateTable();
         }
         else{
-            CustomPanelAPI panel = Global.getSettings().createCustom(width + 3, panelInDenial.getPosition().getHeight(), null);
+            CustomPanelAPI panel = Global.getSettings().createCustom(width +1, panelInDenial.getPosition().getHeight(), null);
             table = new HoldingsTable(panel.getPosition().getWidth(), panel.getPosition().getHeight(), panel, true, 0, 0);
             table.createSections();
             table.createTable();

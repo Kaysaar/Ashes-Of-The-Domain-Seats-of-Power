@@ -1,6 +1,7 @@
 package data.scripts.ambition;
 
 import com.fs.starfarer.api.Global;
+import data.scripts.ambition.subgoals.AmbitionSubGoalSpec;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 
 public class AmbitionSpecManager {
-    public static LinkedHashMap<String,AmbitionSubGoalSpec> specSubGoals = new LinkedHashMap<>();
+    public static LinkedHashMap<String, AmbitionSubGoalSpec> specSubGoals = new LinkedHashMap<>();
     public static LinkedHashMap<String,AmbitionSpec> specs = new LinkedHashMap<>();
     public static AmbitionSubGoalSpec getSubGoalSpec(String specId){
         return specSubGoals.get(specId);

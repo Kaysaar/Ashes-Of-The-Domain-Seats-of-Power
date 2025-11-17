@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.listeners.PlayerColonizationListener;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.loading.specs.PlanetSpec;
 import data.conditions.AoTDFactionCapital;
+import data.scripts.ambition.AmbitionManager;
 import data.scripts.managers.AoTDFactionManager;
 
 public class CapitalReapplyListener implements PlayerColonizationListener {
@@ -21,6 +22,7 @@ public class CapitalReapplyListener implements PlayerColonizationListener {
                 AoTDFactionCapital.applyToCapital();
             }
         }
+        AmbitionManager.getInstance();
     }
 
     @Override

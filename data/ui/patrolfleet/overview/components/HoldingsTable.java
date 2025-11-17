@@ -27,7 +27,7 @@ public class HoldingsTable extends UITableImpl {
         if(dropDownButtons.isEmpty()){
             ArrayList<StarSystemAPI>systems = HoldingsUtilis.getSystemsWithPlayerFactionColonies();
             for (StarSystemAPI system : systems) {
-                HoldingsDropDownButton button = new HoldingsDropDownButton(this,width+9,60,0,0,false,system,HoldingsUtilis.getFactionMarketsInSystem(Global.getSector().getPlayerFaction(),system));
+                HoldingsDropDownButton button = new HoldingsDropDownButton(this,width-13,60,0,0,false,system,HoldingsUtilis.getFactionMarketsInSystem(Global.getSector().getPlayerFaction(),system));
                 dropDownButtons.add(button);
             }
 
@@ -41,12 +41,12 @@ public class HoldingsTable extends UITableImpl {
         Color bright = Misc.getBrightPlayerColor();
         float usableWidth = width-13;
         float section =usableWidth/3;
-        buttonName = tooltipOfButtons.addAreaCheckbox("Name", SortingState.ASCENDING, base, bg, bright, section, 20, 0f);
-        buttonFPUsed = tooltipOfButtons.addAreaCheckbox("FP allocated", SortingState.NON_INITIALIZED, base, bg, bright, section, 20, 0f);
-        buttonFPGenerated = tooltipOfButtons.addAreaCheckbox("FP generated", SortingState.NON_INITIALIZED, base, bg, bright, section, 20, 0f);
+        buttonName = tooltipOfButtons.addAreaCheckbox("Name", SortingState.ASCENDING, base, bg, bright, section+20, 20, 0f);
+        buttonFPUsed = tooltipOfButtons.addAreaCheckbox("FP allocated", SortingState.NON_INITIALIZED, base, bg, bright, section-11, 20, 0f);
+        buttonFPGenerated = tooltipOfButtons.addAreaCheckbox("FP generated", SortingState.NON_INITIALIZED, base, bg, bright, section-11, 20, 0f);
         buttonName.getPosition().inTL(10, 0);
-        buttonFPUsed.getPosition().inTL(section+1, 0);
-        buttonFPGenerated.getPosition().inTL((section+1)*2, 0);
+        buttonFPUsed.getPosition().inTL(section+31, 0);
+        buttonFPGenerated.getPosition().inTL((section*2)+21, 0);
         mainPanel.addUIElement(tooltipOfButtons).inTL(0, 0);
         lastCheckedState = buttonName;
     }

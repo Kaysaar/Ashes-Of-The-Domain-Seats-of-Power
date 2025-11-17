@@ -4,11 +4,13 @@ package data.plugins;
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import data.industry.AoTDMilitaryBase;
 import data.industry.AoTDRelay;
 import data.listeners.CapitalReapplyListener;
 import data.listeners.ChooseCapitalListener;
+import data.listeners.PatrolReportListener;
 import data.listeners.timeline.*;
 import data.listeners.timeline.models.FirstIncomeColonyListener;
 import data.listeners.timeline.models.FirstIndustryListener;
@@ -16,6 +18,7 @@ import data.listeners.timeline.models.FirstMarketConditionListener;
 import data.listeners.timeline.models.FirstSizeColonyListener;
 import data.plugins.coreui.FactionTabListener;
 import data.plugins.coreui.PatrolTabListener;
+import data.scripts.ambition.AmbitionManager;
 import data.scripts.ambition.AmbitionSpecManager;
 import data.scripts.listeners.CrisisReplacer;
 import data.scripts.managers.TimelineListenerManager;
@@ -74,11 +77,13 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
             Global.getSector().getEconomy().getMarketsCopy().forEach(x -> x.getPrimaryEntity().getMemoryWithoutUpdate().set("$aotd_was_colonized", true));
         }
         Global.getSector().getListenerManager().addListener(new ChooseCapitalListener(),true);
+        Global.getSector().getListenerManager().addListener(new PatrolReportListener(),true);
         if(newGame && Global.getSettings().isDevMode()){
             AoTDFactionManager.getInstance().addXP(100000);
         }
         AoTDFactionManager.getInstance().advance(0f);
         PatrolTemplateManager.loadAllExistingTemplates();
+
         if(newGame){
             AoTDFactionPatrolsManager.getInstance().advanceAfterFleets(-1f);
         }
@@ -92,6 +97,12 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         UpgradePathManager.getInstance().addNewCustomPath(path,Industries.PATROLHQ);
         Global.getSector().getListenerManager().addListener(new FactionTabListener(),true);
         Global.getSector().getListenerManager().addListener(new PatrolTabListener(),true);
+
+        if(newGame){
+            AmbitionManager.getInstance();
+            AmbitionManager.getInstance().setNewGameMode(true);
+            Global.getSector().getPlayerFaction().getDoctrine().setOfficerQuality(1);
+        }
     }
 
     @Override

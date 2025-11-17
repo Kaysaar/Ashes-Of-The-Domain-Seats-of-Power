@@ -55,7 +55,7 @@ public class ResearchAndExplorationGoal extends BaseFactionGoal{
 
         List<MarketAPI> markets = AoTDFactionManager.getMarketsUnderPlayer();
         if(id.equals("goal_1")){
-            markets.forEach(x->x.getStability().modifyFlat("aotd_prosperity_1",1,"Reached Property Threshold"));
+            NovaExploraria.setReachedThreshold();
         }
         else if(id.equals("goal_2")){
             AoTDFactionManager.getInstance().getXpPointsPerMonth().modifyFlat("aotd_research",400);

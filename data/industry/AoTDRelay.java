@@ -129,15 +129,19 @@ public class AoTDRelay extends MilitaryRelay {
             route = (RouteManager.RouteData) param;
         }
         AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
+        if(route==null){
+            return;
+        }
         BasePatrolFleet fleetData = AoTDFactionPatrolsManager.getInstance().getFleet(data.getId());
         if (fleetData != null) {
-            fleetData.performReplacement();
+
             if (fleetData.isDecomisioned()) {
+                fleetData.getShipsForReplacementWhenInPrep().clear();
                 float days = fleetData.getFPTaken()/AoTDFactionPatrolsManager.getInstance().getDaysPerFP().getModifiedValue();
                 fleetData.startProcessOfDecom(days);
                 return;
             }
-
+            fleetData.performReplacement();
             if(fleetData.isInTransit()){
                 RouteManager.RouteData finalRoute = route;
                 Global.getSector().addScript(new DelayedActionScript(MathUtils.getRandomNumberInRange(2,4)) {

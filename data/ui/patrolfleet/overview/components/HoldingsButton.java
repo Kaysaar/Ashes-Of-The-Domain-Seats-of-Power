@@ -25,7 +25,8 @@ public class HoldingsButton extends CustomButton {
     @Override
     public void createButtonContent(TooltipMakerAPI tooltip) {
         float widthOfSection = width;
-        float nameSectionWidth = ((widthOfSection+indent)/3)-indent;
+        float nameSectionWidth = ((widthOfSection)/3);
+        nameSectionWidth+=20;
         float restWidthToDistribute = widthOfSection - nameSectionWidth;
         float fPGeneratedAmount =restWidthToDistribute/2;
         float fPUsedAmount = restWidthToDistribute/2;
@@ -46,21 +47,22 @@ public class HoldingsButton extends CustomButton {
         }
         EntityWithNameComponent component = new EntityWithNameComponent(star,nameSectionWidth,height-25);
         component.createUI();
-        tooltip.addCustom(component.getMainPanel(),0f).getPosition().inTL(0,8);
+        tooltip.addCustom(component.getMainPanel(),0f).getPosition().inTL(-indent,8);
         LabelAPI taken = tooltip.addPara(""+takenV,0f);
         if(takenV>0){
             taken.setColor(Color.ORANGE);
         }
+
         LabelAPI generated = tooltip.addPara(""+generatedV,Misc.getPositiveHighlightColor(),0f);
         if(isWithArrow){
             panelIndicator = Global.getSettings().createCustom(15,15,null);
             tooltip.addCustom(panelIndicator,0f).getPosition().inTL(widthOfSection-30,centerY-7);
 
         }
-        float currCenter = nameSectionWidth+(fPGeneratedAmount/2);
+        float currCenter = (float) (nameSectionWidth+(fPGeneratedAmount/2)-(Math.floor(indent/2)));
         taken.getPosition().inTL(currCenter-(taken.computeTextWidth(taken.getText())/2),centerY-(taken.computeTextHeight(taken.getText())/2));
 
-        currCenter = nameSectionWidth+fPGeneratedAmount+(fPUsedAmount/2);
+        currCenter = (float) (nameSectionWidth+fPGeneratedAmount+(fPUsedAmount/2)-(Math.floor(indent/2)));
         generated.getPosition().inTL(currCenter-(generated.computeTextWidth(generated.getText())/2),centerY-(generated.computeTextHeight(generated.getText())/2));
     }
 }

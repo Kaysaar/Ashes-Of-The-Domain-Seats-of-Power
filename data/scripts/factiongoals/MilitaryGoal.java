@@ -31,7 +31,7 @@ public class MilitaryGoal extends BaseFactionGoal{
     public void createTooltipForSection(String id, TooltipMakerAPI tooltip) {
         float pad = 2f;
         if(id.equals("goal_1")){
-            tooltip.addPara(BaseIntelPlugin.INDENT+"Unlock policy : Services Guarantees Citizenship", pad);
+            tooltip.addPara(BaseIntelPlugin.INDENT+"Unlock new Building : Hexagon", pad);
         }
         if(id.equals("goal_2")){
             tooltip.addPara(BaseIntelPlugin.INDENT+"Unlock policy : Managed Democracy", pad);
