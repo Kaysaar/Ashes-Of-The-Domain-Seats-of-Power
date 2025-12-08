@@ -57,6 +57,7 @@ public class TemplateFilterPanel implements ExtendedUIPanelPlugin {
         createCopy = test.addButton("Create template from copy", null, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, tWidth - 15, 35, 10f);
         test.addPara("Filters", Misc.getTooltipTitleAndLightHighlightColor(), 6f).setAlignment(Alignment.MID);
         searchBar = test.addTextField(componentPanel.getPosition().getWidth() - 10, 25, Fonts.ORBITRON_20AA, 5f);
+        searchBar.setMaxChars(25);
         searchBar.setText(prevText);
          missingModsChk = test.addCheckbox(
                 200f, 20f,

@@ -24,9 +24,16 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
     CustomPanelAPI headerPanel;
     TextFieldAPI textForName;
     CustomPanelAPI dataAboutFleetPanel;
-    public ButtonAPI recon,home,star;
+    public ButtonAPI recon,home,star,enabledPrefix;
     boolean patrolFleetCreatorMode = false;
     FleetFactory.PatrolType type;
+    boolean fleetPrefixNameDissabled;
+
+    public boolean isFleetPrefixNameDissabled() {
+        return fleetPrefixNameDissabled;
+    }
+
+    String prevText = "";
     public TextFieldAPI getTextForName() {
         return textForName;
     }
@@ -35,6 +42,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         this.existingTemplate = existingTemplate;
         if(existingTemplate instanceof BasePatrolFleet fleet){
             type = fleet.getPatrolType();
+            fleetPrefixNameDissabled = fleet.isDontUseFactionPrefix();
         }
     }
 
@@ -78,7 +86,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         updateHeader();
         float height  =  componentPanel.getPosition().getHeight() - headerPanel.getPosition().getHeight()-105;
         if(patrolFleetCreatorMode){
-            height = componentPanel.getPosition().getHeight() - headerPanel.getPosition().getHeight()-155;
+            height = componentPanel.getPosition().getHeight() - headerPanel.getPosition().getHeight()-205;
         }
         list  = new TemplateShipList(componentPanel.getPosition().getWidth(), height,existingTemplate,true);
         list.createUI();
@@ -105,6 +113,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         }
 
         textForName = tooltip.addTextField(headerPanel.getPosition().getWidth()-5,25, Fonts.ORBITRON_20AA,3f);
+        textForName.setMaxChars(25);
         if(existingTemplate!=null){
             textForName.setText(existingTemplate.getNameOfTemplate());
         }
@@ -122,17 +131,30 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         }
         float height = 100;
         if(patrolFleetCreatorMode){
-            height = 150;
+            height = 210;
         }
         dataAboutFleetPanel = Global.getSettings().createCustom(componentPanel.getPosition().getWidth(),height,null);
         TooltipMakerAPI tooltip = dataAboutFleetPanel.createUIElement(dataAboutFleetPanel.getPosition().getWidth(),dataAboutFleetPanel.getPosition().getHeight(),false);
 
         if(patrolFleetCreatorMode){
-            tooltip.addSectionHeading("Fleet data",Alignment.MID,0f);
+            enabledPrefix =  tooltip.addCheckbox(componentPanel.getPosition().getWidth(),20,"Disable Faction Prefix",null, ButtonAPI.UICheckboxSize.SMALL,0f);
+            tooltip.addPara("On the campaign map, this fleet appears as",3f).setAlignment(Alignment.MID);
             int available =  AoTDFactionPatrolsManager.getInstance().getAvailableFP();
+            enabledPrefix.setChecked(fleetPrefixNameDissabled);
             if(existingTemplate instanceof BasePatrolFleet fleet){
                 available+=fleet.geTotalFpTaken();
+
             }
+            if(enabledPrefix.isChecked()){
+                tooltip.addPara("%s",1f,Color.ORANGE,getTextForName().getText()).setAlignment(Alignment.MID);
+
+            }
+            else{
+                tooltip.addPara("%s",1f,Color.ORANGE,Global.getSector().getPlayerFaction().getDisplayName()+" "+getTextForName().getText()).setAlignment(Alignment.MID);
+
+            }
+            tooltip.addSectionHeading("Fleet data",Alignment.MID,5f);
+
             tooltip.addPara("We currently can afford maximum of %s fleet points !",3f,Color.ORANGE,""+available);
         }
         else{
@@ -153,8 +175,9 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
             star.getPosition().inTL(dataAboutFleetPanel.getPosition().getWidth()-widthOfButton,y);
             home.getPosition().inTL(dataAboutFleetPanel.getPosition().getWidth()/2-(widthOfButton/2),y);
             recon.getPosition().inTL(0,y);
-            tooltip.addPara("Roles are set only before a fleet begins patrol duty",3f).getPosition().inTL(5,y+heightButtons+3);
-
+            LabelAPI l =tooltip.addPara("Roles are set only before a fleet begins patrol duty",3f);
+            l.setAlignment(Alignment.MID);
+            l.getPosition().inTL(5,y+heightButtons+3);
         }
         dataAboutFleetPanel.addUIElement(tooltip).inTL(0,0);
         componentPanel.addComponent(dataAboutFleetPanel).inTL(0,componentPanel.getPosition().getHeight()-height);
@@ -163,7 +186,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
 
     @Override
     public void clearUI() {
-
+        getList().clearUI();
     }
 
     @Override
@@ -186,6 +209,18 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
         if(list!=null){
             if(list.needsToUpgradeInfo){
                 list.needsToUpgradeInfo = false;
+                createInfo();
+            }
+        }
+        if(textForName!=null){
+            if(!textForName.getText().equals(prevText)){
+                prevText = textForName.getText();
+                createInfo();
+            }
+        }
+        if(enabledPrefix!=null && existingTemplate instanceof BasePatrolFleet fleet){
+            if(enabledPrefix.isChecked()!=fleetPrefixNameDissabled){
+               fleetPrefixNameDissabled = enabledPrefix.isChecked();
                 createInfo();
             }
         }

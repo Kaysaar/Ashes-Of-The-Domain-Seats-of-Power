@@ -52,8 +52,9 @@ public class FleetButtonComponent extends CustomButton {
         float startXPerm =  235;
         float seperator = -7f;
         if(templateButton) {
-
-            float available = width-startXPerm;
+            startXPerm = 231;
+            float available = width-startXPerm-110;
+            float statusPositionStart = width-100;
             CustomPanelAPI custom = Global.getSettings().createCustom(available,maxHeight,null);
             TooltipMakerAPI customTooltip = custom.createUIElement(custom.getPosition().getWidth(),custom.getPosition().getHeight(),false);
             LinkedHashMap<String,Integer>ships =new LinkedHashMap<>(data.assignedShipsThatShouldSpawn);
@@ -65,8 +66,8 @@ public class FleetButtonComponent extends CustomButton {
                     ShipHullSpecAPI spec = Global.getSettings().getHullSpec(e.getKey());
                     int boxSize = (int) Math.floor(maxHeight*buttonScale.get(spec.getHullSize()));
                     if(startX+boxSize>=available){
-                        LabelAPI l =  tooltip.addPara(". . .",Color.ORANGE,0f);
-                        l.getPosition().inTL(available+startXPerm+5,height/2-(l.computeTextHeight(l.getText())/2));
+                        LabelAPI l =  customTooltip.addPara(". . .",Color.ORANGE,0f);
+                        l.getPosition().inTL(startX+5,height/2-(l.computeTextHeight(l.getText())/2));
                         reachedDest =true;
                         break;
                     }
@@ -83,7 +84,10 @@ public class FleetButtonComponent extends CustomButton {
             if(rest<=0)rest=0;
             custom.addUIElement(customTooltip).inTL(-5,0);
             tooltip.addCustom(custom,0f).getPosition().inTL(startXPerm+(rest/2),y);
+            LabelAPI status = tooltip.addPara(data.getFPTaken()+"",Misc.getTooltipTitleAndLightHighlightColor(),0f);
+            status.autoSizeToWidth(100);
 
+            status.getPosition().inTL(statusPositionStart+50-(Math.min(50,(status.computeTextWidth(status.getText())/2))),height/2-(status.computeTextHeight(status.getText())/2));
         }
         else{
             float available = width-startXPerm-290;

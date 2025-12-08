@@ -113,7 +113,7 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
 
         float admiralShipSize = 110;
         float normalShipSize = 50;
-        if (template != null) {
+        if (template != null&&!forProduction) {
             admiralShipSize = 130;
             normalShipSize = 60;
         }
@@ -122,7 +122,7 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
             normalShipSize = 90;
         }
         componentPanel = Global.getSettings().createCustom(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight(), null);
-        TooltipMakerAPI tooltip = componentPanel.createUIElement(componentPanel.getPosition().getWidth(), componentPanel.getPosition().getHeight(), template == null);
+        TooltipMakerAPI tooltip = componentPanel.createUIElement(componentPanel.getPosition().getWidth(), componentPanel.getPosition().getHeight(), template == null||forProduction);
         sortShipsByFPDescInPlace();
         LinkedHashMap<String, Integer> alreadyPlaced = new LinkedHashMap<>(ships);
         String highest = getShipWithHighestFP();
@@ -185,7 +185,7 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
                     for (int i = 0; i < entry.getValue(); i++) {
                         if (startingX + normalShipSize >= componentPanel.getPosition().getWidth()) {
                             startingY += seperatorY + normalShipSize;
-                            if (template != null && startingY + normalShipSize > componentPanel.getPosition().getHeight()) {
+                            if (!forProduction&&template != null && startingY + normalShipSize > componentPanel.getPosition().getHeight()) {
                                 break;
                             }
                             if (startingY < admiralShipSize) {
@@ -361,7 +361,7 @@ public class TemplateShipList implements ExtendedUIPanelPlugin {
 
     @Override
     public void clearUI() {
-
+        ships.clear();
     }
 
     @Override

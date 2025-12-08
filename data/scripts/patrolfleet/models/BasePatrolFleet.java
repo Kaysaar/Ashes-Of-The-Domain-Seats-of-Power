@@ -24,6 +24,16 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
     boolean decomisioned;
     boolean forcedTransitDays = false;
     boolean grounded = false;
+    boolean dontUseFactionPrefix = false;
+
+    public void setDontUseFactionPrefix(boolean dontUseFactionPrefix) {
+        this.dontUseFactionPrefix = dontUseFactionPrefix;
+    }
+
+    public boolean isDontUseFactionPrefix() {
+        return dontUseFactionPrefix;
+    }
+
     FleetFactory.PatrolType patrolType;
 
     public FleetFactory.PatrolType getPatrolType() {

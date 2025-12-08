@@ -16,7 +16,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class HoldingsTable extends UITableImpl {
-    ArrayList<DropDownButton> copyOfButtons = new ArrayList<>();
     public ButtonAPI buttonName, buttonFPUsed, buttonFPGenerated;
     float currYPos = 0;
     ButtonAPI lastCheckedState;
@@ -31,7 +30,18 @@ public class HoldingsTable extends UITableImpl {
                 dropDownButtons.add(button);
             }
 
-            copyOfButtons.addAll(dropDownButtons);}
+        }
+
+    }
+
+    @Override
+    public void clearTable() {
+        super.clearTable();
+    }
+
+    @Override
+    public void clearUI() {
+        super.clearUI();
     }
 
     @Override
@@ -49,38 +59,6 @@ public class HoldingsTable extends UITableImpl {
         buttonFPGenerated.getPosition().inTL((section*2)+21, 0);
         mainPanel.addUIElement(tooltipOfButtons).inTL(0, 0);
         lastCheckedState = buttonName;
-    }
-    public void recreateOldListBasedOnPrevSort(){
-        dropDownButtons.clear();
-        dropDownButtons.addAll(copyOfButtons);
-        sortDBList();
-        this.recreateTable();
-
-    }
-    private void sortDBList() {
-        if(lastCheckedState!=null){
-            SortingState state = (SortingState) buttonName.getCustomData();
-            boolean ascending = false;
-            if (state == SortingState.ASCENDING) {
-                ascending = true;
-            }
-            if(lastCheckedState.equals(buttonName)){
-                HoldingsUtilis.sortDropDownButtonsByName(dropDownButtons, ascending);
-            }
-            if(lastCheckedState.equals(buttonFPGenerated)){
-                HoldingsUtilis.sortDropDownButtonsFPGenerated(dropDownButtons, ascending);
-            }
-            if(lastCheckedState.equals(buttonFPUsed)){
-                //Note : func not completed
-                HoldingsUtilis.sortDropDownButtonsByFPConsumed(dropDownButtons, ascending);
-            }
-        }
-    }
-    public ArrayList<DropDownButton> getHoldings(){
-        sortDBList();
-        return dropDownButtons;
-
-
     }
     @Override
     public void createTable() {
@@ -180,6 +158,7 @@ public class HoldingsTable extends UITableImpl {
 
 
     }
+
 
     @Override
     public void reportButtonPressed(CustomButton buttonPressed) {

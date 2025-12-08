@@ -64,7 +64,10 @@ public class TemplateShipShowcase extends ButtonComponent {
             shipPanel =  ShipInfoGenerator.getShipImage(spec,boxSize-10,col).one;
 
             componentPanel.addComponent(shipPanel).inTL(originalWidth/2-(shipPanel.getPosition().getWidth()/2)+1,5);
-            ShipUIData.createTooltipForShip(Global.getSettings().getHullSpec(shipId),shipPanel);
+            if(!removable){
+                ShipUIData.createTooltipForShip(Global.getSettings().getHullSpec(shipId),shipPanel);
+            }
+
         }
     }
     public TemplateShipShowcase(float boxSize, boolean shouldRenderBorders, String shipId,TemplateShipList list,int am) {

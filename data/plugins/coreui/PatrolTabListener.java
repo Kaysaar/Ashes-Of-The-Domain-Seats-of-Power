@@ -14,7 +14,7 @@ import org.lwjgl.input.Keyboard;
 public class PatrolTabListener implements CommandTabListener {
     @Override
     public String getNameForTab() {
-        return "Military";
+        return "Military & Templates";
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PatrolTabListener implements CommandTabListener {
 
     @Override
     public float getWidthOfButton() {
-        return 150;
+        return 205;
     }
 
     @Override

@@ -14,12 +14,14 @@ import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
-import data.ui.patrolfleet.overview.fleetview.AvailableTemplateList;
+import data.ui.patrolfleet.overview.fleetview.templatelist.AvailableTemplateList;
+import data.ui.patrolfleet.overview.fleetview.SaveAsTemplateDialog;
 import data.ui.patrolfleet.templates.TemplatePanel;
 import data.ui.patrolfleet.templates.TemplateShowcase;
 import data.ui.patrolfleet.templates.shiplist.components.ShipSelector;
 import data.ui.patrolfleet.templates.shiplist.dialog.templaterandom.TemplateRandomSection;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TemplateCreatorDialog extends BasePopUpDialog {
@@ -32,6 +34,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
     ButtonAPI toggleMode;
     TemplateRandomSection randSection;
     ButtonAPI templateList;
+    ButtonAPI saveAsTemplate;
     boolean randomMode = false;
     boolean patrolFleetCreatorMode = false;
     CustomPanelAPI content;
@@ -137,7 +140,20 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
         if(templateList!=null&&templateList.isChecked()){
             templateList.setChecked(false);
             AvailableTemplateList list = new AvailableTemplateList(this);
-            AshMisc.placePopUpUI(list,templateList,700,400);
+            AshMisc.initPopUpDialog(list,1000,600);
+        }
+
+        if(saveAsTemplate!=null&&showcase!=null&&showcase.getList()!=null){
+            boolean enabled =  !showcase.getList().getShips().isEmpty();
+            if(saveAsTemplate.isEnabled() !=enabled){
+                saveAsTemplate.setEnabled(enabled);
+            }
+            if(saveAsTemplate.isChecked()){
+                saveAsTemplate.setChecked(false);
+                SaveAsTemplateDialog list = new SaveAsTemplateDialog(this);
+                AshMisc.initPopUpDialog(list,450,200);
+            }
+
         }
 
     }
@@ -189,8 +205,11 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
 
         }
         if(patrolFleetCreatorMode){
-            templateList =tooltip.addButton("Pick available template", "normal", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.BL_TR, buttonConfirmWidth * 1.8f, 25.0F, 0.0F);
+            templateList =tooltip.addButton("Pick available template", "normal", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.BL_TR, buttonConfirmWidth * 1.7f, 25.0F, 0.0F);
             templateList.getPosition().inTL(buttonConfirmWidth*1.5F+10,0);
+            templateList.setEnabled(!PatrolTemplateManager.getTemplatesAvailable().isEmpty());
+            saveAsTemplate =tooltip.addButton("Save As Template", "normal", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, buttonConfirmWidth * 1.3f, 25.0F, 0.0F);
+            saveAsTemplate.getPosition().inTL(buttonConfirmWidth*1.5F+10+(buttonConfirmWidth * 1.7f)+5,0);
         }
         contentOfButtonPanel.addUIElement(tooltip).inTL(0, 0);
         buttonPanel.addComponent(contentOfButtonPanel).inTL(0, 0);
@@ -201,9 +220,10 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
         super.applyConfirmScript();
         if(patrolFleetCreatorMode){
             if(fleet==null){
-                BasePatrolFleet fleet = new BasePatrolFleet(showcase.list.getShips(),showcase.textForName.getText());
+                BasePatrolFleet fleet = new BasePatrolFleet(new LinkedHashMap<>(showcase.list.getShips()),showcase.textForName.getText());
                 fleet.setTiedTo(market);
                 fleet.setPatrolType(type);
+                fleet.setDontUseFactionPrefix(showcase.isFleetPrefixNameDissabled());
                 fleet.setFleetName(showcase.textForName.getText());
                 AoTDFactionPatrolsManager.getInstance().addNewFleet(fleet);
                 OverviewPatrolPanel.forceRequestUpdate = true;
@@ -232,6 +252,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                         fleet.getShipsForReplacementWhenInPrep().clear();
 
                     }
+                    fleet.setDontUseFactionPrefix(showcase.isFleetPrefixNameDissabled());
                     fleet.setFleetName(showcase.textForName.getText());
                     fleet.setPatrolType(type);
                     OverviewPatrolPanel.forceRequestUpdate = true;
@@ -239,6 +260,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                 else{
                     fleet.assignedShipsThatShouldSpawn.clear();
                     fleet.data.clear();
+                    fleet.setDontUseFactionPrefix(showcase.isFleetPrefixNameDissabled());
                     BasePatrolFleet fleet = new BasePatrolFleet(showcase.list.getShips(),showcase.textForName.getText());
                     this.fleet.assignedShipsThatShouldSpawn.putAll(fleet.assignedShipsThatShouldSpawn);
                     this.fleet.data.putAll(fleet.data);
@@ -248,37 +270,39 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                 }
 
             }
-
-
-
         }
         else{
-            if (showRefernce != null && showRefernce.getTemplate() != null) {
-                int index = 0;
-                for (Map.Entry<String, BasePatrolFleetTemplate> entry : PatrolTemplateManager.templates.entrySet()) {
-                    if (entry.getKey().equals(showRefernce.getTemplate().getNameOfTemplate())) {
-                        break;
-                    }
-                    index++;
-                }
-                BasePatrolFleetTemplate template = new BasePatrolFleetTemplate(showcase.list.getShips(), showcase.textForName.getText());
-                AshMisc.replaceEntryAtIndex(PatrolTemplateManager.templates, index, showcase.textForName.getText(), template);
-                PatrolTemplateManager.saveAllExistingTemplates();
-                TemplatePanel.forceRequestUpdate = true;
-                return;
-
-            }
-            PatrolTemplateManager.templates.put(showcase.textForName.getText(), new BasePatrolFleetTemplate(showcase.list.getShips(), showcase.textForName.getText()));
-            PatrolTemplateManager.saveAllExistingTemplates();
-            TemplatePanel.forceRequestUpdate = true;
+            saveTemplate();
         }
 
 
+    }
+
+    public void saveTemplate() {
+        if (showRefernce != null && showRefernce.getTemplate() != null) {
+            int index = 0;
+            for (Map.Entry<String, BasePatrolFleetTemplate> entry : PatrolTemplateManager.templates.entrySet()) {
+                if (entry.getKey().equals(showRefernce.getTemplate().getNameOfTemplate())) {
+                    break;
+                }
+                index++;
+            }
+            BasePatrolFleetTemplate template = new BasePatrolFleetTemplate(new LinkedHashMap<>(showcase.list.getShips()), showcase.textForName.getText());
+            AshMisc.replaceEntryAtIndex(PatrolTemplateManager.templates, index, showcase.textForName.getText(), template);
+            PatrolTemplateManager.saveAllExistingTemplates();
+            TemplatePanel.forceRequestUpdate = true;
+            return;
+
+        }
+        PatrolTemplateManager.templates.put(showcase.textForName.getText(), new BasePatrolFleetTemplate(new LinkedHashMap<>(showcase.list.getShips()), showcase.textForName.getText()));
+        PatrolTemplateManager.saveAllExistingTemplates();
+        TemplatePanel.forceRequestUpdate = true;
     }
 
     @Override
     public void onExit() {
         super.onExit();
         selector.clearUI();
+        showcase.clearUI();
     }
 }

@@ -128,10 +128,14 @@ public class AoTDRelay extends MilitaryRelay {
         if(route==null){
             route = (RouteManager.RouteData) param;
         }
-        AoTDPatrolFleetData data = (AoTDPatrolFleetData) route.getCustom();
         if(route==null){
             return;
         }
+        if(!(route.getCustom() instanceof AoTDPatrolFleetData data)) {
+            super.reportFleetDespawnedToListener(fleet,reason,param);
+            return;
+        }
+
         BasePatrolFleet fleetData = AoTDFactionPatrolsManager.getInstance().getFleet(data.getId());
         if (fleetData != null) {
 

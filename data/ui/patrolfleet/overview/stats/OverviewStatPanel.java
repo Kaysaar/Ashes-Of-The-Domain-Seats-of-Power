@@ -66,7 +66,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         if (taken > total) {
             colors[1] = Misc.getNegativeHighlightColor();
         }
-        ProgressBarComponentV2 component = new ProgressBarComponentV2(width - 15, 25,"Fleet points "+total+" / "+taken,null, Misc.getDarkPlayerColor().brighter(),Misc.getBasePlayerColor(), Math.min(1f, (float) total / taken)){
+        ProgressBarComponentV2 component = new ProgressBarComponentV2(width - 15, 25,"Fleet points : "+total+" / "+taken,null, Misc.getDarkPlayerColor().brighter(),Misc.getBasePlayerColor(), Math.min(1f, (float) total / taken)){
             @Override
             public void influenceLabel() {
                 this.getProgressLabel().setHighlightColors(colors);
@@ -218,7 +218,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
 
     @Override
     public void clearUI() {
-
+        table.clearUI();
     }
 
     @Override

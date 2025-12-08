@@ -149,6 +149,7 @@ public class PatrolAssigmentAIV5 extends PatrolAssignmentAIV4 {
        BasePatrolFleet fleetData = AoTDFactionPatrolsManager.getInstance().getFleet(data.getId());
         if(fleetData!=null) {
             this.fleet.setName(fleetData.getNameOfFleet());
+            this.fleet.setNoFactionInName(fleetData.isDontUseFactionPrefix());
             if(!retreatInitalized){
                 if(fleetData.isDecomisioned()||fleetData.isInTransit()||fleetData.isGrounded()){
                     initRetreat();

@@ -101,7 +101,7 @@ public class PatrolTemplateManager {
         return true;
     }
 
-    public static LinkedHashMap<String, BasePatrolFleetTemplate> getTemplatesAvailableSorted() {
+    public static LinkedHashMap<String, BasePatrolFleetTemplate> getTemplatesAvailable() {
         LinkedHashMap<String, BasePatrolFleetTemplate> survivors = new LinkedHashMap<>(PatrolTemplateManager.templates);
 
         for (BasePatrolFleetTemplate template : PatrolTemplateManager.templates.values()) {
@@ -111,7 +111,10 @@ public class PatrolTemplateManager {
                 survivors.remove(template.getNameOfTemplate());
             }
         }
-        return survivors.entrySet().stream()
+        return survivors;
+    }
+    public static LinkedHashMap<String, BasePatrolFleetTemplate> getTemplatesAvailableSorted() {
+        return getTemplatesAvailable().entrySet().stream()
                 .sorted(new Comparator<Map.Entry<String, BasePatrolFleetTemplate>>() {
                     @Override
                     public int compare(Map.Entry<String, BasePatrolFleetTemplate> o1, Map.Entry<String, BasePatrolFleetTemplate> o2) {
