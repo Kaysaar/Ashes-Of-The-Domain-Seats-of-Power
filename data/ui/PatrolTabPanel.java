@@ -62,6 +62,7 @@ public class PatrolTabPanel  extends CommandUIPlugin {
                 currentlyChosen = buttons.getKey();
                 if(currentlyChosen.getCustomData() instanceof  String datum){
                     ShipPanelData.reinit(datum.equals("template"));
+                    TemplatePanel.forceRequestUpdateListOnly = true;
                 }
                 break;
             }
