@@ -29,15 +29,6 @@ import static com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3.addComman
 
 public class PatrolFleetFactory {
 
-    /**
-     * Build a fleet strictly from template.assignedShipsThatShouldSpawn,
-     * then finish (inflater, commander, officers, etc.) using FleetParamsV3.
-     *
-     * @param template  hullId -> count source (required)
-     * @param params    FleetParamsV3 with faction/source/quality/etc.
-     * @param source    optional MarketAPI fallback if params.source is null
-     * @param rng       optional RNG for officer creation/autofit; null -> new Random()
-     */
     public static CampaignFleetAPI createFleetFromAssigned(
             BasePatrolFleet template,
             FleetParamsV3 params,

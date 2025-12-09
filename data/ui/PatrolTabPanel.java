@@ -11,6 +11,7 @@ import com.fs.starfarer.api.ui.*;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
 import data.ui.patrolfleet.templates.TemplatePanel;
 import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
+import data.ui.patrolfleet.templates.shiplist.components.ShipUIData;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -59,6 +60,9 @@ public class PatrolTabPanel  extends CommandUIPlugin {
         for (Map.Entry<ButtonAPI, CustomPanelAPI> buttons : panelMap.entrySet()) {
             if (buttons.getKey().getText().toLowerCase().contains(panelToShowcase)) {
                 currentlyChosen = buttons.getKey();
+                if(currentlyChosen.getCustomData() instanceof  String datum){
+                    ShipPanelData.reinit(datum.equals("template"));
+                }
                 break;
             }
         }
@@ -114,6 +118,13 @@ public class PatrolTabPanel  extends CommandUIPlugin {
                 if (!entry.getKey().equals(currentlyChosen)) {
                     resetCurrentPlugin(entry.getKey());
                     CommandTabMemoryManager.getInstance().getTabStates().put(getTabStateId(),entry.getKey().getText().toLowerCase());
+                    if(currentlyChosen.getCustomData() instanceof  String data){
+                        if(!AshMisc.isPLayerHavingHeavyIndustry()){
+                            ShipPanelData.reinit(data.equals("template"));
+                            TemplatePanel.forceRequestUpdateListOnly = true;
+                        }
+                    }
+
                 }
 
 
@@ -164,8 +175,8 @@ public class PatrolTabPanel  extends CommandUIPlugin {
         Color base, bg;
         base = Global.getSector().getPlayerFaction().getBaseUIColor();
         bg = Global.getSector().getPlayerFaction().getDarkUIColor();
-        customProd = buttonTooltip.addButton("Overview", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
-        research = buttonTooltip.addButton("Templates", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
+        customProd = buttonTooltip.addButton("Overview", "overview", base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
+        research = buttonTooltip.addButton("Templates", "template", base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         ;
         sp = buttonTooltip.addButton("Armory", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         ;
@@ -176,15 +187,12 @@ public class PatrolTabPanel  extends CommandUIPlugin {
         customProd.getPosition().inTL(0, 0);
         research.getPosition().inTL(141, 0);
         sp.getPosition().inTL(282, 0);
-        ShipPanelData.updateList();
-        ShipPanelData.populateShipInfo();
-        ShipPanelData.populateShipSizeInfo();
-        ShipPanelData.populateShipTypeInfo();
         buttonPanel.addUIElement(buttonTooltip).inTL(0, 0);
         mainPanel.addComponent(buttonPanel).inTL(0, 10);
         insertPatrolTemplatePanel(research);
         insertOverviewPatrol(customProd);
     }
+
 
     private void insertPatrolTemplatePanel(ButtonAPI tiedButton) {
         if (panelForTemplates == null) {

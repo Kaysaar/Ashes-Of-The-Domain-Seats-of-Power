@@ -1,7 +1,6 @@
 package data.ui.ambitions;
 
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
-import ashlib.data.plugins.ui.models.ProgressBarComponent;
 import ashlib.data.plugins.ui.models.ProgressBarComponentV2;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;

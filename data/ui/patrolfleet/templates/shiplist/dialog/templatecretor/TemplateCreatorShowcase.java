@@ -218,7 +218,7 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
                 createInfo();
             }
         }
-        if(enabledPrefix!=null && existingTemplate instanceof BasePatrolFleet fleet){
+        if(enabledPrefix!=null){
             if(enabledPrefix.isChecked()!=fleetPrefixNameDissabled){
                fleetPrefixNameDissabled = enabledPrefix.isChecked();
                 createInfo();

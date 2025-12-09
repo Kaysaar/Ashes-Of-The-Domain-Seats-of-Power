@@ -1,6 +1,7 @@
 package data.scripts.policies;
 
-import ashlib.data.plugins.ui.models.ProgressBarComponent;
+
+import ashlib.data.plugins.ui.models.ProgressBarComponentV2;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
@@ -31,7 +32,7 @@ public class ExpandInfrastructure extends BaseFactionPolicy {
         float progress = Math.min(1f,getDaysTillPlaced()/720);
         if(AoTDFactionManager.getInstance().doesHavePolicyEnabled(this.getSpec().getId())){
             tooltip.addPara("Current progress of policy : %s",5f,Color.ORANGE,Misc.getRoundedValueMaxOneAfterDecimal(100*progress)+"%");
-            ProgressBarComponent component = new ProgressBarComponent(DetailedFactionPolicyTooltip.width,20,progress, Misc.getDarkPlayerColor().brighter());
+            ProgressBarComponentV2 component = new ProgressBarComponentV2(DetailedFactionPolicyTooltip.width,20,progress, Misc.getDarkPlayerColor().brighter());
 
             tooltip.addCustom(component.getRenderingPanel(), 5f);
         }

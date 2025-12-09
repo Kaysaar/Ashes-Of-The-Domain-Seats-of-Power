@@ -1,6 +1,6 @@
 package data.ui.basecomps;
 
-import ashlib.data.plugins.ui.models.ProgressBarComponent;
+import ashlib.data.plugins.ui.models.ProgressBarComponentV2;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
@@ -44,7 +44,7 @@ public class FactionXPPanel implements ExtendUIPanelPlugin {
         tooltip.setTitleFont(Fonts.ORBITRON_24AABOLD);
         LabelAPI label =tooltip.addTitle("Faction Experience");
         label.setAlignment(Alignment.MID);
-        ProgressBarComponent component = new ProgressBarComponent(width-15,21, AoTDFactionManager.getInstance().getProgressXP(), Misc.getDarkPlayerColor().brighter().brighter());
+        ProgressBarComponentV2 component = new ProgressBarComponentV2(width-15,21, AoTDFactionManager.getInstance().getProgressXP(), Misc.getDarkPlayerColor().brighter().brighter());
         tooltip.addCustom(component.getRenderingPanel(),5f);
         tooltip.setParaFontOrbitron();
         Color[] colors = new Color[2];

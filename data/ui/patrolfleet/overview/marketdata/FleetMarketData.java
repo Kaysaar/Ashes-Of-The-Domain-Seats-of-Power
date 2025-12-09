@@ -158,12 +158,20 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
     public void advance(float amount) {
         if(add!=null&&add.isChecked()){
             add.setChecked(false);
-            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Create new Patrol",true,market),1200,600);
+            float height = 600;
+            if(!AshMisc.isPLayerHavingHeavyIndustry()){
+                height = 630;
+            }
+            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Create new Patrol",true,market),1200,height);
 
         }
         if(showEdit){
             showEdit = false;
-            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol",true,lastChecked.getData(),market),1200,600);
+            float height = 600;
+            if(!AshMisc.isPLayerHavingHeavyIndustry()){
+                height = 630;
+            }
+            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol",true,lastChecked.getData(),market),1200,height);
             lastChecked = null;
 
         }

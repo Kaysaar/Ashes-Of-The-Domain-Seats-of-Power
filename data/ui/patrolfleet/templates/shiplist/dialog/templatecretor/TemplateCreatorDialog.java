@@ -177,7 +177,13 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
 
         showcase.createUI();
         content.addComponent(showcase.getMainPanel()).inTL(775, -1);
-        tooltip.addCustom(content, 2f);
+        if(!AshMisc.isPLayerHavingHeavyIndustry()&&patrolFleetCreatorMode){
+            tooltip.setParaFont(Fonts.ORBITRON_20AA);
+            tooltip.addPara("Warning! No Heavy Industry — ship options are limited.",Misc.getNegativeHighlightColor(), -2f)
+                    .setAlignment(Alignment.MID);
+
+        }
+        tooltip.addCustom(content, 5f);
         tooltip.setHeightSoFar(0f);
     }
 

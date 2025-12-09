@@ -188,7 +188,11 @@ public class TemplateShowcase implements ExtendedUIPanelPlugin {
             if(edit.isChecked()){
                 edit.setChecked(false);
                 //Confirmation later;
-                AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol Fleet Template",this),1200,600);
+                float height = 600;
+                if(!AshMisc.isPLayerHavingHeavyIndustry()){
+                    height = 630;
+                }
+                AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol Fleet Template",this),1200,height);
                 return;
             }
             if(copy.isChecked()){

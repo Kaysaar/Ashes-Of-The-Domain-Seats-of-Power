@@ -81,7 +81,8 @@ public class TemplatePanel implements ExtendedUIPanelPlugin {
         if(filterPanel!=null) {
             if(filterPanel.createNew!=null&&filterPanel.createNew.isChecked()){
                 filterPanel.createNew.setChecked(false);
-                AshMisc.initPopUpDialog(new TemplateCreatorDialog("Create new Patrol Fleet Template",this),1200,600);
+                float height = 600;
+                AshMisc.initPopUpDialog(new TemplateCreatorDialog("Create new Patrol Fleet Template",this),1200,height);
             }
             if(forceRequestUpdate){
                 forceRequestUpdate= false;

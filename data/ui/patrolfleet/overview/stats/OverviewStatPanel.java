@@ -2,7 +2,6 @@ package data.ui.patrolfleet.overview.stats;
 
 import ashlib.data.plugins.ui.models.DropDownButton;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
-import ashlib.data.plugins.ui.models.ProgressBarComponent;
 import ashlib.data.plugins.ui.models.ProgressBarComponentV2;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
 import com.fs.starfarer.api.Global;

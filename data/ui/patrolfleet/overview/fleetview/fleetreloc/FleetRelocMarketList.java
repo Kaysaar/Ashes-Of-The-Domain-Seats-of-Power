@@ -29,6 +29,7 @@ public class FleetRelocMarketList implements ExtendedUIPanelPlugin {
     public static LinkedHashSet<String> industriesAllowingInterstellarTransition = new LinkedHashSet<>();
     static {
         industriesAllowingInterstellarTransition.add(Industries.HIGHCOMMAND);
+        industriesAllowingInterstellarTransition.add("aotd_hexagon");
     }
     public static boolean doesPlayerFactionMeetCriteriaForInterstellarReloc(){
         boolean met = false;

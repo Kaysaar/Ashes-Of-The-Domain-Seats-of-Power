@@ -1,12 +1,11 @@
 package data.industry;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.BattleAPI;
-import com.fs.starfarer.api.campaign.CampaignEventListener;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.campaign.FleetAssignment;
+import com.fs.starfarer.api.Script;
+import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.listeners.FleetEventListener;
 import com.fs.starfarer.api.impl.campaign.DebugFlags;
+import com.fs.starfarer.api.impl.campaign.aotd_entities.BiFrostGateEntity;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
 import com.fs.starfarer.api.impl.campaign.ids.*;
@@ -14,6 +13,8 @@ import com.fs.starfarer.api.util.DelayedActionScript;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import data.ai.PatrolAssigmentAIV5;
+import data.kaysaar.aotd.vok.campaign.econ.globalproduction.impl.bifrost.BifrostMega;
+import data.kaysaar.aotd.vok.campaign.econ.globalproduction.models.GPManager;
 import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.models.AoTDPatrolFleetData;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
@@ -191,7 +192,35 @@ public class AoTDRelay extends MilitaryRelay {
                         fleetToSpawn.getAbility(Abilities.SUSTAINED_BURN).activate();
                         fleetToSpawn.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
                         fleetToSpawn.addAssignment(FleetAssignment.ORBIT_PASSIVE,market.getPrimaryEntity(),3f,"Preparing for re-location");
+                        if (Global.getSettings().getModManager().isModEnabled("aotd_vok")) {
+                            BifrostMega mega = (BifrostMega) GPManager.getInstance().getMegastructure("aotd_bifrost");
+                            if(mega!=null&&mega.areStarSystemsConnected(market.getStarSystem(),fleetData.getTiedTo().getStarSystem())){
+                                SectorEntityToken token = mega.getSectionEntityInStarSystem(market.getStarSystem());
+                                SectorEntityToken travel = mega.getSectionEntityInStarSystem(fleetData.getTiedTo().getStarSystem());
+
+                                fleetToSpawn.addAssignment(FleetAssignment.GO_TO_LOCATION, token, 15, "Taking course towards Bifrost Gate",  new Script() {
+                                    @Override
+                                    public void run() {
+                                        float distLY = Misc.getDistanceLY(token, travel);
+                                        if (token.getCustomPlugin() instanceof BiFrostGateEntity) {
+                                            BiFrostGateEntity plugin = (BiFrostGateEntity) token.getCustomPlugin();
+                                            plugin.showBeingUsed(distLY);
+                                        }
+                                        if (travel.getCustomPlugin() instanceof BiFrostGateEntity) {
+                                            BiFrostGateEntity plugin = (BiFrostGateEntity) travel.getCustomPlugin();
+                                            plugin.showBeingUsed(distLY);
+                                        }
+                                        JumpPointAPI.JumpDestination dest = new JumpPointAPI.JumpDestination(travel, null);
+                                        Global.getSector().doHyperspaceTransition(fleetToSpawn, token, dest, 2f);
+
+
+                                    }
+                                });
+                            }
+
+                        }
                         fleetToSpawn.addAssignment(FleetAssignment.GO_TO_LOCATION_AND_DESPAWN,fleetData.getTiedTo().getPrimaryEntity(),10000f,"Relocating to new market");
+
                     }
                 });
                 return;

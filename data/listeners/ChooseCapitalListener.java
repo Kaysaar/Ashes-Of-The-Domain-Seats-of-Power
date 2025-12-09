@@ -1,5 +1,9 @@
 package data.listeners;
 
+import ashlib.data.plugins.coreui.CommandTabMemoryManager;
+import com.fs.starfarer.api.EveryFrameScript;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.InteractionDialogImageVisual;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -22,7 +26,7 @@ public class ChooseCapitalListener extends BaseIndustryOptionProvider {
     public static Object INTERACTION_PLUGIN = new Object();
     public static Object INTERACTION_TRIGGER = new Object();
     public static Object CUSTOM_PLUGIN = new Object();
-    public static Object STORY_ACTION = new Object();
+    public static Object COMMAND_PLUGIN = new Object();
     public static Object IMMEDIATE_ACTION = new Object();
     public static Object DISABLED_OPTION = new Object();
 
@@ -42,6 +46,16 @@ public class ChooseCapitalListener extends BaseIndustryOptionProvider {
 
             return result;
         }
+        if(ind.getId().equals("aotd_nova_exploraria")){
+            List<IndustryOptionData> result = new ArrayList<IndustryOptionData>();
+
+            IndustryOptionData opt = new IndustryOptionData("Access Nova Exploraria", COMMAND_PLUGIN, ind, this);
+            opt.color = Color.ORANGE;
+            result.add(opt);
+
+
+            return result;
+        }
         return null;
     }
 
@@ -49,6 +63,9 @@ public class ChooseCapitalListener extends BaseIndustryOptionProvider {
     public void createTooltip(IndustryOptionData opt, TooltipMakerAPI tooltip, float width) {
         if (opt.id == CUSTOM_PLUGIN) {
             tooltip.addPara("Declare this world a capital", 0f);
+        }
+        if (opt.id == COMMAND_PLUGIN) {
+            tooltip.addPara("Access Nova Exploraria Dedicated Fleets from %s", 0f,Color.ORANGE,"Capital Abilities");
         }
     }
 
@@ -79,10 +96,41 @@ public class ChooseCapitalListener extends BaseIndustryOptionProvider {
                     opt.ind.getMarket().removeIndustry(Industries.POPULATION, MarketAPI.MarketInteractionMode.REMOTE,false);
                     opt.ind.getMarket().addIndustry("aotd_capital_complex");
                     Industry ind = opt.ind.getMarket().getIndustry(Industries.POPULATION);
+                    InteractionDialogAPI dialog = Global.getSector().getCampaignUI().getCurrentInteractionDialog();
+
+                    if(dialog!=null){
+                        Global.getSector().addTransientScript(new EveryFrameScript() {
+                            @Override
+                            public boolean isDone() {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean runWhilePaused() {
+                                return true;
+                            }
+
+                            @Override
+                            public void advance(float amount) {
+                                InteractionDialogAPI dialog = Global.getSector().getCampaignUI().getCurrentInteractionDialog();
+                                if(dialog==null){
+                                    Global.getSector().removeTransientScript(this);
+                                }
+                                if(!dialog.getOptionPanel().getSavedOptionList().isEmpty()){
+                                    InteractionDialogImageVisual visual = new InteractionDialogImageVisual("illustrations","player_capital_image",480,300);
+                                    dialog.getVisualPanel().showImageVisual(visual);
+                                    Global.getSector().removeTransientScript(this);
+                                }
+
+                            }
+                        });
+
+                    }
                     ind.setSpecialItem(data);
                     ind.setImproved(opt.ind.isImproved());
                     ind.setAICoreId(opt.ind.getAICoreId());
                     PlanetAPI planet = ind.getMarket().getPlanetEntity();
+                    planet.setInteractionImage("illustrations","player_capital_image");
                     PlanetSpecAPI spec = planet.getSpec();
                     ((PlanetSpec) spec).name = "Capital";
                     planet.applySpecChanges();
@@ -96,7 +144,15 @@ public class ChooseCapitalListener extends BaseIndustryOptionProvider {
                 }
             };
             ui.showDialog(800, 100, delegate);
+
         }
+         if(opt.id==COMMAND_PLUGIN){
+             CommandTabMemoryManager.getInstance().setLastCheckedTab("faction");
+             CommandTabMemoryManager.getInstance().getTabStates().put("faction","overview");
+             Global.getSector().getCampaignUI().showCoreUITab(CoreUITabId.OUTPOSTS);
+         }
+
+
 
     }
 

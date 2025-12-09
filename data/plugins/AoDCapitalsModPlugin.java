@@ -63,6 +63,7 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         if (!Global.getSector().hasScript(FactionAdvance.class)) {
             Global.getSector().addScript(new FactionAdvance());
         }
+
         if (!Global.getSector().hasScript(AoTDPatrolManagerMover.class)) {
             Global.getSector().addScript(new AoTDPatrolManagerMover());
         }

@@ -1,6 +1,6 @@
 package data.scripts.policies;
 
-import ashlib.data.plugins.ui.models.ProgressBarComponent;
+import ashlib.data.plugins.ui.models.ProgressBarComponentV2;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.ui.Alignment;
@@ -41,7 +41,7 @@ public class ControlledBordersPolicy extends BaseFactionPolicy {
                 tooltip.addPara("Policy can now be removed",Misc.getPositiveHighlightColor(),5f);
             }
 
-            ProgressBarComponent component = new ProgressBarComponent(DetailedFactionPolicyTooltip.width,20,progress, Misc.getDarkPlayerColor().brighter());
+            ProgressBarComponentV2 component = new ProgressBarComponentV2(DetailedFactionPolicyTooltip.width,20,progress, Misc.getDarkPlayerColor().brighter());
 
             tooltip.addCustom(component.getRenderingPanel(), 5f);
         }

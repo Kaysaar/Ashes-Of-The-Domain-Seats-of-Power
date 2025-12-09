@@ -115,7 +115,7 @@ public class TemplateRandomSection implements ExtendedUIPanelPlugin {
         int amountCap  = cap.current;
 
         // Base pool
-        List<ShipHullSpecAPI> specs = ShipPanelData.getLearnedShipPackages().stream().filter(x->!x.getHints().contains(ShipHullSpecAPI.ShipTypeHints.CIVILIAN)).toList();
+        List<ShipHullSpecAPI> specs = ShipPanelData.getLearnedShipPackages(false).stream().filter(x->!x.getHints().contains(ShipHullSpecAPI.ShipTypeHints.CIVILIAN)).toList();
 
         // Optional manufacturer filter
         if (!filter.chosenManu.isEmpty()) {

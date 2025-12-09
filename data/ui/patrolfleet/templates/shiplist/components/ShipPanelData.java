@@ -1,9 +1,11 @@
 package data.ui.patrolfleet.templates.shiplist.components;
 
+import ashlib.data.plugins.misc.AshMisc;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.Misc;
 import data.kaysaar.aotd.vok.campaign.econ.globalproduction.models.GPManager;
@@ -35,14 +37,14 @@ public class ShipPanelData {
         return false;
     }
 
-    public static ArrayList<ShipHullSpecAPI>learnedShips = new ArrayList<>();
+    public static ArrayList<ShipHullSpecAPI> learnedShips = new ArrayList<>();
     public static LinkedHashMap<String, Integer> shipTypeInfo = new LinkedHashMap<>();
 
     public static LinkedHashMap<String, Integer> getShipTypeInfo() {
         return shipTypeInfo;
     }
 
-    public static LinkedHashMap<String,Integer>getManuForShipsUnbound(){
+    public static LinkedHashMap<String, Integer> getManuForShipsUnbound() {
         LinkedHashMap<String, Integer> shipManInfos = new LinkedHashMap<>();
         for (ShipHullSpecAPI learnedShipPackage : Global.getSettings().getAllShipHullSpecs()) {
             String man = learnedShipPackage.getManufacturer();
@@ -64,6 +66,7 @@ public class ShipPanelData {
         return shipManInfos;
 
     }
+
     public static void populateShipInfo() {
         shipManInfo.clear();
         LinkedHashMap<String, Integer> shipManInfos = new LinkedHashMap<>();
@@ -107,12 +110,21 @@ public class ShipPanelData {
 
         return sortedMap;
     }
-    public static void updateList(){
+
+    public static void updateList(boolean forTemplate) {
         learnedShips.clear();
-        learnedShips.addAll(getLearnedShipPackages());
+        learnedShips.addAll(getLearnedShipPackages(forTemplate));
     }
-    public static ArrayList<ShipHullSpecAPI> getLearnedShipPackages() {
+    public static  void reinit(boolean forTemplate){
+        ShipPanelData.updateList(forTemplate);
+        ShipPanelData.populateShipInfo();
+        ShipPanelData.populateShipSizeInfo();
+        ShipPanelData.populateShipTypeInfo();
+    }
+
+    public static ArrayList<ShipHullSpecAPI> getLearnedShipPackages(boolean forTemplate) {
         ArrayList<ShipHullSpecAPI> list = new ArrayList<>();
+        Set<String> known = Global.getSettings().getFactionSpec(Factions.PLAYER).getKnownShips();
         for (ShipHullSpecAPI allShipHullSpec : Global.getSettings().getAllShipHullSpecs()) {
             if (allShipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.STATION)) continue;
             if (allShipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.MODULE)) continue;
@@ -120,7 +132,7 @@ public class ShipPanelData {
             if (allShipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.UNBOARDABLE)) continue;
             if (allShipHullSpec.getHullSize().equals(ShipAPI.HullSize.FIGHTER)) continue;
 
-            if(allShipHullSpec.hasTag(Tags.MODULE_HULL_BAR_ONLY))continue;
+            if (allShipHullSpec.hasTag(Tags.MODULE_HULL_BAR_ONLY)) continue;
 
             if (Global.getSettings().getHullIdToVariantListMap().get(allShipHullSpec.getHullId()).isEmpty()) {
                 boolean found = false;
@@ -137,9 +149,12 @@ public class ShipPanelData {
                 if (GPManager.hasSpecialProject(ProjectReward.ProjectRewardType.SHIP, allShipHullSpec.getHullId()))
                     continue;
             }
-            if (!Global.getSector().getPlayerFaction().knowsShip(allShipHullSpec.getHullId())&&!Global.getSettings().isDevMode()) continue;
-            list.add(allShipHullSpec);
-
+            if (!Global.getSector().getPlayerFaction().knowsShip(allShipHullSpec.getHullId())&& !Global.getSettings().isDevMode()) continue;
+            if (!AshMisc.isPLayerHavingHeavyIndustry()&& known.contains(allShipHullSpec.getHullId())) {
+                list.add(allShipHullSpec);
+            } else if(AshMisc.isPLayerHavingHeavyIndustry()||forTemplate||Global.getSettings().isDevMode()) {
+                list.add(allShipHullSpec);
+            }
 
         }
         return list;
