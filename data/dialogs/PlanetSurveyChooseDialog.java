@@ -38,6 +38,7 @@ public class PlanetSurveyChooseDialog implements InteractionDialogPlugin {
                 continue;
             }
             if (curr.getName().contains("Limbo")) continue;
+            if (curr.getName().contains("Abyssal Depths")) continue;
             if (curr.getHyperspaceAnchor() == null) continue;
             if (Misc.getStarSystemForAnchor(curr.getHyperspaceAnchor()) == null) continue;
             systems.add(curr.getHyperspaceAnchor());
