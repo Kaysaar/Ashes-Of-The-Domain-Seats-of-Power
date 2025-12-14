@@ -1,7 +1,10 @@
 package data.ui.timeline;
 
+import com.fs.starfarer.api.Global;
 import data.plugins.AoDCapitalsModPlugin;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
+
+import java.nio.file.Paths;
 
 public class PathManager {
     public static String getTimelineScreenshotsPath() {
@@ -34,14 +37,10 @@ public class PathManager {
     }
     public static String getStarsectorRootPath() {
         try {
-            String jarPath = AoDCapitalsModPlugin.class
-                    .getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .getPath();
+            String jarPath = Global.getSettings().getModManager().getModSpec("aotd_sop").getPath();
 
             String p = jarPath;
-
+            p =  p.replace("\\","/");
             String gameRoot;
 
             // Prefer trimming at "starsector-core"
@@ -71,7 +70,7 @@ public class PathManager {
                 gameRoot = gameRoot.substring(1);
             }
 
-            return gameRoot;
+            return Paths.get(gameRoot).toAbsolutePath().normalize().toString();
         } catch (Exception e) {
             return "";
         }
@@ -79,26 +78,9 @@ public class PathManager {
     public static String getPatrolFleetDataPath() {
         try {
             // Path to starfarer.api.jar inside starsector-core
-            String jarPath = AoDCapitalsModPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-
-
-            // Strip off "starsector-core/starfarer.api.jar"
-            String gameRoot;
-            if (jarPath.endsWith("jars/AodCapitals.jar")) {
-                gameRoot = jarPath.substring(0, jarPath.length() - "jars/AodCapitals.jar".length());
-            } else {
-                // Fallback: just go two directories up from the JAR
-                int coreIndex = jarPath.indexOf("/jars/");
-                if (coreIndex > 0) {
-                    gameRoot = jarPath.substring(0, coreIndex + 1);
-                } else {
-                    gameRoot = jarPath;
-                }
-            }
-
-            // Construct path to your mod’s subfolder
             String modFolder = PatrolTemplateManager.directoryForTemplates;
-            return getStarsectorRootPath()+"saves/common/Aotd-sop-patrol-templates/" + modFolder;
+
+            return getStarsectorRootPath()+"/saves/common/Aotd-sop-patrol-templates/" + modFolder;
         } catch (Exception e) {
             return "";
         }

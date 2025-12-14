@@ -177,7 +177,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         tooltip.addCustom(secondPanelInDenial, 5f);
 
         tooltip.addSectionHeading("Faction Holdings", Alignment.MID, 5f);
-        CustomPanelAPI panelInDenial = Global.getSettings().createCustom(width, componentPanel.getPosition().getHeight() - tooltip.getHeightSoFar() - 25, null);
+        CustomPanelAPI panelInDenial = Global.getSettings().createCustom(width, componentPanel.getPosition().getHeight() - tooltip.getHeightSoFar() - 35, null);
 
         float offsetY;
         if (table != null) {
