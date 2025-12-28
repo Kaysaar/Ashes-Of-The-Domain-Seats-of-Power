@@ -3,6 +3,11 @@ package data.plugins;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.econ.CommoditySpecAPI;
+import com.fs.starfarer.api.campaign.econ.Industry;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.econ.MutableCommodityQuantity;
+import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
@@ -17,9 +22,11 @@ import data.listeners.timeline.models.FirstIndustryListener;
 import data.listeners.timeline.models.FirstMarketConditionListener;
 import data.listeners.timeline.models.FirstSizeColonyListener;
 import data.plugins.coreui.FactionTabListener;
+import data.plugins.coreui.HoldingsTabListener;
 import data.plugins.coreui.PatrolTabListener;
 import data.scripts.ambition.AmbitionManager;
 import data.scripts.ambition.AmbitionSpecManager;
+import data.scripts.economy.CargoEconomyAnalyzer;
 import data.scripts.listeners.CrisisReplacer;
 import data.scripts.managers.TimelineListenerManager;
 import data.memory.AoTDSopMemFlags;
@@ -40,9 +47,12 @@ import data.scripts.timelineevents.templates.FactionExpansionEvent;
 import data.scripts.timelineevents.templates.GroundDefenceModifierEvent;
 import kaysaar.bmo.buildingmenu.upgradepaths.CustomUpgradePath;
 import kaysaar.bmo.buildingmenu.upgradepaths.UpgradePathManager;
+import org.apache.log4j.Logger;
+import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 
@@ -51,7 +61,10 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
     public void onNewGame() {
         Global.getSector().getListenerManager().addListener(new CrisisReplacer(),true);
     }
-
+    public long getWeightOfMarket(int size){
+        return (long) Math.sqrt(Math.pow(10,size-3));
+    }
+    public static final Logger log = Logger.getLogger(AoDCapitalsModPlugin.class);
     public void onGameLoad(boolean newGame) {
 
         try {
@@ -71,6 +84,7 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         if (!Global.getSector().getListenerManager().hasListenerOfClass(FactionHistoryUpdateListener.class)) {
             Global.getSector().getListenerManager().addListener(new FactionHistoryUpdateListener());
         }
+
         Global.getSector().getListenerManager().addListener(new CapitalReapplyListener(),true);
         addTransientScripts();
         TimelineListenerManager.getInstance().setNeedsResetAfterInterval(true);
@@ -98,11 +112,19 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         UpgradePathManager.getInstance().addNewCustomPath(path,Industries.PATROLHQ);
         Global.getSector().getListenerManager().addListener(new FactionTabListener(),true);
         Global.getSector().getListenerManager().addListener(new PatrolTabListener(),true);
-
+//        Global.getSector().getListenerManager().addListener(new HoldingsTabListener(),true);
+        CargoEconomyAnalyzer.analyzeCommodities(Collections.singletonList(Commodities.FUEL),true);
         if(newGame){
             AmbitionManager.getInstance();
             AmbitionManager.getInstance().setNewGameMode(true);
             Global.getSector().getPlayerFaction().getDoctrine().setOfficerQuality(1);
+        }
+        for (MarketAPI marketAPI : Global.getSector().getEconomy().getMarketsCopy()) {
+            String message = marketAPI.getName()+ " : Food supply : "+(marketAPI.getCommodityData(Commodities.FOOD).getMaxSupply()*Global.getSettings().getCommoditySpec(Commodities.FOOD).getEconUnit())+" : market size "+marketAPI.getSize();
+            String message2 = marketAPI.getName()+ " : Food demand : "+(marketAPI.getCommodityData(Commodities.FOOD).getMaxDemand()*Global.getSettings().getCommoditySpec(Commodities.FOOD).getEconUnit())+" : market size "+marketAPI.getSize();
+
+            log.info(message);
+            log.info(message2);
         }
     }
 

@@ -12,7 +12,7 @@ import data.scripts.managers.AoTDFactionManager;
 import data.ui.FactionPanel;
 import org.lwjgl.input.Keyboard;
 
-import static data.misc.AoTDSopMisc.tryToGetButtonProd;
+import static data.plugins.AoTDSopMisc.tryToGetButtonProd;
 
 public class FactionTabListener implements CommandTabListener {
     @Override
@@ -68,13 +68,17 @@ public class FactionTabListener implements CommandTabListener {
 
     @Override
     public void performRecalculations(UIComponentAPI uiComponentAPI) {
-        UIDataSop.WIDTH = Global.getSettings().getScreenWidth() - tryToGetButtonProd("colonies").getPosition().getX();
+        ButtonAPI button = tryToGetButtonProd("holdings");
+        if(button==null){
+            button = tryToGetButtonProd("colonies");
+        }
+        UIDataSop.WIDTH = Global.getSettings().getScreenWidth() - button.getPosition().getX();
         UIDataSop.HEIGHT = uiComponentAPI.getPosition().getHeight();
     }
 
     @Override
     public int getOrder() {
-        return 0;
+        return 20;
     }
 
     @Override

@@ -5,7 +5,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import data.ui.patrolfleet.overview.components.HoldingsDropDownButton;
+import data.ui.holdings.starsystems.components.StarSystemHoldingDropDown;
+import data.ui.patrolfleet.overview.components.PatrolFleetHoldingsDropDown;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,6 +56,16 @@ public class HoldingsUtilis {
             }
         });
     }
+    public static void sortDropDownButtonsIncome(ArrayList<DropDownButton> buttons, final boolean ascending) {
+        Collections.sort(buttons, new Comparator<DropDownButton>() {
+            @Override
+            public int compare(DropDownButton button1, DropDownButton button2) {
+                float days1 = calculateIncome(button1);
+                float days2 = calculateIncome(button2);
+                return ascending ? Float.compare(days1, days2) : Float.compare(days2, days1);
+            }
+        });
+    }
     public static void sortDropDownButtonsByFPConsumed(ArrayList<DropDownButton> buttons, final boolean ascending) {
         Collections.sort(buttons, new Comparator<DropDownButton>() {
             @Override
@@ -66,19 +77,31 @@ public class HoldingsUtilis {
         });
     }
     private static String getButtonName(DropDownButton button) {
-        if(button instanceof HoldingsDropDownButton hl){
+        if(button instanceof PatrolFleetHoldingsDropDown hl){
+            return hl.getStarSystem().getName();
+        }
+        if(button instanceof StarSystemHoldingDropDown hl){
             return hl.getStarSystem().getName();
         }
         return "";
     }
     private static float calculateFPGenerated(DropDownButton button) {
-        if(button instanceof HoldingsDropDownButton hl){
+        if(button instanceof PatrolFleetHoldingsDropDown hl){
             return FleetPointUtilis.getFleetPointsGeneratedByStarSystem(hl.getStarSystem(),Global.getSector().getPlayerFaction());
         }
         return 0f;
     }
+    private static float calculateIncome(DropDownButton button) {
+        float income = 0f;
+        if(button instanceof StarSystemHoldingDropDown hl){
+            for (MarketAPI market : hl.getMarkets()) {
+                income+=market.getNetIncome();
+            }
+        }
+        return income;
+    }
     private static float calculateFPTaken(DropDownButton button) {
-        if(button instanceof HoldingsDropDownButton hl){
+        if(button instanceof PatrolFleetHoldingsDropDown hl){
             return FleetPointUtilis.getFleetPointsTakenByStarSystem(hl.getStarSystem(),Global.getSector().getPlayerFaction());
         }
         return 0f;

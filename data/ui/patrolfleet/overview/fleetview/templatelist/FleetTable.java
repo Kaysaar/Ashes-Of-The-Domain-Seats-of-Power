@@ -3,15 +3,11 @@ package data.ui.patrolfleet.overview.fleetview.templatelist;
 import ashlib.data.plugins.ui.models.CustomButton;
 import ashlib.data.plugins.ui.models.DropDownButton;
 import ashlib.data.plugins.ui.plugins.UITableImpl;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.ui.ButtonAPI;
-import com.fs.starfarer.api.ui.CustomPanelAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
-import data.scripts.patrolfleet.utilis.HoldingsUtilis;
-import data.ui.patrolfleet.overview.components.HoldingsDropDownButton;
 import data.ui.patrolfleet.overview.fleetview.FleetButtonComponent;
 import data.ui.patrolfleet.templates.shiplist.components.SortingState;
 

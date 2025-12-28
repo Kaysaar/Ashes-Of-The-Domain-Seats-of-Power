@@ -2,9 +2,12 @@ package data.plugins;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.campaign.intel.bases.LuddicPathBaseIntel;
 import com.fs.starfarer.api.impl.campaign.intel.events.RemnantHostileActivityFactor;
@@ -14,12 +17,20 @@ import com.fs.starfarer.api.impl.campaign.intel.group.GenericRaidFGI;
 import com.fs.starfarer.api.impl.campaign.missions.FleetCreatorMission;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithTriggers;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
+import com.fs.starfarer.api.ui.ButtonAPI;
+import com.fs.starfarer.api.ui.UIComponentAPI;
+import com.fs.starfarer.api.ui.UIPanelAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.intel.HelldiversRaidIntel;
+import data.misc.ProductionUtil;
+import data.misc.ReflectionUtilis;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static com.fs.starfarer.api.util.Misc.isMilitary;
 
 public class AoTDSopMisc {
     public static boolean startAttack(MarketAPI source,MarketAPI target, StarSystemAPI system, Random random, FleetGroupIntel.FGIEventListener listener,boolean isLuddite) {
@@ -74,5 +85,50 @@ public class AoTDSopMisc {
             names.add(Global.getSettings().getIndustrySpec(spec).getName());
         }
         return Misc.getJoined(joiner,names);
+    }
+    public static ButtonAPI tryToGetButtonProd(String name) {
+        ButtonAPI button = null;
+        try {
+            for (UIComponentAPI componentAPI : ReflectionUtilis.getChildrenCopy((UIPanelAPI) ProductionUtil.getCurrentTab())) {
+                if (componentAPI instanceof ButtonAPI) {
+                    if (((ButtonAPI) componentAPI).getText().toLowerCase().contains(name)) {
+                        button = (ButtonAPI) componentAPI;
+                        break;
+                    }
+                }
+            }
+            return button;
+        } catch (Exception e) {
+
+        }
+        return button;
+
+    }
+    public static FactionAPI getClaimingFaction(SectorEntityToken planet) {
+        if (planet.getStarSystem() != null) {
+            String claimedBy = planet.getStarSystem().getMemoryWithoutUpdate().getString(MemFlags.CLAIMING_FACTION);
+            if (claimedBy != null) {
+                return Global.getSector().getFaction(claimedBy);
+            }
+        }
+
+        int max = 0;
+        MarketAPI result = null;
+        List<MarketAPI> markets = Global.getSector().getEconomy().getMarkets(planet.getContainingLocation());
+        for (MarketAPI curr : markets) {
+            if (curr.isHidden()) continue;
+            int score = curr.getSize();
+            for (MarketAPI other : markets) {
+                if (other != curr && other.getFaction() == curr.getFaction()) score++;
+            }
+            if (isMilitary(curr)) score += 10;
+            if (score > max) {
+                max = score;
+                result = curr;
+            }
+        }
+        if (result == null) return null;
+
+        return result.getFaction();
     }
 }

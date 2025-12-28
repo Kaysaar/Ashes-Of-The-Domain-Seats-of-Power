@@ -178,11 +178,17 @@ public class BasePatrolFleet extends BasePatrolFleetTemplate {
                 removeShipsByFpGreedySmallestFirst(shipsInDecomFleet,alreadyConsumed);
             }
             if(days>=daysStorage){
+
+                if(isInTransit()&&days>=daysStorage*2f){
+                    //Force Transit days was not forced by despawn
+                    forcedTransitDays = true;
+                }
                 if(isInTransit()&&forcedTransitDays){
                     forcedTransitDays = false;
                     setInTransit(false);
                     return;
                 }
+
                 if(isDecomisioned()&&isStartedProcessOfDecom()){
                     shouldRemove = true;
                     daysStorage=0;

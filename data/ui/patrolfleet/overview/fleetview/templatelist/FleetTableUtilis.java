@@ -1,9 +1,6 @@
 package data.ui.patrolfleet.overview.fleetview.templatelist;
 
 import ashlib.data.plugins.ui.models.DropDownButton;
-import com.fs.starfarer.api.Global;
-import data.scripts.patrolfleet.utilis.FleetPointUtilis;
-import data.ui.patrolfleet.overview.components.HoldingsDropDownButton;
 
 import java.util.ArrayList;
 import java.util.Collections;

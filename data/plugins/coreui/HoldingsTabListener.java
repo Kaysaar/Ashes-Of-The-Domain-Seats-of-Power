@@ -2,29 +2,31 @@ package data.plugins.coreui;
 
 import ashlib.data.plugins.coreui.CommandTabListener;
 import ashlib.data.plugins.coreui.CommandUIPlugin;
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.ButtonAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.ui.UIComponentAPI;
 import data.misc.UIDataSop;
-import data.scripts.managers.AoTDFactionManager;
-import data.ui.PatrolTabPanel;
+import data.ui.HoldingsUIPanel;
 import org.lwjgl.input.Keyboard;
 
-public class PatrolTabListener implements CommandTabListener {
+import java.awt.*;
+
+public class HoldingsTabListener implements CommandTabListener {
     @Override
     public String getNameForTab() {
-        return "Military & Templates";
+        return "Holdings";
     }
 
     @Override
     public String getButtonToReplace() {
-        return "doctrine & blueprints";
+        return "colonies";
     }
 
     @Override
     public String getButtonToBePlacedNear() {
-        return "income";
+        return null;
     }
 
     @Override
@@ -43,24 +45,26 @@ public class PatrolTabListener implements CommandTabListener {
             @Override
             public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
                 tooltip.addSectionHeading("Ashes of the Domain : Seats of Power", Alignment.MID,0f);
-                tooltip.addPara("In this tabs you will be able to design patrol fleets and control your forces, to guard your assets.",5f);
+                tooltip.addPara("This tab lists all holdings owned by you or your faction: %s, %s, %s, and %s."
+                        ,5f, Color.ORANGE,"Star Systems","Colonies","Megastructures","Companies");
+                tooltip.addPara("From here, you can manage all of them.", 3f);
             }
         };
     }
 
     @Override
     public CommandUIPlugin createPlugin() {
-        return new PatrolTabPanel(UIDataSop.WIDTH, UIDataSop.HEIGHT);
+        return new HoldingsUIPanel(UIDataSop.WIDTH, UIDataSop.HEIGHT);
     }
 
     @Override
     public float getWidthOfButton() {
-        return 205;
+        return 130;
     }
 
     @Override
     public int getKeyBind() {
-        return Keyboard.KEY_4;
+        return Keyboard.KEY_1;
     }
 
     @Override
@@ -70,12 +74,12 @@ public class PatrolTabListener implements CommandTabListener {
 
     @Override
     public int getOrder() {
-        return 30;
+        return 10;
     }
 
     @Override
     public boolean shouldButtonBeEnabled() {
-        return !AoTDFactionManager.getMarketsUnderPlayer().isEmpty();
+        return true;
     }
 
     @Override

@@ -5,17 +5,16 @@ import ashlib.data.plugins.ui.models.DropDownButton;
 import ashlib.data.plugins.ui.plugins.UITableImpl;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.util.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HoldingsDropDownButton extends DropDownButton {
+public class PatrolFleetHoldingsDropDown extends DropDownButton {
     StarSystemAPI main;
     ArrayList<MarketAPI> sub;
 
-    public HoldingsDropDownButton(UITableImpl tableOfReference, float width, float height, float maxWidth, float maxHeight, boolean droppableMode, StarSystemAPI system, ArrayList<MarketAPI> markets) {
+    public PatrolFleetHoldingsDropDown(UITableImpl tableOfReference, float width, float height, float maxWidth, float maxHeight, boolean droppableMode, StarSystemAPI system, ArrayList<MarketAPI> markets) {
         super(tableOfReference, width, height, maxWidth, maxHeight, system != null);
         this.main = system;
         this.sub = markets;
@@ -33,7 +32,7 @@ public class HoldingsDropDownButton extends DropDownButton {
     @Override
     public void advance(float amount) {
         super.advance(amount);
-        HoldingsButton bt = (HoldingsButton) mainButton;
+        PatrolFleetHoldingsButton bt = (PatrolFleetHoldingsButton) mainButton;
         bt.setArrowPointDown(isDropped);
 
     }
@@ -44,16 +43,16 @@ public class HoldingsDropDownButton extends DropDownButton {
             buttons = new ArrayList<>();
             if (droppableMode) {
                 for (MarketAPI subSpec : sub) {
-                    HoldingsButton button = new HoldingsButton(width-5f , height, subSpec, 5f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
+                    PatrolFleetHoldingsButton button = new PatrolFleetHoldingsButton(width-5f , height, subSpec, 5f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
                     button.createUI();
                     buttons.add(button);
                 }
             }
             if (droppableMode) {
-                mainButton = new HoldingsButton(width , height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), true);
+                mainButton = new PatrolFleetHoldingsButton(width , height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), true);
 
             } else {
-                mainButton = new HoldingsButton(width , height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
+                mainButton = new PatrolFleetHoldingsButton(width , height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
 
             }
             mainButton.createUI();

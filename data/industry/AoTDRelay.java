@@ -126,7 +126,7 @@ public class AoTDRelay extends MilitaryRelay {
             return;
         }
         RouteManager.RouteData route = RouteManager.getInstance().getRoute(getRouteSourceId(), fleet);
-        if(route==null){
+        if(route==null&& param instanceof RouteManager.RouteData){
             route = (RouteManager.RouteData) param;
         }
         if(route==null){
@@ -236,7 +236,7 @@ public class AoTDRelay extends MilitaryRelay {
     }
     @Override
     public CampaignFleetAPI spawnFleet(RouteManager.RouteData route) {
-        if (market.getFaction() != null && !market.getFaction().isPlayerFaction()) return super.spawnFleet(route);
+        if (market.getFaction() != null && !market.getFaction().isPlayerFaction() && !(route.getCustom() instanceof AoTDPatrolFleetData)) return super.spawnFleet(route);
         AoTDPatrolFleetData custom = (AoTDPatrolFleetData) route.getCustom();
         CampaignFleetAPI fleet = createPatrol(custom.getId(), route);
         if (fleet == null || fleet.isEmpty()) return null;

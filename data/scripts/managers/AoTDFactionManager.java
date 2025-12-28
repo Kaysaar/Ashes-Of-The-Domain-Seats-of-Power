@@ -95,6 +95,9 @@ public class AoTDFactionManager {
     public MarketAPI getCapitalMarket(){
         return getMarketsUnderPlayer().stream().filter(x->x.getPrimaryEntity().getId().equals(capitalID)).findFirst().orElse(null);
     }
+    public boolean isCaptialMarket(MarketAPI market){
+        return capitalID!=null&&market.getPrimaryEntity().getId().equals(capitalID);
+    }
 
     public LinkedHashMap<Integer,Integer>levels = new LinkedHashMap<>();
     public void addLevel(int level,int threshold){

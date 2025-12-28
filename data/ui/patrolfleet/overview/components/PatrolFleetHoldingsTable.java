@@ -15,18 +15,18 @@ import data.ui.patrolfleet.templates.shiplist.components.SortingState;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class HoldingsTable extends UITableImpl {
+public class PatrolFleetHoldingsTable extends UITableImpl {
     public ButtonAPI buttonName, buttonFPUsed, buttonFPGenerated;
     float currYPos = 0;
     ButtonAPI lastCheckedState;
     public MarketAPI currentlyChosenMarket;
 
-    public HoldingsTable(float width, float height, CustomPanelAPI panelToPlace, boolean doesHaveScroller, float xCord, float yCord) {
+    public PatrolFleetHoldingsTable(float width, float height, CustomPanelAPI panelToPlace, boolean doesHaveScroller, float xCord, float yCord) {
         super(width, height, panelToPlace, doesHaveScroller, xCord, yCord);
         if(dropDownButtons.isEmpty()){
             ArrayList<StarSystemAPI>systems = HoldingsUtilis.getSystemsWithPlayerFactionColonies();
             for (StarSystemAPI system : systems) {
-                HoldingsDropDownButton button = new HoldingsDropDownButton(this,width-13,60,0,0,false,system,HoldingsUtilis.getFactionMarketsInSystem(Global.getSector().getPlayerFaction(),system));
+                PatrolFleetHoldingsDropDown button = new PatrolFleetHoldingsDropDown(this,width-13,60,0,0,false,system,HoldingsUtilis.getFactionMarketsInSystem(Global.getSector().getPlayerFaction(),system));
                 dropDownButtons.add(button);
             }
 
@@ -64,7 +64,7 @@ public class HoldingsTable extends UITableImpl {
     public void createTable() {
         super.createTable();
         for (DropDownButton dropDownButton : dropDownButtons) {
-            HoldingsDropDownButton button = (HoldingsDropDownButton) dropDownButton;
+            PatrolFleetHoldingsDropDown button = (PatrolFleetHoldingsDropDown) dropDownButton;
             button.resetUI();
             button.createUI();
             tooltipOfImpl.addCustom(dropDownButton.getPanelOfImpl(), 2f);

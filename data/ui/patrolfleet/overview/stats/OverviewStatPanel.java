@@ -1,6 +1,5 @@
 package data.ui.patrolfleet.overview.stats;
 
-import ashlib.data.plugins.ui.models.DropDownButton;
 import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import ashlib.data.plugins.ui.models.ProgressBarComponentV2;
 import ashlib.data.plugins.ui.plugins.UILinesRenderer;
@@ -17,7 +16,7 @@ import data.plugins.AoTDSopMisc;
 import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.utilis.PatrolFleetFactory;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
-import data.ui.patrolfleet.overview.components.HoldingsTable;
+import data.ui.patrolfleet.overview.components.PatrolFleetHoldingsTable;
 
 import java.awt.*;
 import java.util.List;
@@ -28,7 +27,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
     CustomPanelAPI mainPanel, componentPanel;
     UILinesRenderer renderer;
     MarketAPI currentMarket;
-    HoldingsTable table;
+    PatrolFleetHoldingsTable table;
     AggressivenessChangerComponent aggressionMeter;
     AdmiraltyLevelComponent levelComponent;
     public OverviewStatPanel(float width, float height) {
@@ -185,7 +184,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         }
         else{
             CustomPanelAPI panel = Global.getSettings().createCustom(width +1, panelInDenial.getPosition().getHeight(), null);
-            table = new HoldingsTable(panel.getPosition().getWidth(), panel.getPosition().getHeight(), panel, true, 0, 0);
+            table = new PatrolFleetHoldingsTable(panel.getPosition().getWidth(), panel.getPosition().getHeight(), panel, true, 0, 0);
             table.createSections();
             table.createTable();
             table.currentlyChosenMarket = currentMarket;

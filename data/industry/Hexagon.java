@@ -160,6 +160,14 @@ public class Hexagon extends AoTDMilitaryBase {
     }
 
     @Override
+    public String getUnavailableReason() {
+        if(!AoTDFactionManager.getInstance().isCaptialMarket(market)){
+            return "Can only be built on capital";
+        }
+        return super.getUnavailableReason();
+    }
+
+    @Override
     public void unapply() {
         super.unapply();
 

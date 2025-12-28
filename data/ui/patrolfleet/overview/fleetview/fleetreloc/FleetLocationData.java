@@ -2,18 +2,17 @@ package data.ui.patrolfleet.overview.fleetview.fleetreloc;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
-import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.utilis.FleetPointUtilis;
 import data.ui.patrolfleet.overview.components.EntityWithNameComponent;
-import data.ui.patrolfleet.overview.components.HoldingsButton;
+import data.ui.patrolfleet.overview.components.PatrolFleetHoldingsButton;
 
 import java.awt.*;
 
-public class FleetLocationData extends HoldingsButton {
+public class FleetLocationData extends PatrolFleetHoldingsButton {
     float lYDistance;
     public FleetLocationData(float width, float height, Object buttonData, float indent, Color base, Color bg, Color bright, boolean isWithArrow,float lYDistance) {
         super(width, height, buttonData, indent, base, bg, bright, isWithArrow);

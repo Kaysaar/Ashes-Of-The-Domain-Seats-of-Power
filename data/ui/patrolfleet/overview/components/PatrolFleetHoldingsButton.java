@@ -5,19 +5,16 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.campaign.econ.impl.BaseIndustry;
-import com.fs.starfarer.api.loading.IndustrySpecAPI;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.utilis.FleetPointUtilis;
-import data.ui.patrolfleet.overview.OverviewPatrolPanel;
 
 import java.awt.*;
 
-public class HoldingsButton extends CustomButton {
+public class PatrolFleetHoldingsButton extends CustomButton {
     public Object data;
-    public HoldingsButton(float width, float height, Object buttonData, float indent, Color base, Color bg, Color bright,boolean isWithArrow) {
+    public PatrolFleetHoldingsButton(float width, float height, Object buttonData, float indent, Color base, Color bg, Color bright, boolean isWithArrow) {
         super(width, height, buttonData, indent, base, bg, bright);
         this.setWithArrow(isWithArrow);
     }

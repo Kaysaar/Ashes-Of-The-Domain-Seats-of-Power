@@ -1,15 +1,9 @@
 package data.ui.patrolfleet.overview.fleetview.templatelist;
 
-import ashlib.data.plugins.ui.models.CustomButton;
 import ashlib.data.plugins.ui.models.DropDownButton;
 import ashlib.data.plugins.ui.plugins.UITableImpl;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
-import data.ui.patrolfleet.overview.components.HoldingsButton;
 import data.ui.patrolfleet.overview.fleetview.FleetButtonComponent;
-
-import java.util.ArrayList;
 
 public class FleetButtonDrop extends DropDownButton {
     BasePatrolFleet fleet;
