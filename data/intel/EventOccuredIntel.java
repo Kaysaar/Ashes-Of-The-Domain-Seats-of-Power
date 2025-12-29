@@ -5,6 +5,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CoreUITabId;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.IntelUIAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
@@ -32,6 +33,18 @@ public class EventOccuredIntel extends BaseIntelPlugin {
         }
         if(AoTDFactionManager.getMarketsUnderPlayer().isEmpty()){
             return null;
+        }
+        if (Global.getSector().getPlayerFaction().getProduction().getGatheringPoint() == null) {
+            MarketAPI oldestMarket = null;
+            float daysInExistence = 0;
+            for (MarketAPI market : AoTDFactionManager.getMarketsUnderPlayer()) {
+                float daysInExistenceTemp = market.getDaysInExistence();
+                if (daysInExistenceTemp > daysInExistence) {
+                    daysInExistence = daysInExistenceTemp;
+                    oldestMarket = market;
+                }
+            }
+            Global.getSector().getPlayerFaction().getProduction().setGatheringPoint(oldestMarket);
         }
         return Global.getSector().getPlayerFaction().getProduction().getGatheringPoint().getPrimaryEntity();
     }

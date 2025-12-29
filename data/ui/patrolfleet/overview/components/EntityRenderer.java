@@ -31,24 +31,26 @@ public class EntityRenderer implements ExtendedUIPanelPlugin {
             float scale = boxSize/(planet.getRadius()*2);
             graphics.setScale(scale);
         }
-        else{
+        else if (tokenOfMarket != null){
             CustomEntitySpecAPI spec = tokenOfMarket.getCustomEntitySpec();
-            sprite = Global.getSettings().getSprite(spec.getSpriteName());
-            float originalWidth= spec.getSpriteWidth();
-            float originalHeight = spec.getSpriteHeight();
-            // Guard against zero/invalid sizes
-            if (originalWidth <= 0f || originalHeight <= 0f) {
-                originalWidth  = Math.max(1f, sprite.getWidth());
-                originalHeight = Math.max(1f, sprite.getHeight());
+            if (spec != null) {
+                sprite = Global.getSettings().getSprite(spec.getSpriteName());
+                float originalWidth= spec.getSpriteWidth();
+                float originalHeight = spec.getSpriteHeight();
+                // Guard against zero/invalid sizes
+                if (originalWidth <= 0f || originalHeight <= 0f) {
+                    originalWidth  = Math.max(1f, sprite.getWidth());
+                    originalHeight = Math.max(1f, sprite.getHeight());
+                }
+
+                // Scale to fit inside boxSize x boxSize, preserving aspect ratio
+                float scale = Math.min(boxSize / originalWidth, boxSize / originalHeight);
+                float scaledW = originalWidth  * scale;
+                float scaledH = originalHeight * scale;
+
+                // Apply size to the sprite
+                sprite.setSize(scaledW, scaledH);
             }
-
-            // Scale to fit inside boxSize x boxSize, preserving aspect ratio
-            float scale = Math.min(boxSize / originalWidth, boxSize / originalHeight);
-            float scaledW = originalWidth  * scale;
-            float scaledH = originalHeight * scale;
-
-            // Apply size to the sprite
-            sprite.setSize(scaledW, scaledH);
         }
 
     }
