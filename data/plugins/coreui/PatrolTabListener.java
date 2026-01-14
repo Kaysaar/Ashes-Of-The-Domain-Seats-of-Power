@@ -75,7 +75,7 @@ public class PatrolTabListener implements CommandTabListener {
 
     @Override
     public boolean shouldButtonBeEnabled() {
-        return !AoTDFactionManager.getMarketsUnderPlayer().isEmpty();
+        return true;
     }
 
     @Override

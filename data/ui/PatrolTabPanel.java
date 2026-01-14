@@ -12,6 +12,7 @@ import data.ui.patrolfleet.overview.OverviewPatrolPanel;
 import data.ui.patrolfleet.templates.TemplatePanel;
 import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
 import data.ui.patrolfleet.templates.shiplist.components.ShipUIData;
+import data.ui.tooltips.TempArmoryTooltip;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -182,16 +183,22 @@ public class PatrolTabPanel  extends CommandUIPlugin {
         sp = buttonTooltip.addButton("Armory", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         ;
         sp.setEnabled(false);
+        sp.setShowTooltipWhileInactive(true);
         customProd.setShortcut(Keyboard.KEY_R, false);
         research.setShortcut(Keyboard.KEY_T, false);
         sp.setShortcut(Keyboard.KEY_A, false);
         customProd.getPosition().inTL(0, 0);
         research.getPosition().inTL(141, 0);
         sp.getPosition().inTL(282, 0);
+
+        // Until Armory is implemented
+        buttonTooltip.addTooltipTo(new TempArmoryTooltip(),sp,TooltipMakerAPI.TooltipLocation.BELOW);
+
         buttonPanel.addUIElement(buttonTooltip).inTL(0, 0);
         mainPanel.addComponent(buttonPanel).inTL(0, 10);
         insertPatrolTemplatePanel(research);
         insertOverviewPatrol(customProd);
+
     }
 
 

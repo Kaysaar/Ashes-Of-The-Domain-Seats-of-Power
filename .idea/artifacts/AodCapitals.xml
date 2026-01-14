@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="AodCapitals">
-    <output-path>$PROJECT_DIR$/../Ashes of  The Domain -Seats Of Power/jars</output-path>
+  <artifact type="jar" build-on-make="true" name="AodCapitals">
+    <output-path>$STARSECTOR_INSTALL_DIR$/mods/Ashes of  The Domain -Seats Of Power/jars</output-path>
     <root id="archive" name="AodCapitals.jar">
       <element id="module-output" name="untitled" />
       <element id="module-output" name="Ashes-of-The-Domain-ALPHA-Capitals" />

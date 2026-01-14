@@ -28,7 +28,6 @@ public class AILegalization extends BaseFactionPolicy {
         tooltip.addPara("All factions that forbid AI use will declare permanent hostility.",Misc.getNegativeHighlightColor(),3f).setAlignment(Alignment.MID);
         tooltip.addPara("Significantly speeds up Colony Crisis",Misc.getNegativeHighlightColor(),3f).setAlignment(Alignment.MID);
         super.createTooltipDescription(tooltip);
-
     }
 
     @Override

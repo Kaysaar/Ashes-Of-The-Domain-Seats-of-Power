@@ -6,8 +6,8 @@ public class AILegalizationCondition extends PolicyApplierCondition{
     @Override
     public void apply(String id) {
        if(market.getAdmin()!=null&&market.getAdmin().isAICore()){
-           market.getStability().modifyFlat("ai_core_legal",2,"Ai Core Legalization");
-           market.getAccessibilityMod().modifyFlat("ai_core_legal",0.2f,"Ai Core Legalization");
+           market.getStability().modifyFlat("ai_core_legal",2,"AI Legalization");
+           market.getAccessibilityMod().modifyFlat("ai_core_legal",0.2f,"AI Legalization");
 
        }
        market.getIndustries().stream().filter(x->x.getAICoreId()!=null).forEach(x->x.getSupplyBonusFromOther().modifyFlat("ai_core_legal",1,"Ai Core Legalization"));
