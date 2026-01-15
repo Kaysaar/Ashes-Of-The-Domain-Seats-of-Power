@@ -16,6 +16,7 @@ public class AILegalizationCondition extends PolicyApplierCondition{
     @Override
     public void unapply(String id) {
         market.getStability().unmodifyFlat("ai_core_legal");
+        market.getAccessibilityMod().unmodifyFlat("ai_core_legal"); // In case still present from pre-fix
         market.getIncomeMult().unmodifyMult("ai_core_legal");
         market.getIndustries().forEach(x->x.getSupplyBonusFromOther().unmodifyFlat("ai_core_legal"));
 
