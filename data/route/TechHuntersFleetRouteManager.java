@@ -139,7 +139,7 @@ public class TechHuntersFleetRouteManager extends RouteFleetAssignmentAI impleme
         // First, try picking a ruins world normally (unless we roll for Remnants)
         boolean tryRemnant =  Misc.random.nextFloat() < remnantChance;
         for (StarSystemAPI system : systems) {
-            if (fleet.getStarSystem().equals(system)) continue;
+            if (fleet.getStarSystem() != null && fleet.getStarSystem().equals(system)) continue;
             // If Remnant roll succeeds, look for a Remnant-themed system
             if (tryRemnant && system.hasTag(Tags.THEME_REMNANT_MAIN)&&!ignorePenalty) {
                 for (PlanetAPI planet : system.getPlanets()) {
