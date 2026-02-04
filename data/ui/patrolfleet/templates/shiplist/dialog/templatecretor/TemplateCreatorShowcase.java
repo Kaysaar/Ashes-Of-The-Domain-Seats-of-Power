@@ -175,6 +175,30 @@ public class TemplateCreatorShowcase implements ExtendedUIPanelPlugin {
             star.getPosition().inTL(dataAboutFleetPanel.getPosition().getWidth()-widthOfButton,y);
             home.getPosition().inTL(dataAboutFleetPanel.getPosition().getWidth()/2-(widthOfButton/2),y);
             recon.getPosition().inTL(0,y);
+            tooltip.addTooltipTo(new BaseTooltipCreator(){
+                public float getTooltipWidth(Object tooltipParam) {
+                    return 350;
+                }
+                public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                    tooltip.addPara("%s fleets are the equivalent of vanilla's small fast patrols e.g. %s fleets",0f,Misc.getHighlightColor(),"Recon","\"Fast Picket\"");
+                }
+            },recon, TooltipMakerAPI.TooltipLocation.ABOVE);
+            tooltip.addTooltipTo(new BaseTooltipCreator(){
+                public float getTooltipWidth(Object tooltipParam) {
+                    return 350;
+                }
+                public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                    tooltip.addPara("%s fleets are the equivalent of vanilla's medium combat patrols e.g. %s fleets",0f,Misc.getHighlightColor(),"Home-guard","\"Patrol\"");
+                }
+            },home, TooltipMakerAPI.TooltipLocation.ABOVE);
+            tooltip.addTooltipTo(new BaseTooltipCreator(){
+                public float getTooltipWidth(Object tooltipParam) {
+                    return 350;
+                }
+                public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                    tooltip.addPara("%s fleets are the equivalent of vanilla's large heavy patrols e.g. %s fleets",0f,Misc.getHighlightColor(),"System Defence","\"Detachment\"");
+                }
+            },star, TooltipMakerAPI.TooltipLocation.ABOVE);
             LabelAPI l =tooltip.addPara("Roles are set only before a fleet begins patrol duty",3f);
             l.setAlignment(Alignment.MID);
             l.getPosition().inTL(5,y+heightButtons+3);
