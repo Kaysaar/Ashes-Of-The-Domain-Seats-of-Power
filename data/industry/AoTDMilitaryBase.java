@@ -282,31 +282,55 @@ public class AoTDMilitaryBase extends MilitaryBase {
     }
     @Override
     public CampaignFleetAPI spawnFleet(RouteManager.RouteData route) {
-        if ((market.getFaction() != null && !market.getFaction().isPlayerFaction() )|| !(route.getCustom() instanceof AoTDPatrolFleetData)) return super.spawnFleet(route);
-        AoTDPatrolFleetData custom = (AoTDPatrolFleetData) route.getCustom();
-        CampaignFleetAPI fleet = createPatrol(custom.getId(), route);
-        if (fleet == null || fleet.isEmpty()) return null;
 
-        fleet.addEventListener(this);
+        if ((market.getFaction() != null && market.getFaction().isPlayerFaction())) {
 
-        market.getContainingLocation().addEntity(fleet);
-        fleet.setFacing((float) Math.random() * 360f);
-        // this will get overridden by the patrol assignment AI, depending on route-time elapsed etc
-        fleet.setLocation(market.getPrimaryEntity().getLocation().x, market.getPrimaryEntity().getLocation().y);
+            AoTDPatrolFleetData custom = (AoTDPatrolFleetData) route.getCustom();
+            CampaignFleetAPI fleet = createPatrol(custom.getId(), route);
+            if (fleet == null || fleet.isEmpty()) return null;
 
-        fleet.addScript(new PatrolAssigmentAIV5(fleet, route));
-        fleet.setTransponderOn(true);
-        fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true, 0.3f);
+            fleet.addEventListener(this);
 
-        //market.getContainingLocation().addEntity(fleet);
-        //fleet.setLocation(market.getPrimaryEntity().getLocation().x, market.getPrimaryEntity().getLocation().y);
-        return fleet;
+            market.getContainingLocation().addEntity(fleet);
+            fleet.setFacing((float) Math.random() * 360f);
+            // this will get overridden by the patrol assignment AI, depending on route-time elapsed etc
+            fleet.setLocation(market.getPrimaryEntity().getLocation().x, market.getPrimaryEntity().getLocation().y);
 
+            fleet.addScript(new PatrolAssigmentAIV5(fleet, route));
+            fleet.setTransponderOn(true);
+            fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true, 0.3f);
+
+            //market.getContainingLocation().addEntity(fleet);
+            //fleet.setLocation(market.getPrimaryEntity().getLocation().x, market.getPrimaryEntity().getLocation().y);
+            return fleet;
+        }
+        else if (!(route.getCustom() instanceof AoTDPatrolFleetData)) {
+            return super.spawnFleet(route);
+        }
+        // Fallback in case AI tries to spawn fleet post player colony capture with AoTDPatrolFleetData
+        else {
+            PatrolFleetData pfd;
+            if (((AoTDPatrolFleetData) route.getCustom()).getType() == null) {
+                pfd = new PatrolFleetData(FleetFactory.PatrolType.COMBAT);
+            }
+            else {
+                pfd = new PatrolFleetData(((AoTDPatrolFleetData) route.getCustom()).getType());
+            }
+            route.setCustom(pfd);
+            return super.spawnFleet(route);
+        }
+        // DEBUG else statement
+//        else throw new RuntimeException("AoTDMilitarybase.java:309 - Failed to spawn fleet\n"
+//                    + "market.getFaction().isPlayerFaction() : " + market.getFaction().isPlayerFaction() + "\n"
+//                    + "market.getFaction().getDisplayName() : " + market.getFaction().getDisplayName() + "\n"
+//                    + "route.getCustom() : " + route.getCustom() + "\n"
+//                    + "route.getCustom().getClass() : " + route.getCustom().getClass()
+//            );
     }
+
     public static String getRouteSourceId(MarketAPI market) {
         return market.getId() + "_" + "military";
     }
-
 
     public static boolean isPatroling(String id, MarketAPI market) {
         if(market==null)return false;
