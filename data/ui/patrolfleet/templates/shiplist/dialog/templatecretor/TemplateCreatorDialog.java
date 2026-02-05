@@ -217,6 +217,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
             saveAsTemplate =tooltip.addButton("Save As Template", "normal", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, buttonConfirmWidth * 1.3f, 25.0F, 0.0F);
             saveAsTemplate.getPosition().inTL(buttonConfirmWidth*1.5F+10+(buttonConfirmWidth * 1.7f)+5,0);
         }
+        addTooltip(tooltip);
         contentOfButtonPanel.addUIElement(tooltip).inTL(0, 0);
         buttonPanel.addComponent(contentOfButtonPanel).inTL(0, 0);
     }

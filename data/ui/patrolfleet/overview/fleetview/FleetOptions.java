@@ -1,5 +1,6 @@
 package data.ui.patrolfleet.overview.fleetview;
 
+import ashlib.data.plugins.ui.models.CenterPopUpUI;
 import ashlib.data.plugins.ui.models.PopUpUI;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-public class FleetOptions extends PopUpUI {
+public class FleetOptions extends CenterPopUpUI {
     CustomPanelAPI mainPanel;
     ButtonAPI change,delete,relocate;
     FleetMarketData data;
