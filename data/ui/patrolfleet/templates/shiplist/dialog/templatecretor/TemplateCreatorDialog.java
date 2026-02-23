@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TemplateCreatorDialog extends BasePopUpDialog {
+    public static float width = 1240;
     ShipSelector selector;
     TemplateCreatorShowcase showcase;
     TemplatePanel referencePanel;

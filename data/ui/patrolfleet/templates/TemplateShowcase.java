@@ -192,7 +192,7 @@ public class TemplateShowcase implements ExtendedUIPanelPlugin {
                 if(!AshMisc.isPLayerHavingHeavyIndustry()){
                     height = 630;
                 }
-                AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol Fleet Template",this),1200,height);
+                AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol Fleet Template",this),TemplateCreatorDialog.width,height);
                 return;
             }
             if(copy.isChecked()){

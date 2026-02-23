@@ -26,7 +26,6 @@ import data.plugins.coreui.HoldingsTabListener;
 import data.plugins.coreui.PatrolTabListener;
 import data.scripts.ambition.AmbitionManager;
 import data.scripts.ambition.AmbitionSpecManager;
-import data.scripts.economy.CargoEconomyAnalyzer;
 import data.scripts.listeners.CrisisReplacer;
 import data.scripts.managers.TimelineListenerManager;
 import data.memory.AoTDSopMemFlags;
@@ -113,22 +112,16 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         Global.getSector().getListenerManager().addListener(new FactionTabListener(),true);
         Global.getSector().getListenerManager().addListener(new PatrolTabListener(),true);
 //        Global.getSector().getListenerManager().addListener(new HoldingsTabListener(),true);
-        CargoEconomyAnalyzer.analyzeCommodities(Collections.singletonList(Commodities.FUEL),true);
         if(newGame){
             AmbitionManager.getInstance();
             AmbitionManager.getInstance().setNewGameMode(true);
             Global.getSector().getPlayerFaction().getDoctrine().setOfficerQuality(1);
         }
-        for (MarketAPI marketAPI : Global.getSector().getEconomy().getMarketsCopy()) {
-            String message = marketAPI.getName()+ " : Food supply : "+(marketAPI.getCommodityData(Commodities.FOOD).getMaxSupply()*Global.getSettings().getCommoditySpec(Commodities.FOOD).getEconUnit())+" : market size "+marketAPI.getSize();
-            String message2 = marketAPI.getName()+ " : Food demand : "+(marketAPI.getCommodityData(Commodities.FOOD).getMaxDemand()*Global.getSettings().getCommoditySpec(Commodities.FOOD).getEconUnit())+" : market size "+marketAPI.getSize();
 
-            log.info(message);
-            log.info(message2);
-        }
+
+
     }
-
-    @Override
+@Override
     public void onApplicationLoad() throws Exception {
         PatrolTemplateManager.ensureFileExists();
         AmbitionSpecManager.loadSpecs();
@@ -143,13 +136,14 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         AoTDMilitaryBase.industriesValidForBase.add(Industries.MILITARYBASE);
         AoTDMilitaryBase.industriesValidForBase.add(Industries.HIGHCOMMAND);
         AoTDMilitaryBase.industriesValidForBase.add("aotd_hexagon");
+
         if(Global.getSettings().getModManager().isModEnabled("IndEvo")){
             Global.getSettings().getIndustrySpec("IndEvo_ComArray").setPluginClass(AoTDRelay.class.getName());
             Global.getSettings().getIndustrySpec("IndEvo_IntArray").setPluginClass(AoTDRelay.class.getName());
             AoTDMilitaryBase.industriesValidForBase.add("IndEvo_ComArray");
             AoTDMilitaryBase.industriesValidForBase.add("IndEvo_IntArray");
-
         }
+
 
 
     }

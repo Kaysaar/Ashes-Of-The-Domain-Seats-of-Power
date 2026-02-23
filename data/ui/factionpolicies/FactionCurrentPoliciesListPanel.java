@@ -1,5 +1,6 @@
 package data.ui.factionpolicies;
 
+import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.BasePopUpDialog;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
@@ -188,9 +189,7 @@ public class FactionCurrentPoliciesListPanel implements ExtendUIPanelPlugin {
                 panel.getButton().setChecked(false);
                 if(panel.isDisplayDialog()){
                     BasePopUpDialog dialog = new FactionPolicyWarningDialog("Policy Warning!");
-                    CustomPanelAPI panelAPI = Global.getSettings().createCustom(700, 300, dialog);
-                    UIPanelAPI panelAPI1 = ProductionUtil.getCoreUI();
-                    dialog.init(panelAPI, panelAPI1.getPosition().getCenterX() - (panelAPI.getPosition().getWidth() / 2), panelAPI1.getPosition().getCenterY() + (panelAPI.getPosition().getHeight() / 2), true);
+                    AshMisc.initPopUpDialog(dialog,700,300);
                 }
                 else{
                     AoTDFactionManager.getInstance().removePolicyFromCopy(panel.policy.getSpec().getId());

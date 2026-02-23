@@ -23,6 +23,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static data.ui.patrolfleet.templates.shiplist.dialog.templatecretor.TemplateCreatorDialog.width;
+
 public class FleetMarketData implements ExtendedUIPanelPlugin {
     CustomPanelAPI mainPanel;
     CustomPanelAPI componentPanel;
@@ -162,7 +164,7 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
             if(!AshMisc.isPLayerHavingHeavyIndustry()){
                 height = 630;
             }
-            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Create new Patrol",true,market),1200,height);
+            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Create new Patrol",true,market),TemplateCreatorDialog.width,height);
 
         }
         if(showEdit){
@@ -171,7 +173,7 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
             if(!AshMisc.isPLayerHavingHeavyIndustry()){
                 height = 630;
             }
-            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol",true,lastChecked.getData(),market),1200,height);
+            AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol",true,lastChecked.getData(),market),TemplateCreatorDialog.width,height);
             lastChecked = null;
 
         }

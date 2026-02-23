@@ -13,7 +13,6 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.campaign.econ.Market;
 import data.misc.ReflectionUtilis;
-import data.scripts.economy.CargoEconomyAnalyzer;
 import data.scripts.managers.AoTDFactionManager;
 import data.ui.holdings.starsystems.StarSystemHoldingsUI;
 import org.lwjgl.input.Keyboard;
@@ -50,8 +49,6 @@ public class HoldingsUIPanel extends CommandUIPlugin {
     public void init(String panelToShowcase, Object data) {
         renderer = new UILinesRenderer(0f);
         original = ReflectionUtilis.invokeMethodWithAutoProjection("getColoniesPanel",data);
-        CargoEconomyAnalyzer.runTestSet(false);   // prints RAW/BAL global totals per commodity
-        CargoEconomyAnalyzer.dumpCommodityCapacities(Commodities.SUPPLIES);
         this.panelForPlugins = mainPanel.createCustomPanel(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight() - 45, null);
         AoTDFactionManager.getInstance().advance(0f);
         if (!AshMisc.isStringValid(panelToShowcase)) {

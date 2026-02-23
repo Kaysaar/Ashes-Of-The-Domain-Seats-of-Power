@@ -1,5 +1,6 @@
 package data.industry.ui;
 
+import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.BasePopUpDialog;
 import ashlib.data.plugins.ui.models.resizable.ImageViewer;
 import com.fs.starfarer.api.Global;
@@ -69,17 +70,14 @@ public class NovaExplorariaButton extends BaseCapitalButton {
         if(abyssButton.isChecked()){
             abyssButton.setChecked(false);
             BasePopUpDialog dialog = new AbyssExpeditionDialog("Abyss Expedition",1,12,1,1,this);
-            CustomPanelAPI panelAPI = Global.getSettings().createCustom(700,330,dialog);
-            UIPanelAPI panelAPI1  = ProductionUtil.getCoreUI();
-            dialog.init(panelAPI,panelAPI1.getPosition().getCenterX()-(panelAPI.getPosition().getWidth()/2),panelAPI1.getPosition().getCenterY()+(panelAPI.getPosition().getHeight()/2),true);
+            AshMisc.initPopUpDialog(dialog,700,330);
 
         }
         if(techHunterPatrol.isChecked()){
             techHunterPatrol.setChecked(false);
             BasePopUpDialog dialog = new TechHunterDialog("Tech Hunters Expedition",1,12,1,1,this);
-            CustomPanelAPI panelAPI = Global.getSettings().createCustom(700,330,dialog);
-            UIPanelAPI panelAPI1  = ProductionUtil.getCoreUI();
-            dialog.init(panelAPI,panelAPI1.getPosition().getCenterX()-(panelAPI.getPosition().getWidth()/2),panelAPI1.getPosition().getCenterY()+(panelAPI.getPosition().getHeight()/2),true);
+
+            AshMisc.initPopUpDialog(dialog,700,330);
 
         }
     }
