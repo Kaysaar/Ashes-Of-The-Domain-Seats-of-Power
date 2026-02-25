@@ -38,8 +38,8 @@ public class PatrolFleetHoldingsButton extends CustomButton {
             takenV = (int) FleetPointUtilis.getFleetPointsConsumedByMarket(market);
 
         } else if (buttonData instanceof StarSystemAPI system) {
-//            star = system.getStar();
-            star = system.getCenter();
+            star = system.getStar();
+            if (star == null) star = system.getCenter();
             generatedV = (int) FleetPointUtilis.getFleetPointsGeneratedByStarSystem(system,Global.getSector().getPlayerFaction());
             takenV = (int) FleetPointUtilis.getFleetPointsTakenByStarSystem(system,Global.getSector().getPlayerFaction());
         }

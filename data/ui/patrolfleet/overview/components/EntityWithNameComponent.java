@@ -4,6 +4,7 @@ import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.PlanetAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.ui.*;
@@ -22,20 +23,18 @@ public class EntityWithNameComponent implements ExtendedUIPanelPlugin {
     public EntityWithNameComponent(SectorEntityToken token, float width, float height) {
         this.token = token;
         mainPanel = Global.getSettings().createCustom(width, height, this);
-
-
     }
+
     public EntityWithNameComponent(SectorEntityToken token, float width, float height,boolean showSize) {
         this.token = token;
         mainPanel = Global.getSettings().createCustom(width, height, this);
         this.showSize = showSize;
-
     }
+
     public EntityWithNameComponent(SectorEntityToken token,boolean factionForStars ,float width, float height) {
         this.token = token;
         mainPanel = Global.getSettings().createCustom(width, height, this);
         this.factionStars = factionForStars;
-
     }
 
     @Override
