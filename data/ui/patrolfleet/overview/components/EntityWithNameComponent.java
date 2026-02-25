@@ -21,6 +21,8 @@ public class EntityWithNameComponent implements ExtendedUIPanelPlugin {
     boolean showSize = false;
     boolean factionStars = false;
     public EntityWithNameComponent(SectorEntityToken token, float width, float height) {
+
+
         this.token = token;
         mainPanel = Global.getSettings().createCustom(width, height, this);
     }
