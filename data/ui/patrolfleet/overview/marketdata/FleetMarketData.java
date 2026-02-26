@@ -194,7 +194,7 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
                 component.setChecked(false);
                 FleetOptions list = new FleetOptions(this);
                 lastChecked = component;
-                AshMisc.placePopUpUIInTL(list,component.mainButton,300,100,new Vector2f(-300,-600));
+                AshMisc.placePopUpUIInTL(list,component.mainButton,300,100,new Vector2f(-300,-60));
             }
         }
     }
