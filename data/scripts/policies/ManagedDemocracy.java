@@ -147,7 +147,7 @@ public class ManagedDemocracy extends BaseFactionPolicy implements EconomyTickLi
                     IntelInfoPlugin info = infos.get(0);
                     if(info instanceof PirateBaseIntel){
                         PirateBaseIntel intels = (PirateBaseIntel) info;
-                        if(!intels.isHidden()&&!intels.getMarket().getMemoryWithoutUpdate().is("$aotd_chosen_for_raid",true)){
+                        if(!intels.isHidden() && !intels.getMarket().getMemoryWithoutUpdate().is("$aotd_chosen_for_raid",true)){
                             AoTDSopMisc.startAttack(AoTDFactionManager.getMarketsUnderPlayer().get(0), intels.getMarket(), intels.getMarket().getStarSystem(), Misc.random, new FleetGroupIntel.FGIEventListener() {
                                 @Override
                                 public void reportFGIAborted(FleetGroupIntel intel) {

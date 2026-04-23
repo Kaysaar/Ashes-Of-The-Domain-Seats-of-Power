@@ -16,6 +16,7 @@ public class HoldingsUtilis {
     public static ArrayList<StarSystemAPI> getSystemsWithPlayerFactionColonies() {
         ArrayList<StarSystemAPI> systems = new ArrayList<>();
         for (StarSystemAPI starSystem : Global.getSector().getStarSystems()) {
+            if (starSystem.getCenter() == null) continue;
             if (Global.getSector().getEconomy().getMarkets(starSystem.getCenter().getContainingLocation()).stream().anyMatch(x -> x.getFaction() != null && x.getFaction().isPlayerFaction())) {
                 systems.add(starSystem);
             }
