@@ -40,24 +40,30 @@ public class PathManager {
             String jarPath = Global.getSettings().getModManager().getModSpec("aotd_sop").getPath();
 
             String p = jarPath;
+
             p =  p.replace("\\","/");
+
             String gameRoot;
 
             // Prefer trimming at "starsector-core"
             int coreIdx = p.indexOf("/starsector-core/");
             if (coreIdx > 0) {
                 gameRoot = p.substring(0, coreIdx + 1); // keep trailing slash
+
             } else {
                 // Otherwise, trim at "/mods/" (parent of mods) or "/jars/"
                 int modsIdx = p.indexOf("/mods/");
                 if (modsIdx > 0) {
                     gameRoot = p.substring(0, modsIdx + 1);
+
                 } else {
                     int jarsIdx = p.indexOf("/jars/");
                     if (jarsIdx > 0) {
                         gameRoot = p.substring(0, jarsIdx + 1);
+
                     } else {
                         gameRoot = p.endsWith("/") ? p : p + "/";
+
                     }
                 }
             }
@@ -66,11 +72,19 @@ public class PathManager {
             if (gameRoot.matches("^/[A-Za-z]:/.*")) {
                 gameRoot = gameRoot.substring(1);
             }
-            if(gameRoot.charAt(0)=='/'){
-                gameRoot = gameRoot.substring(1);
+            else {
+                if (gameRoot.matches("^//[A-Za-z]:/.*")) {
+                    gameRoot = gameRoot.substring(2);
+                }
+                else {
+                    gameRoot = gameRoot;
+                }
             }
 
-            return Paths.get(gameRoot).toAbsolutePath().normalize().toString();
+            String end = Paths.get(gameRoot).toAbsolutePath().normalize().toString();
+
+            return end;
+
         } catch (Exception e) {
             return "";
         }
@@ -85,5 +99,4 @@ public class PathManager {
             return "";
         }
     }
-
 }

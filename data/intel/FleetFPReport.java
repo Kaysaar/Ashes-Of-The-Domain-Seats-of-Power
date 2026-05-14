@@ -27,8 +27,8 @@ public class FleetFPReport extends BaseIntelPlugin {
     }
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
-        int total = AoTDFactionPatrolsManager.getInstance().getTotalFpGenerated();
-        int available = AoTDFactionPatrolsManager.getInstance().getAvailableFP();
+        float total = AoTDFactionPatrolsManager.getInstance().getTotalFpGenerated();
+        float available = AoTDFactionPatrolsManager.getInstance().getAvailableFP();
         String percentage = Misc.getRoundedValue((available/total)*100f)+"%";
         info.addPara("Over %s of FP ( %s ) is not assigned!",2f,new Color[]{Color.ORANGE,Misc.getNegativeHighlightColor()},percentage,""+available).setAlignment(Alignment.MID);
         info.addPara("Access military overview to assign FP to patrols",3f).setAlignment(Alignment.MID);

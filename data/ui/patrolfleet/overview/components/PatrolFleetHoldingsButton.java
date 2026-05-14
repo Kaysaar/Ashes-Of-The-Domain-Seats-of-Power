@@ -23,7 +23,7 @@ public class PatrolFleetHoldingsButton extends CustomButton {
     public void createButtonContent(TooltipMakerAPI tooltip) {
         float widthOfSection = width;
         float nameSectionWidth = ((widthOfSection)/3);
-        nameSectionWidth+=20;
+        nameSectionWidth+=60;
         float restWidthToDistribute = widthOfSection - nameSectionWidth;
         float fPGeneratedAmount =restWidthToDistribute/2;
         float fPUsedAmount = restWidthToDistribute/2;

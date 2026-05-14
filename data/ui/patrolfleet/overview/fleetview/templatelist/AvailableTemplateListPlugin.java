@@ -42,7 +42,6 @@ public class AvailableTemplateListPlugin implements ExtendedUIPanelPlugin {
         float disposableHeightForFirstPart = contentPanel.getPosition().getHeight()-240;
         if(table==null){
             final AvailableTemplateListPlugin thisPlugin = this;
-
             table = new FleetTable(contentPanel.getPosition().getWidth(),disposableHeightForFirstPart,true,0,0){
                 @Override
                 public void reportButtonPressed(CustomButton buttonPressed) {
@@ -53,7 +52,6 @@ public class AvailableTemplateListPlugin implements ExtendedUIPanelPlugin {
             table.createSections();
             table.recreateTable();
         }
-        ArrayList<String > validToHighlight = new ArrayList<>();
 
         if(filterPanel==null){
 
@@ -70,7 +68,7 @@ public class AvailableTemplateListPlugin implements ExtendedUIPanelPlugin {
 
                     // Drop all keys not present in manusPresent
                     map.keySet().removeIf(k -> !manusPresent.contains(k)&&!k.equals("All designs"));
-                    validToHighlight.removeIf(k->!manusPresent.contains(k));
+
                 }
 
                 @Override

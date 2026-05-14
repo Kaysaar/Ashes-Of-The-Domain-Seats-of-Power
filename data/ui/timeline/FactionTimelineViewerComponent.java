@@ -35,7 +35,7 @@ public class FactionTimelineViewerComponent implements ExtendUIPanelPlugin {
     TooltipMakerAPI tooltip;
     CustomPanelAPI content;
     RightMouseInterceptor interceptor = new RightMouseInterceptor();
-    ButtonAPI left, right;
+    ButtonAPI left, right,farLeft,farRight;
     ButtonAPI takeScreenshot;
     SpriteAPI sprite = Global.getSettings().getSprite("rendering","GlitchSquare");
     ScreenActionBlocker blocker;
@@ -88,11 +88,15 @@ public class FactionTimelineViewerComponent implements ExtendUIPanelPlugin {
 
         mover = new RightMouseTooltipMoverV2();
         mover.init(dummy, mainPanel);
-        left = tooltip.addButton("<<", "<<", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
-        right = tooltip.addButton(">>", ">>", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
+        left = tooltip.addButton("<", "<", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
+        right = tooltip.addButton(">", ">", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
+        farLeft = tooltip.addButton("<<", "<<", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
+        farRight = tooltip.addButton(">>", ">>", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 20, 40, 0f);
         takeScreenshot = tooltip.addButton("Export Timeline to Png", ">>", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE, 170, 40, 0f);
         left.getPosition().inTL(mainPanel.getPosition().getCenterX()-left.getPosition().getWidth()-10, mainPanel.getPosition().getHeight()-left.getPosition().getHeight()-5);
         right.getPosition().inTL(mainPanel.getPosition().getCenterX()+right.getPosition().getWidth()+10, mainPanel.getPosition().getHeight()-right.getPosition().getHeight()-5);
+        farRight.getPosition().rightOfMid(right,5);
+        farLeft.getPosition().leftOfMid(left,5);
         takeScreenshot.getPosition().inTL(mainPanel.getPosition().getWidth()-takeScreenshot.getPosition().getWidth()-5,mainPanel.getPosition().getHeight()-right.getPosition().getHeight()-5);
         tooltip.setHeightSoFar(0f);
         mover.setBorders(-dummy.getPosition().getWidth() + mainPanel.getPosition().getWidth(), 0);
@@ -176,28 +180,34 @@ public class FactionTimelineViewerComponent implements ExtendUIPanelPlugin {
                 requestCaptureThisFrame = true;
             }
         }
-        if(left!=null){
-            if(mover.isMoving()&&left.isEnabled()){
-                left.setEnabled(false);
-            } else if (!mover.isMoving()) {
-                left.setEnabled(true);
+        if (left != null && right != null && farLeft != null && farRight != null) {
+            boolean moving = mover.isMoving();
+            boolean canUseButtons = !exportInProgress && !moving;
+
+            if(left.isEnabled()!=canUseButtons){
+                left.setEnabled(canUseButtons);
             }
-            if(!mover.isMoving()){
-                if(left.isChecked()){
+
+            if(right.isEnabled()!=canUseButtons){
+                right.setEnabled(canUseButtons);
+            }
+            if(farLeft.isEnabled()!=canUseButtons){
+                farLeft.setEnabled(canUseButtons);
+            }
+            if(farRight.isEnabled()!=canUseButtons){
+                farRight.setEnabled(canUseButtons);
+            }
+            if (canUseButtons) {
+                if (farLeft.isChecked()) {
+                    farLeft.setChecked(false);
+                    mover.moveBy(9999999f);
+                } else if (farRight.isChecked()) {
+                    farRight.setChecked(false);
+                    mover.moveBy(-9999999f);
+                } else if (left.isChecked()) {
                     left.setChecked(false);
                     mover.moveBy(mainPanel.getPosition().getWidth());
-                }
-            }
-        }
-        if(right!=null){
-            if(mover.isMoving()&&right.isEnabled()){
-                right.setEnabled(false);
-
-            } else if (!mover.isMoving()) {
-                right.setEnabled(true);
-            }
-            if(!mover.isMoving()){
-                if(right.isChecked()){
+                } else if (right.isChecked()) {
                     right.setChecked(false);
                     mover.moveBy(-mainPanel.getPosition().getWidth());
                 }

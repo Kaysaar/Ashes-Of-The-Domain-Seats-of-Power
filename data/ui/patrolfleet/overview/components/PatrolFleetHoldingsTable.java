@@ -51,12 +51,12 @@ public class PatrolFleetHoldingsTable extends UITableImpl {
         Color bright = Misc.getBrightPlayerColor();
         float usableWidth = width-13;
         float section =usableWidth/3;
-        buttonName = tooltipOfButtons.addAreaCheckbox("Name", SortingState.ASCENDING, base, bg, bright, section+20, 20, 0f);
-        buttonFPUsed = tooltipOfButtons.addAreaCheckbox("FP allocated", SortingState.NON_INITIALIZED, base, bg, bright, section-11, 20, 0f);
-        buttonFPGenerated = tooltipOfButtons.addAreaCheckbox("FP generated", SortingState.NON_INITIALIZED, base, bg, bright, section-11, 20, 0f);
+        buttonName = tooltipOfButtons.addAreaCheckbox("Name", SortingState.ASCENDING, base, bg, bright, section+60, 20, 0f);
+        buttonFPUsed = tooltipOfButtons.addAreaCheckbox("FP allocated", SortingState.NON_INITIALIZED, base, bg, bright, section-31, 20, 0f);
+        buttonFPGenerated = tooltipOfButtons.addAreaCheckbox("FP generated", SortingState.NON_INITIALIZED, base, bg, bright, section-31, 20, 0f);
         buttonName.getPosition().inTL(10, 0);
-        buttonFPUsed.getPosition().inTL(section+31, 0);
-        buttonFPGenerated.getPosition().inTL((section*2)+21, 0);
+        buttonFPUsed.getPosition().rightOfMid(buttonName,1);
+        buttonFPGenerated.getPosition().rightOfMid(buttonFPUsed,1);
         mainPanel.addUIElement(tooltipOfButtons).inTL(0, 0);
         lastCheckedState = buttonName;
     }

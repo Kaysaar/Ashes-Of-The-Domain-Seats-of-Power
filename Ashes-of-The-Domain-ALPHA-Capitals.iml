@@ -13,5 +13,6 @@
     <orderEntry type="library" name="Vok" level="project" />
     <orderEntry type="library" name="IndEvo" level="project" />
     <orderEntry type="library" name="bmo" level="project" />
+    <orderEntry type="library" name="AoTDToolboxTheory" level="project" />
   </component>
 </module>

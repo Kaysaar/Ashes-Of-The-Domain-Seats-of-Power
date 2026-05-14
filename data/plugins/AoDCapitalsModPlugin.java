@@ -3,16 +3,13 @@ package data.plugins;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.econ.CommoditySpecAPI;
-import com.fs.starfarer.api.campaign.econ.Industry;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.campaign.econ.MutableCommodityQuantity;
-import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Conditions;
-import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import data.industry.AoTDMilitaryBase;
 import data.industry.AoTDRelay;
+import data.industry.grandwonder.ReligionWonderType;
+import data.industry.grandwonder.SeatOfPowerProjects;
+import data.kaysaar.aotd.tot.grandwonders.GrandWonderTypeManager;
 import data.listeners.CapitalReapplyListener;
 import data.listeners.ChooseCapitalListener;
 import data.listeners.PatrolReportListener;
@@ -47,23 +44,26 @@ import data.scripts.timelineevents.templates.GroundDefenceModifierEvent;
 import kaysaar.bmo.buildingmenu.upgradepaths.CustomUpgradePath;
 import kaysaar.bmo.buildingmenu.upgradepaths.UpgradePathManager;
 import org.apache.log4j.Logger;
-import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedHashMap;
+
+import static data.kaysaar.aotd.tot.misc.AoTDToolboxMisc.setIndustryOnPlanet;
 
 
 public class AoDCapitalsModPlugin extends BaseModPlugin {
     @Override
     public void onNewGame() {
-        Global.getSector().getListenerManager().addListener(new CrisisReplacer(),true);
+        Global.getSector().getListenerManager().addListener(new CrisisReplacer(), true);
     }
-    public long getWeightOfMarket(int size){
-        return (long) Math.sqrt(Math.pow(10,size-3));
+
+    public long getWeightOfMarket(int size) {
+        return (long) Math.sqrt(Math.pow(10, size - 3));
     }
+
     public static final Logger log = Logger.getLogger(AoDCapitalsModPlugin.class);
+
     public void onGameLoad(boolean newGame) {
 
         try {
@@ -84,47 +84,46 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
             Global.getSector().getListenerManager().addListener(new FactionHistoryUpdateListener());
         }
 
-        Global.getSector().getListenerManager().addListener(new CapitalReapplyListener(),true);
+        Global.getSector().getListenerManager().addListener(new CapitalReapplyListener(), true);
         addTransientScripts();
         TimelineListenerManager.getInstance().setNeedsResetAfterInterval(true);
         if (newGame) {
             Global.getSector().getEconomy().getMarketsCopy().forEach(x -> x.getPrimaryEntity().getMemoryWithoutUpdate().set("$aotd_was_colonized", true));
         }
-        Global.getSector().getListenerManager().addListener(new ChooseCapitalListener(),true);
-        Global.getSector().getListenerManager().addListener(new PatrolReportListener(),true);
-        if(newGame && Global.getSettings().isDevMode()){
+        Global.getSector().getListenerManager().addListener(new ChooseCapitalListener(), true);
+        Global.getSector().getListenerManager().addListener(new PatrolReportListener(), true);
+        if (newGame && Global.getSettings().isDevMode()) {
             AoTDFactionManager.getInstance().addXP(100000);
         }
         AoTDFactionManager.getInstance().advance(0f);
         PatrolTemplateManager.loadAllExistingTemplates();
+        if (newGame) {
+            if (!Global.getSector().getMemoryWithoutUpdate().getBoolean("$nex_randomSector")) {
+                setIndustryOnPlanet("Canaan", "Gilead", "aotd_shrine_of_gilead", null, null, false, null, null);
 
-        if(newGame){
+            }
+        }
+        if (newGame) {
             AoTDFactionPatrolsManager.getInstance().advanceAfterFleets(-1f);
         }
-        CustomUpgradePath path = new CustomUpgradePath(1,4);
-        LinkedHashMap<String, Vector2f> map = new LinkedHashMap<>();
-        map.put(Industries.PATROLHQ, new Vector2f(1,0));
-        map.put(Industries.MILITARYBASE, new Vector2f(0,1));
-        map.put(Industries.HIGHCOMMAND, new Vector2f(0,2));
-        map.put("aotd_hexagon", new Vector2f(0,3));
-        path.setIndustryCoordinates(map);
-        UpgradePathManager.getInstance().addNewCustomPath(path,Industries.PATROLHQ);
-        Global.getSector().getListenerManager().addListener(new FactionTabListener(),true);
-        Global.getSector().getListenerManager().addListener(new PatrolTabListener(),true);
+        Global.getSector().getListenerManager().addListener(new FactionTabListener(), true);
+        Global.getSector().getListenerManager().addListener(new PatrolTabListener(), true);
 //        Global.getSector().getListenerManager().addListener(new HoldingsTabListener(),true);
-        if(newGame){
+        if (newGame) {
             AmbitionManager.getInstance();
             AmbitionManager.getInstance().setNewGameMode(true);
             Global.getSector().getPlayerFaction().getDoctrine().setOfficerQuality(1);
         }
 
 
-
     }
-@Override
+
+    @Override
     public void onApplicationLoad() throws Exception {
         PatrolTemplateManager.ensureFileExists();
         AmbitionSpecManager.loadSpecs();
+        GrandWonderTypeManager.addNewSpec(new SeatOfPowerProjects());
+        GrandWonderTypeManager.addNewSpec(new ReligionWonderType());
     }
 
     @Override
@@ -137,13 +136,12 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         AoTDMilitaryBase.industriesValidForBase.add(Industries.HIGHCOMMAND);
         AoTDMilitaryBase.industriesValidForBase.add("aotd_hexagon");
 
-        if(Global.getSettings().getModManager().isModEnabled("IndEvo")){
+        if (Global.getSettings().getModManager().isModEnabled("IndEvo")) {
             Global.getSettings().getIndustrySpec("IndEvo_ComArray").setPluginClass(AoTDRelay.class.getName());
             Global.getSettings().getIndustrySpec("IndEvo_IntArray").setPluginClass(AoTDRelay.class.getName());
             AoTDMilitaryBase.industriesValidForBase.add("IndEvo_ComArray");
             AoTDMilitaryBase.industriesValidForBase.add("IndEvo_IntArray");
         }
-
 
 
     }
@@ -160,44 +158,44 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         TimelineListenerManager.getInstance().addNewListener(new FirstIncomeColonyListener(AoTDSopMemFlags.REACHED_INCOME, 10000000, 3));
 
         TimelineListenerManager.getInstance().addNewListener(new FirstMarketConditionListener(AoTDSopMemFlags.MARKET_CONDITION_COLONIZED, Conditions.RUINS_VAST, new FirstVastRuins(), false));
-        TimelineListenerManager.getInstance().addNewListener(new FirstMarketConditionListener(AoTDSopMemFlags.MARKET_CONDITION_COLONIZED,Conditions.MILD_CLIMATE,new MildConditionEvent(),false));
-        TimelineListenerManager.getInstance().addNewListener(new FirstMarketConditionListener(AoTDSopMemFlags.MARKET_CONDITION_COLONIZED,Conditions.SOLAR_ARRAY,new OrbitalShadeEvent(),false));
+        TimelineListenerManager.getInstance().addNewListener(new FirstMarketConditionListener(AoTDSopMemFlags.MARKET_CONDITION_COLONIZED, Conditions.MILD_CLIMATE, new MildConditionEvent(), false));
+        TimelineListenerManager.getInstance().addNewListener(new FirstMarketConditionListener(AoTDSopMemFlags.MARKET_CONDITION_COLONIZED, Conditions.SOLAR_ARRAY, new OrbitalShadeEvent(), false));
 
         Global.getSector().getListenerManager().addListener(new ParadiseColonyListenerEnforcer(), true);
 
 
         TimelineListenerManager.getInstance().addNewListener(new VastRuinsScouredEventListener(AoTDSopMemFlags.VAST_RUINS_DEPLETED));
-        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY,new FirstPlanetaryShieldEvent(null)));
-        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY,new FirstHighCommand(null)));
+        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new FirstPlanetaryShieldEvent(null)));
+        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new FirstHighCommand(null)));
 
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new HegemonyInspectionDefeat()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new TriTachyonFendingOffAttacks()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new LuddicChurchDefeat()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new LuddicPathDefeat()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new DefeatingPerseanLeague()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new TriTachyonDealEvent()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new SindiranDiktatDefeat()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new MostWanted()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new HegemonyInspectionDefeat()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new TriTachyonFendingOffAttacks()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new LuddicChurchDefeat()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new LuddicPathDefeat()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new DefeatingPerseanLeague()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new TriTachyonDealEvent()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new SindiranDiktatDefeat()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new MostWanted()));
 
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.FIRST_ITEM,new HypershuntInstallEvent()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.FIRST_ITEM,new PristineNanoforgeEvent()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new FirstFourIndustries()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new TwelveSturcutresEvent()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new FoodMonopolyEvent(TimelineEventType.PROSPERITY,"food")));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new UnderworldMonopolyEvent()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new MilitaryMonopolyEvent()));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new ConsumerGoodsMonopolyEvent()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.FIRST_ITEM, new HypershuntInstallEvent()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.FIRST_ITEM, new PristineNanoforgeEvent()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new FirstFourIndustries()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new TwelveSturcutresEvent()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new FoodMonopolyEvent(TimelineEventType.PROSPERITY, "food")));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new UnderworldMonopolyEvent()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new MilitaryMonopolyEvent()));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new ConsumerGoodsMonopolyEvent()));
 
 
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new GroundDefenceModifierEvent(1000,1)));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new GroundDefenceModifierEvent(10000,2)));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new GroundDefenceModifierEvent(50000,3)));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new GroundDefenceModifierEvent(100000,4)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new GroundDefenceModifierEvent(1000, 1)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new GroundDefenceModifierEvent(10000, 2)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new GroundDefenceModifierEvent(50000, 3)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new GroundDefenceModifierEvent(100000, 4)));
 
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new FactionExpansionEvent(10,1)));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new FactionExpansionEvent(20,2)));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new FactionExpansionEvent(40,3)));
-        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT,new FactionExpansionEvent(80,4)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new FactionExpansionEvent(10, 1)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new FactionExpansionEvent(20, 2)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new FactionExpansionEvent(40, 3)));
+        TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new FactionExpansionEvent(80, 4)));
 
 
     }

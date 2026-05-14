@@ -13,8 +13,9 @@ import com.fs.starfarer.api.util.DelayedActionScript;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import data.ai.PatrolAssigmentAIV5;
-import data.kaysaar.aotd.vok.campaign.econ.globalproduction.impl.bifrost.BifrostMega;
-import data.kaysaar.aotd.vok.campaign.econ.globalproduction.models.GPManager;
+
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.BifrostMegastructure;
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.BifrostMegastructureManager;
 import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.models.AoTDPatrolFleetData;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
@@ -193,7 +194,7 @@ public class AoTDRelay extends MilitaryRelay {
                         fleetToSpawn.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
                         fleetToSpawn.addAssignment(FleetAssignment.ORBIT_PASSIVE,market.getPrimaryEntity(),3f,"Preparing for re-location");
                         if (Global.getSettings().getModManager().isModEnabled("aotd_vok")) {
-                            BifrostMega mega = (BifrostMega) GPManager.getInstance().getMegastructure("aotd_bifrost");
+                            BifrostMegastructure mega = BifrostMegastructureManager.getInstance().getMegastructure();
                             if(mega!=null&&mega.areStarSystemsConnected(market.getStarSystem(),fleetData.getTiedTo().getStarSystem())){
                                 SectorEntityToken token = mega.getSectionEntityInStarSystem(market.getStarSystem());
                                 SectorEntityToken travel = mega.getSectionEntityInStarSystem(fleetData.getTiedTo().getStarSystem());
@@ -234,6 +235,7 @@ public class AoTDRelay extends MilitaryRelay {
 
 
     }
+
     @Override
     public CampaignFleetAPI spawnFleet(RouteManager.RouteData route) {
         if ((market.getFaction() != null && !market.getFaction().isPlayerFaction() )|| !(route.getCustom() instanceof AoTDPatrolFleetData)) return super.spawnFleet(route);

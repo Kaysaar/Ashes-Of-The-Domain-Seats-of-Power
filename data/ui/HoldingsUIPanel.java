@@ -128,7 +128,6 @@ public class HoldingsUIPanel extends CommandUIPlugin {
     }
 
     public void pauseSound() {
-        Global.getSoundPlayer().pauseCustomMusic();
         Global.getSoundPlayer().restartCurrentMusic();
         pausedMusic = true;
     }

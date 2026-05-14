@@ -8,10 +8,10 @@ import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.Misc;
-import data.kaysaar.aotd.vok.campaign.econ.globalproduction.models.GPManager;
+import data.kaysaar.aotd.vok.campaign.econ.produciton.specs.AoTDProductionSpecManager;
 import data.kaysaar.aotd.vok.scripts.specialprojects.models.ProjectReward;
 import org.jetbrains.annotations.Nullable;
-
+/// TODO IMPL AFTER VOK 5.0
 import java.util.*;
 
 public class ShipPanelData {
@@ -146,7 +146,7 @@ public class ShipPanelData {
                 if (!found) continue;
             }
             if (Global.getSettings().getModManager().isModEnabled("aotd_vok")) {
-                if (GPManager.hasSpecialProject(ProjectReward.ProjectRewardType.SHIP, allShipHullSpec.getHullId()))
+                if (AoTDProductionSpecManager.hasSpecialProject(ProjectReward.ProjectRewardType.SHIP, allShipHullSpec.getHullId()))
                     continue;
             }
             if (!Global.getSector().getPlayerFaction().knowsShip(allShipHullSpec.getHullId())&& !Global.getSettings().isDevMode()) continue;

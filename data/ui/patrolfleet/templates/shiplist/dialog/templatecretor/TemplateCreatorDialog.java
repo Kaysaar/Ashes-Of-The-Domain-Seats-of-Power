@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TemplateCreatorDialog extends BasePopUpDialog {
-    public static float width = 1240;
+    public static float width = 1260;
     ShipSelector selector;
     TemplateCreatorShowcase showcase;
     TemplatePanel referencePanel;
@@ -42,6 +42,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
     MarketAPI market;
     BasePatrolFleet fleet;
     FleetFactory.PatrolType type;
+    boolean setTypeAutomatically = false;
     public TemplateCreatorShowcase getShowcase() {
         return showcase;
     }
@@ -57,6 +58,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
     public TemplateCreatorDialog(String headerTitle, boolean patrolFleetCreator, MarketAPI market) {
         super(headerTitle);
         this.market = market;
+        setTypeAutomatically = true;
         this.patrolFleetCreatorMode = patrolFleetCreator;
     }
     public TemplateCreatorDialog(String headerTitle, boolean patrolFleetCreator,BasePatrolFleet fleet, MarketAPI market) {
@@ -177,6 +179,10 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
         }
 
         showcase.createUI();
+        if(patrolFleetCreatorMode&&setTypeAutomatically){
+            setTypeAutomatically = false;
+            showcase.type = FleetFactory.PatrolType.COMBAT;
+        }
         content.addComponent(showcase.getMainPanel()).inTL(775, -1);
         if(!AshMisc.isPLayerHavingHeavyIndustry()&&patrolFleetCreatorMode){
             tooltip.setParaFont(Fonts.ORBITRON_20AA);

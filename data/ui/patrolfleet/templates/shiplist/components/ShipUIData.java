@@ -14,6 +14,7 @@ import com.fs.starfarer.api.util.Pair;
 import com.fs.starfarer.ui.impl.StandardTooltipV2;
 import com.fs.starfarer.ui.impl.StandardTooltipV2Expandable;
 import data.misc.ReflectionUtilis;
+import data.scripts.patrolfleet.utilis.FleetPointUtilis;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class ShipUIData {
     public static float WIDTH_OF_SIZE = WIDTH_OF_OPTIONS * 0.08f;
     public static float WIDTH_OF_TYPE = WIDTH_OF_OPTIONS * 0.08f;
     public static float WIDTH_OF_DESIGN_TYPE = WIDTH_OF_OPTIONS * 0.20f;
-    public static float WIDTH_OF_CREDIT_COST = WIDTH_OF_OPTIONS * 0.15f;
+    public static float WIDTH_OF_FP = WIDTH_OF_OPTIONS * 0.15f;
     public static float WIDTH_OF_GP = WIDTH_OF_OPTIONS * 0.15f - 5f;
 
     public static void recompute(float width, float height) {
@@ -40,7 +41,9 @@ public class ShipUIData {
         WIDTH_OF_NAME = WIDTH_OF_OPTIONS * 0.36f;
         WIDTH_OF_SIZE = WIDTH_OF_OPTIONS * 0.12f;
         WIDTH_OF_TYPE = WIDTH_OF_OPTIONS * 0.12f;
-        WIDTH_OF_DESIGN_TYPE = WIDTH_OF_OPTIONS * 0.40f;
+        WIDTH_OF_DESIGN_TYPE = (WIDTH_OF_OPTIONS * 0.40f) - 80;
+        WIDTH_OF_FP = 80;
+
     }
     public static UiPackage getShipOption(ShipHullSpecAPI option) {
         FactionAPI faction = Global.getSector().getPlayerFaction();
@@ -60,12 +63,14 @@ public class ShipUIData {
         LabelAPI size = mainTooltip.addPara(Misc.getHullSizeStr(option.getHullSize()), 0f);
         LabelAPI type = mainTooltip.addPara(AshMisc.getType(option), 0f);
         LabelAPI designType = mainTooltip.addPara(option.getManufacturer(), Misc.getDesignTypeColor(option.getManufacturer()), 0f);
+        LabelAPI credits = mainTooltip.addPara(((int)(FleetPointUtilis.getHullFP(option.getHullId())))+"",Color.ORANGE, 0f);
+
         size.getPosition().inTL(getxPad(size, getCenter(WIDTH_OF_NAME  , WIDTH_OF_SIZE)), getyPad(size));
         type.getPosition().inTL(getxPad(type, getCenter(WIDTH_OF_NAME  + WIDTH_OF_SIZE, WIDTH_OF_TYPE)), getyPad(type));
         designType.getPosition().inTL(getxPad(designType, getCenter(WIDTH_OF_NAME  + WIDTH_OF_SIZE + WIDTH_OF_TYPE, WIDTH_OF_DESIGN_TYPE)), getyPad(designType));
-        float centerXTotalCost =  getCenter(WIDTH_OF_NAME  + WIDTH_OF_SIZE + WIDTH_OF_TYPE+ WIDTH_OF_DESIGN_TYPE,WIDTH_OF_CREDIT_COST+WIDTH_OF_GP);
+        float centerXTotalCost =  getCenter(WIDTH_OF_NAME  + WIDTH_OF_SIZE + WIDTH_OF_TYPE+ WIDTH_OF_DESIGN_TYPE, WIDTH_OF_FP +WIDTH_OF_GP);
 
-//        credits.getPosition().inTL(centerXTotalCost-(credits.computeTextWidth(credits.getText())/2),35);
+        credits.getPosition().inTL(centerXTotalCost-(credits.computeTextWidth(credits.getText())/2),getyPad(credits));
         mainTooltip.addCustom(panelImage.one, 5f).getPosition().inTL(2, 12);
         FleetMemberAPI fleetMemberAPI = Global.getFactory().createFleetMember(FleetMemberType.SHIP, AshMisc.getVaraint(option));
         fleetMemberAPI.getRepairTracker().setCR(0.7f);

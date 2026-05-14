@@ -78,7 +78,6 @@ public class OverviewShortInfoPanel implements ExtendUIPanelPlugin {
        ButtonAPI button =tooltipSub.addButton("Capital Abilities", "colonies", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, contentPanel.getPosition().getWidth() - 10, 30, 10f);
        button.setEnabled(AoTDFactionManager.getInstance().doesControlCapital()&& NovaExploraria.getNova()!=null&&NovaExploraria.getNova().isFunctional());
         buttons.add(button);
-        buttons.add(tooltipSub.addButton("Global Market Data", "commodities", Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, contentPanel.getPosition().getWidth() - 10, 30, 10f));
         tooltip.endSubTooltip();
 
         tooltip.addCustom(new FactionBonusPanel(contentPanel.getPosition().getWidth(), contentPanel.getPosition().getHeight() - tooltipSub.getHeightSoFar() - tooltip.getHeightSoFar() - 205f, false).getMainPanel(), 5f);

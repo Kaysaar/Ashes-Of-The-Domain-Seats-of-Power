@@ -30,6 +30,10 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
     PatrolFleetHoldingsTable table;
     AggressivenessChangerComponent aggressionMeter;
     AdmiraltyLevelComponent levelComponent;
+    ProgressBarComponentV2 thresholdForPicket;
+    ProgressBarComponentV2 thresholdForMarketDefence;
+    LabelAPI l1,l2;
+    public static int perSection =25;
     public OverviewStatPanel(float width, float height) {
         mainPanel = Global.getSettings().createCustom(width, height, this);
         renderer = new UILinesRenderer(0f);
@@ -71,6 +75,8 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
                 this.getProgressLabel().setHighlight(""+total,""+taken);
             }
         };
+
+
         tooltip.addCustom(component.getMainPanel(), 0f).getPosition().inTL(7, 25);
         tooltip.addTooltipToPrevious(new TooltipMakerAPI.TooltipCreator() {
             @Override
@@ -174,6 +180,41 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         admTab.autoSizeToWidth(admTab.computeTextWidth(admTab.getText()));
         secondPanelInDenial.addUIElement(tl).inTL(0, 0);
         tooltip.addCustom(secondPanelInDenial, 5f);
+        CustomPanelAPI mainPSecond = Global.getSettings().createCustom(componentPanel.getPosition().getWidth(),50,null);
+        TooltipMakerAPI barsTl = mainPSecond.createUIElement(mainPSecond.getPosition().getWidth(),mainPSecond.getPosition().getHeight(),false);
+        int segmentPicket = (int) (AoTDFactionPatrolsManager.getInstance().thresholdForPicket/perSection);
+        int segmentNormal = (int) (AoTDFactionPatrolsManager.getInstance().thresholdForMarketDefence/perSection);
+        thresholdForPicket = new ProgressBarComponentV2((mainPSecond.getPosition().getWidth()-10)/2, 18,segmentPicket,300/perSection,Misc.getBasePlayerColor(),1){
+            @Override
+            public void influenceLabel() {
+                this.getProgressLabel().setHighlightColors(colors);
+                this.getProgressLabel().setHighlight(""+total,""+taken);
+            }
+        };
+
+        thresholdForMarketDefence = new ProgressBarComponentV2((mainPSecond.getPosition().getWidth()-10)/2, 18,segmentNormal,700/(perSection),Misc.getBasePlayerColor(),2){
+            @Override
+            public void influenceLabel() {
+                this.getProgressLabel().setHighlightColors(colors);
+                this.getProgressLabel().setHighlight(""+total,""+taken);
+            }
+        };
+        tooltip.addSectionHeading("Fleet point role thresholds",Alignment.MID,5f);
+        barsTl.addCustom(thresholdForPicket.getMainPanel(),18).getPosition().inTL(0,18);
+        barsTl.addCustom(thresholdForMarketDefence.getMainPanel(),0f).getPosition().inTL(mainPSecond.getPosition().getWidth()-thresholdForMarketDefence.getMainPanel().getPosition().getWidth()-5,18);
+        LabelAPI label = barsTl.addPara("Recon: %s FP",0f,Color.ORANGE,""+AoTDFactionPatrolsManager.getInstance().thresholdForPicket);
+        label.autoSizeToWidth(thresholdForPicket.getMainPanel().getPosition().getWidth());
+        label.setAlignment(Alignment.MID);
+        label.getPosition().aboveMid(thresholdForPicket.getMainPanel(),18);
+        l1= label;
+
+        label = barsTl.addPara("Home-guard: %s FP",0f,Color.ORANGE,""+AoTDFactionPatrolsManager.getInstance().thresholdForMarketDefence);
+        label.autoSizeToWidth(thresholdForMarketDefence.getMainPanel().getPosition().getWidth());
+        label.setAlignment(Alignment.MID);
+        l2 = label;
+        label.getPosition().aboveMid(thresholdForMarketDefence.getMainPanel(),18);
+        mainPSecond.addUIElement(barsTl).inTL(0,0);
+        tooltip.addCustom(mainPSecond,18);
 
         tooltip.addSectionHeading("Faction Holdings", Alignment.MID, 5f);
         CustomPanelAPI panelInDenial = Global.getSettings().createCustom(width, componentPanel.getPosition().getHeight() - tooltip.getHeightSoFar() - 35, null);
@@ -245,6 +286,20 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
                 OverviewPatrolPanel.forceRequestUpdateListOnly = true;
             }
             currentMarket = next;
+        }
+        if(thresholdForMarketDefence!=null&&thresholdForPicket!=null){
+            if(thresholdForPicket.currentSection>=thresholdForMarketDefence.currentSection){
+                thresholdForMarketDefence.currentSection = thresholdForPicket.currentSection+1;
+                thresholdForMarketDefence.createUI();
+            }
+            AoTDFactionPatrolsManager.getInstance().setThresholdForPicket(thresholdForPicket.currentSection*perSection);
+            AoTDFactionPatrolsManager.getInstance().setThresholdForMarketDefence(thresholdForMarketDefence.currentSection*perSection);
+            String tP = ""+(thresholdForPicket.currentSection*perSection);
+            String mP = ""+(thresholdForMarketDefence.currentSection*perSection);
+            l1.setText("Recon: "+tP+" FP");
+            l2.setText("Home-guard: "+mP+" FP");
+            l1.setHighlight(tP);
+            l2.setHighlight(mP);
         }
     }
 

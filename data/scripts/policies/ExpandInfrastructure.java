@@ -48,11 +48,7 @@ public class ExpandInfrastructure extends BaseFactionPolicy {
     public void applyForMarket(MarketAPI x) {
         if(getDaysTillPlaced()<720){
             x.getIndustries().forEach(y->y.getAllSupply().forEach(z->{
-                z.getQuantity().unmodifyFlat(getID());
-
-                int before  = z.getQuantity().getModifiedInt();
-                int penalty = Math.round(before*0.4f);
-                z.getQuantity().modifyFlat(getID(),-penalty,"Expand Infrastructure Policy");
+                z.getQuantity().modifyMultAlways(getID(),0.6f,"Expand Infrastructure Policy");
             }));
        }
         else{

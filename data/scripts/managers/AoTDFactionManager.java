@@ -9,6 +9,7 @@ import com.fs.starfarer.api.combat.MutableStat;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.util.Misc;
 import data.conditions.AoTDFactionCapital;
+import data.kaysaar.aotd.tot.scripts.economy.AoTDSectorProductionDemandDataUtils;
 import data.scripts.factiongoals.BaseFactionGoal;
 import data.scripts.factiongoals.MilitaryGoal;
 import data.scripts.factiongoals.ProsperityGoal;
@@ -577,9 +578,8 @@ public class AoTDFactionManager {
         return Arrays.stream(commodities).allMatch(x ->getMarketSharePercentage(x,Global.getSector().getPlayerFaction()) >= threshold);
     }
 
-    public static int getMarketSharePercentage(String commodityID,FactionAPI faction) {
-        MarketAPI market = Global.getSector().getEconomy().getMarketsCopy().get(0);
-        return market.getCommodityData(commodityID).getCommodityMarketData().getMarketSharePercent(faction);
+    public static float getMarketSharePercentage(String commodityID,FactionAPI faction) {
+        return AoTDSectorProductionDemandDataUtils.getProductionPercentageShareOfFaction(commodityID,faction.getId())*100;
     }
     public static HashSet<String> getAllCommoditiesInCirculation(){
         HashSet<String>strs =new HashSet<>();

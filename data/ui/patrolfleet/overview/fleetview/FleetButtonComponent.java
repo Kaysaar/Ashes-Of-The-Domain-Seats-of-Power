@@ -54,7 +54,7 @@ public class FleetButtonComponent extends CustomButton {
         if(templateButton) {
             startXPerm = 231;
             float available = width-startXPerm-110;
-            float statusPositionStart = width-100;
+            float statusPositionStart = width-95;
             CustomPanelAPI custom = Global.getSettings().createCustom(available,maxHeight,null);
             TooltipMakerAPI customTooltip = custom.createUIElement(custom.getPosition().getWidth(),custom.getPosition().getHeight(),false);
             LinkedHashMap<String,Integer>ships =new LinkedHashMap<>(data.assignedShipsThatShouldSpawn);
@@ -92,7 +92,7 @@ public class FleetButtonComponent extends CustomButton {
         else{
             float available = width-startXPerm-290;
             float statusPositionStart = startXPerm+available+10;
-            float pointsFP = statusPositionStart+185;
+            float pointsFP = width-95;
             CustomPanelAPI custom = Global.getSettings().createCustom(available,maxHeight,null);
             TooltipMakerAPI customTooltip = custom.createUIElement(custom.getPosition().getWidth(),custom.getPosition().getHeight(),false);
             LinkedHashMap<String,Integer>ships =new LinkedHashMap<>();

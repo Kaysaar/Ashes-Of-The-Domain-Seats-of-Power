@@ -35,6 +35,32 @@ public class FleetTable extends UITableImpl {
         }
 
     }
+    public FleetTable(float width, float height, boolean doesHaveScroller, float xCord, float yCord,ArrayList<BasePatrolFleet>possibleFleets) {
+        super(width, height, doesHaveScroller, xCord, yCord);
+        if(dropDownButtons.isEmpty()){
+            for (BasePatrolFleet value : possibleFleets) {
+                FleetButtonDrop test = new FleetButtonDrop(this,width-13,60,0,0,value);
+                dropDownButtons.add(test);
+
+            }
+
+
+        }
+
+    }
+    public void addToTable(BasePatrolFleet fleet){
+        dropDownButtons.add(new FleetButtonDrop(this,width-13,60,0,0,fleet));
+        this.recreateTable();
+    }
+    public void removeFromTable(BasePatrolFleet fleet){
+            dropDownButtons.removeIf(x->{
+                if(x instanceof FleetButtonDrop drop1){
+                    return drop1.fleet.equals(fleet);
+                }
+                return false;
+            });
+        this.recreateTable();
+    }
     @Override
     public void createTable() {
         super.createTable();

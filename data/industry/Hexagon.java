@@ -4,6 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.BattleAPI;
 import com.fs.starfarer.api.campaign.CampaignEventListener;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.econ.Industry;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.FleetEventListener;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.econ.impl.BaseIndustry;
@@ -12,13 +14,87 @@ import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.kaysaar.aotd.tot.grandwonders.GrandWonderAPI;
+import data.kaysaar.aotd.tot.grandwonders.GrandWonderTypeManager;
 import data.scripts.managers.AoTDFactionManager;
+import kaysaar.bmo.buildingmenu.BuildingMenuMisc;
 
-public class Hexagon extends AoTDMilitaryBase {
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+
+public class Hexagon extends AoTDMilitaryBase implements GrandWonderAPI {
     @Override
     public boolean isAvailableToBuild() {
-        return AoTDFactionManager.getInstance().doesControlCapital()&&AoTDFactionManager.getInstance().getCapitalMarket().getId().equals(market.getId());
+        return AoTDFactionManager.getInstance().doesControlCapital();
+    }
+
+    @Override
+    public String getWonderTypeId() {
+        return "base_capital_wonder";
+    }
+
+    @Override
+    public LinkedHashMap<String, String> getRequirementsToBuildWonder() {
+        return new LinkedHashMap<>();
+    }
+
+    @Override
+    public boolean hasReqBeenMetOnMarket(String s) {
+        return true;
+    }
+
+    @Override
+    public LinkedHashSet<String> getIndustriesToPreventFromAppearingInMenu(MarketAPI marketAPI) {
+        LinkedHashSet<String>ind = new LinkedHashSet<>();
+        ind.add(Industries.PATROLHQ);
+        ind.addAll(BuildingMenuMisc.getUpgradePath(Industries.PATROLHQ));
+
+
+        return ind;
+    }
+
+    @Override
+    public boolean shouldShowInListOfWonders(MarketAPI marketAPI) {
+        return AoTDFactionManager.getInstance().doesControlCapital()&&GrandWonderTypeManager.getSpec(getWonderTypeId()).canBuildAdditionalWonderOfType(this.getSpec().getId(), marketAPI);
+    }
+
+    @Override
+    public LinkedHashMap<String, Integer> getDemandCostForRestoration() {
+        LinkedHashMap<String,Integer>res = new LinkedHashMap<>();
+        res.put(Commodities.METALS,15);
+        res.put(Commodities.SUPPLIES,5);
+        res.put(Commodities.HEAVY_MACHINERY,5);
+        return res;
+    }
+
+    @Override
+    public boolean canShutDown() {
+        return false;
+    }
+
+    @Override
+    public boolean showShutDown() {
+        return false;
+    }
+
+    @Override
+    public void finishedConstruction(MarketAPI marketAPI) {
+        for (String industriesToPreventFromAppearingInMenu : getIndustriesToPreventFromAppearingInMenu(marketAPI)) {
+            if(marketAPI.hasIndustry(industriesToPreventFromAppearingInMenu)) {
+                Industry ind = marketAPI.getIndustry(industriesToPreventFromAppearingInMenu);
+                this.setAICoreId(ind.getAICoreId());
+                this.setSpecialItem(ind.getSpecialItem());
+                this.setImproved(ind.isImproved());
+                marketAPI.removeIndustry(ind.getId(), MarketAPI.MarketInteractionMode.REMOTE,false);
+            }
+        }
+    }
+
+    @Override
+    public void addToCustomSectionInTooltip(TooltipMakerAPI tooltipMakerAPI) {
+
     }
     @Override
     public boolean showWhenUnavailable() {
@@ -161,9 +237,6 @@ public class Hexagon extends AoTDMilitaryBase {
 
     @Override
     public String getUnavailableReason() {
-        if(!AoTDFactionManager.getInstance().isCaptialMarket(market)){
-            return "Can only be built on capital";
-        }
         return super.getUnavailableReason();
     }
 

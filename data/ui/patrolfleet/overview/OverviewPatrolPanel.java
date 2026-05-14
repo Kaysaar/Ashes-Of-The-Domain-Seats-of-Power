@@ -22,7 +22,7 @@ public class OverviewPatrolPanel  implements ExtendedUIPanelPlugin {
     OverviewStatPanel stats;
     FleetMarketData data;
     MarketAPI lastSavedMarket = null;
-    public static float OverviewStatPanelWidth = 430f;
+    public static float OverviewStatPanelWidth = 460;
     public static boolean forceRequestUpdate = false;
     public static boolean forceRequestUpdateListOnly = false;
     public static boolean forceRequestUpdateStatsOnly = false;

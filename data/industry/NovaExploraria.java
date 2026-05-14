@@ -8,13 +8,17 @@ import com.fs.starfarer.api.combat.MutableStat;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.fleets.RouteManager;
+import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
+import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import data.industry.ui.NovaExplorariaButton;
 import data.intel.NovaExplorariaExpeditionIntel;
+import data.kaysaar.aotd.tot.grandwonders.GrandWonderTypeManager;
 import data.route.AbyssDelversFleetRouteManager;
 import data.route.NovaExplorariaExpeditionFleetRouteManager;
 import data.route.TechHuntersFleetRouteManager;
@@ -22,7 +26,9 @@ import data.scripts.managers.AoTDFactionManager;
 import data.ui.overview.capitalbuilding.BaseCapitalButton;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 
@@ -59,12 +65,12 @@ public class NovaExploraria extends BaseCapitalIndustry {
     }
     @Override
     public boolean isAvailableToBuild() {
-        return AoTDFactionManager.getInstance().doesControlCapital()&&AoTDFactionManager.getInstance().getCapitalMarket().getId().equals(market.getId())&&reachedThresholdOfPoints();
+        return AoTDFactionManager.getInstance().doesControlCapital()&&reachedThresholdOfPoints();
     }
 
     @Override
     public boolean showWhenUnavailable() {
-        return (Global.getSector().getPlayerFleet().getCargo().getCredits().get() < this.getBuildCost() && market.hasCondition("aotd_capital"));
+        return reachedThresholdOfPoints();
     }
 
     @Override
@@ -209,6 +215,13 @@ public class NovaExploraria extends BaseCapitalIndustry {
 
 
     }
+
+    @Override
+    protected void addPostUpkeepSection(TooltipMakerAPI tooltip, IndustryTooltipMode mode) {
+        tooltip.addSectionHeading("Exploration Fleets", Alignment.MID,5f);
+        tooltip.addPara("This structure enables sending survey, and tech-hunting expeditions across sector. You can interact with it in %s in %s tab",3f, Color.ORANGE,"Capital Abilities","Faction");
+    }
+
     @Override
     public BaseCapitalButton createButton(float width, float height) {
         return new NovaExplorariaButton(width,height,this);
@@ -293,5 +306,39 @@ public class NovaExploraria extends BaseCapitalIndustry {
         }
 
         return fleet;
+    }
+
+    @Override
+    public LinkedHashMap<String, Integer> getDemandCostForRestoration() {
+        LinkedHashMap<String,Integer>res = new LinkedHashMap<>();
+        res.put(Commodities.METALS,10);
+        res.put(Commodities.SUPPLIES,5);
+        res.put(Commodities.HEAVY_MACHINERY,5);
+        res.put(Commodities.SHIPS,8);
+        return res;
+    }
+
+    @Override
+    public void finishedConstruction(MarketAPI marketAPI) {
+
+    }
+    @Override
+    public boolean canShutDown() {
+        return false;
+    }
+
+    @Override
+    public boolean showShutDown() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldShowInListOfWonders(MarketAPI marketAPI) {
+        return  AoTDFactionManager.getInstance().doesControlCapital()&&GrandWonderTypeManager.getSpec(getWonderTypeId()).canBuildAdditionalWonderOfType(this.getSpec().getId(), marketAPI)&&this.showWhenUnavailable();
+    }
+
+    @Override
+    public void addToCustomSectionInTooltip(TooltipMakerAPI tooltipMakerAPI) {
+
     }
 }

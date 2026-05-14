@@ -28,7 +28,7 @@ public class DeleteFleetDialog extends BasePopUpDialog {
         float days = fleetToDecom.getFPTaken()/AoTDFactionPatrolsManager.getInstance().getDaysPerFP().getModifiedValue();
 
         tooltip.addPara("You are about to de-commission %s, which will leave %s, less defended.", 3f, Color.ORANGE, fleetToDecom.getNameOfFleet(), fleetToDecom.getTiedTo().getName());
-        tooltip.addPara("Depending on current state of patrol decommission will take around %s. FP will be slowly refunded as de-commission progresses.", 5f,Color.ORANGE, AshMisc.convertDaysToString(Math.round(days)));
+        tooltip.addPara("Depending on current state of patrol de-commission will take around %s. FP will be slowly refunded as de-commission progresses.", 5f,Color.ORANGE, AshMisc.convertDaysToString(Math.round(days)));
         tooltip.addPara("This procedure can not be canceled! Do you want to proceed?", 15f).setAlignment(Alignment.MID);
 
 

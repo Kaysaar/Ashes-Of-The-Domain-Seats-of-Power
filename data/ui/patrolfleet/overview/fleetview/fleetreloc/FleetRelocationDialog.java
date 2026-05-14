@@ -15,8 +15,9 @@ import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
 import data.industry.AoTDMilitaryBase;
-import data.kaysaar.aotd.vok.campaign.econ.globalproduction.impl.bifrost.BifrostMega;
-import data.kaysaar.aotd.vok.campaign.econ.globalproduction.models.GPManager;
+
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.BifrostMegastructure;
+import data.kaysaar.aotd.vok.campaign.econ.megastructures.impl.scripts.BifrostMegastructureManager;
 import data.plugins.AoTDSopMisc;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.utilis.PatrolFleetFactory;
@@ -27,10 +28,7 @@ import java.awt.*;
 
 public class FleetRelocationDialog extends BasePopUpDialog {
     BasePatrolFleet fleetData;
-    FleetRelocMarketList list;
-    ButtonAPI buttonName,buttonFPUsed,buttonFPGenerated;
-    CustomPanelAPI panelInfo,panelInfoContent;
-    FleetLocationData currChosen;
+    FleetRelocationSelectorPanel relocationPanel;
     public FleetRelocationDialog(BasePatrolFleet fleetData) {
         super("Relocate Fleet");
         this.fleetData = fleetData;
@@ -40,93 +38,42 @@ public class FleetRelocationDialog extends BasePopUpDialog {
     @Override
     public void createContentForDialog(TooltipMakerAPI tooltip, float width) {
         tooltip.setParaFont(Fonts.ORBITRON_20AABOLD);
-        tooltip.addPara("Choose market to which relocate fleet",2f).setAlignment(Alignment.MID);
-        float usableWidth = width-13;
-        float section =usableWidth/3;
-        Color base,bg,bright;
-        base = Misc.getBasePlayerColor();
-        bg= Misc.getDarkPlayerColor();
-        bright = Misc.getBrightPlayerColor();
-        buttonName = tooltip.addAreaCheckbox("Name", SortingState.ASCENDING, base, bg, bright, section, 20, 0f);
-        buttonFPUsed = tooltip.addAreaCheckbox("FP allocated", SortingState.NON_INITIALIZED, base, bg, bright, section, 20, 0f);
-        buttonFPGenerated = tooltip.addAreaCheckbox("Distance (LY)", SortingState.NON_INITIALIZED, base, bg, bright, section, 20, 0f);
-        buttonFPUsed.getPosition().inTL(section+1, 30);
-        buttonFPGenerated.getPosition().inTL((section+1)*2, 30);
-        buttonName.getPosition().inTL(0, 30);
-        buttonName.setClickable(false);
-        buttonFPGenerated.setClickable(false);
-        buttonFPUsed.setClickable(false);
-        list = new FleetRelocMarketList(width,panelToInfluence.getPosition().getHeight()-this.y-170,Global.getSector().getPlayerFaction(), fleetData.getTiedTo());
-        list.createUI();
-        tooltip.addCustom(list.getMainPanel(),5f).getPosition().inTL(0,55);
-        panelInfo = Global.getSettings().createCustom(width-10,100,null);
-        tooltip.addCustom(panelInfo,5f);
+        tooltip.addPara("Choose market to which relocate fleet", 2f)
+                .setAlignment(Alignment.MID);
+
+        float panelHeight = panelToInfluence.getPosition().getHeight() - this.y-20;
+
+        relocationPanel = new FleetRelocationSelectorPanel(
+                width,
+                panelHeight,
+                fleetData.getTiedTo()
+        );
+
+        tooltip.addCustom(relocationPanel.getMainPanel(), 5f);
         tooltip.setHeightSoFar(0f);
-        updateInfo();
-    }
-    public void updateInfo(){
-        if(panelInfoContent!=null){
-            panelInfo.removeComponent(panelInfoContent);
-        }
-        panelInfoContent = Global.getSettings().createCustom(panelInfo.getPosition().getWidth(),panelInfo.getPosition().getHeight(),null);
-        TooltipMakerAPI tooltip = panelInfoContent.createUIElement(panelInfoContent.getPosition().getWidth(),panelInfo.getPosition().getHeight(),false);
-        tooltip.setParaFont(Fonts.ORBITRON_20AABOLD);
-
-        if(!FleetRelocMarketList.doesPlayerFactionMeetCriteriaForInterstellarReloc()){
-            tooltip.addPara("For relocation between star systems %s must be under control of faction",3f,Color.ORANGE, AoTDSopMisc.getAllIndustriesJoined(FleetRelocMarketList.industriesAllowingInterstellarTransition.stream().toList(),"or")).setAlignment(Alignment.MID);
-        }
-        if(currChosen!=null){
-            MarketAPI market = (MarketAPI) currChosen.buttonData;
-            if(Global.getSettings().getModManager().isModEnabled("aotd_vok")){
-                BifrostMega mega = (BifrostMega) GPManager.getInstance().getMegastructure("aotd_bifrost");
-                if(mega!=null&&mega.areStarSystemsConnected(fleetData.getTiedTo().getStarSystem(),market.getStarSystem())){
-                    tooltip.addPara("Re-location of this fleet will take few days, due to working %s connecting both star systems!",3f,Color.ORANGE,"Bifrost Network").setAlignment(Alignment.MID);
-
-                }
-                else{
-                    tooltip.addPara("Re-location of this fleet to %s will take around %s",3f,Color.ORANGE,market.getName(), AshMisc.convertDaysToString(Math.round(RouteLocationCalculator.getTravelDays(fleetData.getTiedTo().getPrimaryEntity(),market.getPrimaryEntity())))).setAlignment(Alignment.MID);
-
-                }
-            }
-            else{
-                tooltip.addPara("Re-location of this fleet to %s will take around %s",3f,Color.ORANGE,market.getName(), AshMisc.convertDaysToString(Math.round(RouteLocationCalculator.getTravelDays(fleetData.getTiedTo().getPrimaryEntity(),market.getPrimaryEntity())))).setAlignment(Alignment.MID);
-
-            }
-        }
-
-        panelInfoContent.addUIElement(tooltip).inTL(0,0);
-        panelInfo.addComponent(panelInfoContent);
     }
 
     @Override
     public void advance(float amount) {
         super.advance(amount);
-        if(list!=null){
-            for (FleetLocationData datum : list.data) {
-                if(datum.mainButton.isChecked()){
-                    datum.mainButton.setChecked(false);
-                    currChosen = datum;
-                    updateInfo();
-                    break;
-                }
-            }
-            for (FleetLocationData datum : list.data) {
-                if(datum.equals(currChosen)){
-                    datum.mainButton.highlight();
-                }
-                else{
-                    datum.mainButton.unhighlight();
-                }
-            }
+
+        if (relocationPanel != null) {
+            relocationPanel.advance(amount);
         }
-
-
     }
 
     @Override
     public void applyConfirmScript() {
-        MarketAPI curr = (MarketAPI) currChosen.buttonData;
-        float days = RouteLocationCalculator.getTravelDays(curr.getPrimaryEntity(), fleetData.getTiedTo().getPrimaryEntity());
+        if (relocationPanel == null || !relocationPanel.hasSelection()) {
+            return;
+        }
+
+        MarketAPI curr = relocationPanel.getSelectedMarket();
+
+        float days = RouteLocationCalculator.getTravelDays(
+                curr.getPrimaryEntity(),
+                fleetData.getTiedTo().getPrimaryEntity()
+        );
         if(!AoTDMilitaryBase.isPatroling(fleetData.getId(), fleetData.getTiedTo())){
             FleetParamsV3 params = new FleetParamsV3(
                     fleetData.getTiedTo(),
@@ -169,7 +116,8 @@ public class FleetRelocationDialog extends BasePopUpDialog {
             fleetToSpawn.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORES_OTHER_FLEETS, true);
             fleetToSpawn.addAssignment(FleetAssignment.ORBIT_PASSIVE, fleetData.getTiedTo().getPrimaryEntity(),1f,"Preparing for re-location");
             if (Global.getSettings().getModManager().isModEnabled("aotd_vok")) {
-                BifrostMega mega = (BifrostMega) GPManager.getInstance().getMegastructure("aotd_bifrost");
+                /// TOOD - MEgA
+                BifrostMegastructure mega = BifrostMegastructureManager.getInstance().getMegastructure();
                 if(mega!=null&&mega.areStarSystemsConnected(fleetData.getTiedTo().getStarSystem(),curr.getStarSystem())){
                     SectorEntityToken token = mega.getSectionEntityInStarSystem(fleetData.getTiedTo().getStarSystem());
                     SectorEntityToken travel = mega.getSectionEntityInStarSystem(curr.getStarSystem());
@@ -208,6 +156,8 @@ public class FleetRelocationDialog extends BasePopUpDialog {
 
     @Override
     public void onExit() {
-        list.clearUI();
+        if (relocationPanel != null) {
+            relocationPanel.clearUI();
+        }
     }
 }

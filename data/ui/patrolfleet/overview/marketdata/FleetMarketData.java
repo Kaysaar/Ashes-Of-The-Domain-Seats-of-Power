@@ -30,7 +30,14 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
     CustomPanelAPI componentPanel;
     MarketAPI market;
     ButtonAPI add;
+    ButtonAPI orderTab;
+
+    public MarketAPI getMarket() {
+        return market;
+    }
+
     ArrayList<FleetButtonComponent>components = new ArrayList<>();
+    boolean massiveOrder = false;
     public  FleetButtonComponent lastChecked;
     public boolean showEdit,showDelete,showReloc;
     public FleetMarketData(float width,float height) {
@@ -56,7 +63,10 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
             TooltipMakerAPI buttonT = componentPanel.createUIElement(componentPanel.getPosition().getWidth(),30,false);
             buttonT.setButtonFontOrbitron20();
             add =buttonT.addButton("Add new fleet",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID, CutStyle.C2_MENU,300,30,0f);
+            orderTab =buttonT.addButton("Mass Deployment Management",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID, CutStyle.TL_BR,300,30,0f);
+
             add.getPosition().inTL(componentPanel.getPosition().getWidth()-(add.getPosition().getWidth())-5,0);
+            orderTab.getPosition().leftOfMid(add,5);
             boolean hasInd = false;
             for (Industry industry : market.getIndustries()) {
                if(AoTDMilitaryBase.industriesValidForBase.contains(industry.getSpec().getId())){
@@ -167,12 +177,18 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
             AshMisc.initPopUpDialog(new TemplateCreatorDialog("Create new Patrol",true,market),TemplateCreatorDialog.width,height);
 
         }
+        if(orderTab!=null&&orderTab.isChecked()){
+            orderTab.setChecked(false);
+            FleetOptions list = new FleetOptions(this,true);
+            AshMisc.placePopUpUI(list,orderTab,300,100);
+        }
         if(showEdit){
             showEdit = false;
             float height = 600;
             if(!AshMisc.isPLayerHavingHeavyIndustry()){
                 height = 630;
             }
+
             AshMisc.initPopUpDialog(new TemplateCreatorDialog("Edit Patrol",true,lastChecked.getData(),market),TemplateCreatorDialog.width,height);
             lastChecked = null;
 
@@ -194,7 +210,8 @@ public class FleetMarketData implements ExtendedUIPanelPlugin {
                 component.setChecked(false);
                 FleetOptions list = new FleetOptions(this);
                 lastChecked = component;
-                AshMisc.placePopUpUIInTL(list,component.mainButton,300,100,new Vector2f(-300,-600));
+                AshMisc.placePopUpUIInTL(list,component.mainButton,300,100,new Vector2f(-300,-50));
+
             }
         }
     }

@@ -5,8 +5,9 @@ import com.fs.starfarer.api.characters.MarketConditionSpecAPI;
 import com.fs.starfarer.api.impl.campaign.econ.impl.PopulationAndInfrastructure;
 import com.fs.starfarer.api.impl.campaign.ids.Industries;
 import com.fs.starfarer.api.loading.IndustrySpecAPI;
+import data.kaysaar.aotd.tot.industries.AoTDToolboxPopAndInfra;
 
-public class CapitalComplex extends PopulationAndInfrastructure {
+public class CapitalComplex extends AoTDToolboxPopAndInfra {
     @Override
     protected Object readResolve() {
         id = Industries.POPULATION;

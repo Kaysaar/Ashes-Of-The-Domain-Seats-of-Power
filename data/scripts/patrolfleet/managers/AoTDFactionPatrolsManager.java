@@ -5,6 +5,7 @@ import com.fs.starfarer.api.campaign.FactionDoctrineAPI;
 import com.fs.starfarer.api.campaign.comm.CommMessageAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.MutableStat;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.ids.Sounds;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
@@ -12,6 +13,7 @@ import com.fs.starfarer.api.impl.campaign.intel.MessageIntel;
 import com.fs.starfarer.api.util.Misc;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.utilis.FleetPointUtilis;
+import data.ui.patrolfleet.overview.stats.OverviewStatPanel;
 
 import java.util.*;
 
@@ -73,6 +75,26 @@ public class AoTDFactionPatrolsManager {
         );
         return fleets;
     }
+    public ArrayList<BasePatrolFleet> getAssignedFleetsForMarketForRelocation(MarketAPI market) {
+        ArrayList<BasePatrolFleet> fleets = new ArrayList<>();
+        if (market == null) return fleets;
+
+        for (BasePatrolFleet value : fleetsCurrentlyInField.values()) {
+            if (value.getTiedTo() != null && market.getId().equals(value.getTiedTo().getId())) {
+                fleets.add(value);
+            }
+        }
+
+        // Sort by FP descending; tie-break by id for stable order
+        fleets.sort(
+                Comparator.comparingInt(BasePatrolFleet::getFPTaken)
+                        .reversed()
+                        .thenComparing(BasePatrolFleet::getId)
+        );
+        fleets.removeIf(x->x.isGrounded()||x.isInTransit()||x.isDecomisioned());
+        return fleets;
+    }
+
 
     public MutableStat getDaysPerFP() {
         return daysPerFP;
@@ -195,6 +217,36 @@ public class AoTDFactionPatrolsManager {
             setInstance();
         }
         return (AoTDFactionPatrolsManager) Global.getSector().getPersistentData().get(keyToData);
+    }
+    public float getDaysToDecomFleet(BasePatrolFleet fleet){
+        return fleet.getFPTaken()/getDaysPerFP().getModifiedValue();
+    }
+    public int thresholdForPicket,thresholdForMarketDefence;
+
+    public void setThresholdForMarketDefence(int thresholdForMarketDefence) {
+        this.thresholdForMarketDefence = thresholdForMarketDefence;
+        if(thresholdForPicket>=thresholdForMarketDefence){
+            thresholdForPicket = thresholdForMarketDefence-OverviewStatPanel.perSection;
+        }
+    }
+
+    public void setThresholdForPicket(int thresholdForPicket) {
+        this.thresholdForPicket = thresholdForPicket;
+        if(thresholdForPicket>=thresholdForMarketDefence){
+            this.thresholdForMarketDefence = thresholdForPicket+ OverviewStatPanel.perSection;
+        }
+    }
+    public FleetFactory.PatrolType getTypeBasedOnFP(int fp){
+        if(thresholdForPicket ==0){
+            setThresholdForPicket(25);
+        }
+        if(fp>thresholdForMarketDefence){
+            return FleetFactory.PatrolType.HEAVY;
+        }
+        if(fp<=thresholdForPicket){
+            return FleetFactory.PatrolType.FAST;
+        }
+        return FleetFactory.PatrolType.COMBAT;
     }
 
     public void addNewFleet(BasePatrolFleet fleet) {

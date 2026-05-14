@@ -1,5 +1,6 @@
 package data.ui.patrolfleet.overview.fleetview;
 
+import ashlib.data.plugins.misc.AshMisc;
 import ashlib.data.plugins.ui.models.CenterPopUpUI;
 import ashlib.data.plugins.ui.models.PopUpUI;
 import com.fs.starfarer.api.Global;
@@ -16,6 +17,10 @@ import data.scripts.managers.AoTDFactionManager;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.scripts.patrolfleet.models.BasePatrolFleetTemplate;
+import data.ui.patrolfleet.overview.fleetview.dialogs.MassDecommissionDialog;
+import data.ui.patrolfleet.overview.fleetview.dialogs.MassDeploymentDialog;
+import data.ui.patrolfleet.overview.fleetview.dialogs.MassRelocationDialog;
+import data.ui.patrolfleet.overview.fleetview.massorders.MassDeploymentOrderUI;
 import data.ui.patrolfleet.overview.marketdata.FleetMarketData;
 import data.ui.patrolfleet.templates.shiplist.dialog.templatecretor.TemplateCreatorDialog;
 
@@ -24,13 +29,22 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-public class FleetOptions extends CenterPopUpUI {
+public class FleetOptions extends PopUpUI {
     CustomPanelAPI mainPanel;
     ButtonAPI change,delete,relocate;
     FleetMarketData data;
 
+    public FleetMarketData getData() {
+        return data;
+    }
+
+    boolean massOrderMode = false;
     public FleetOptions(FleetMarketData fleet) {
         this.data = fleet;
+    }
+    public FleetOptions(FleetMarketData fleet,boolean massOrderMode) {
+        this.data = fleet;
+        this.massOrderMode = massOrderMode;
     }
     @Override
     public void createUI(CustomPanelAPI panelAPI) {
@@ -44,18 +58,26 @@ public class FleetOptions extends CenterPopUpUI {
         TooltipMakerAPI tooltip = mainPanel.createUIElement(panelAPI.getPosition().getWidth(),panelAPI.getPosition().getHeight(),true);
         FactionAPI pirates  = Global.getSector().getFaction(Factions.PIRATES);
         tooltip.addSpacer(0f).getPosition().inTL(7,0);
-        change = tooltip.addButton("Edit fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
-        relocate = tooltip.addButton("Relocate fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
-        delete = tooltip.addButton("Delete fleet",null, pirates.getBaseUIColor(),pirates.getDarkUIColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
-        BasePatrolFleet fleet = data.lastChecked.getData();
-        if(fleet.isDecomisioned()||fleet.isInTransit()){
-            change.setEnabled(false);
-            relocate.setEnabled(false);
-            delete.setEnabled(false);
+        if(!massOrderMode){
+            change = tooltip.addButton("Edit fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
+            relocate = tooltip.addButton("Relocate fleet",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
+            delete = tooltip.addButton("Delete fleet",null, pirates.getBaseUIColor(),pirates.getDarkUIColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
+            BasePatrolFleet fleet = data.lastChecked.getData();
+            if(fleet.isDecomisioned()||fleet.isInTransit()){
+                change.setEnabled(false);
+                relocate.setEnabled(false);
+                delete.setEnabled(false);
+            }
+            if(fleet.isGrounded()){
+                relocate.setEnabled(false);
+            }
         }
-        if(fleet.isGrounded()){
-            relocate.setEnabled(false);
+        else{
+            change = tooltip.addButton("Order Massive Deployment",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
+            relocate = tooltip.addButton("Order Rapid Re-location",null, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
+            delete = tooltip.addButton("Order Massive De-Commission",null, pirates.getBaseUIColor(),pirates.getDarkUIColor(), Alignment.MID, CutStyle.NONE,mainPanel.getPosition().getWidth()-5,30,3f);
         }
+
         int count = 0;
         for (MarketAPI marketAPI : AoTDFactionManager.getMarketsUnderPlayer()) {
             for (Industry industry : marketAPI.getIndustries()) {
@@ -95,18 +117,38 @@ public class FleetOptions extends CenterPopUpUI {
     @Override
     public void advance(float amount) {
         super.advance(amount);
-        if(isButtonChecked(change)){
-            data.showEdit = true;
-            forceDismiss();
+        if(massOrderMode){
+            if(isButtonChecked(change)){
+                change.setChecked(false);
+                MassDeploymentDialog dialog = new MassDeploymentDialog(data.getMarket(),this);
+                AshMisc.initPopUpDialog(dialog,1250,640);
+            }
+            if(isButtonChecked(delete)){
+                delete.setChecked(false);
+                MassDecommissionDialog dialog = new MassDecommissionDialog(data.getMarket(),this);
+                AshMisc.initPopUpDialog(dialog,1250,640);
+            }
+            if(isButtonChecked(relocate)){
+                relocate.setChecked(false);
+                MassRelocationDialog dialog = new MassRelocationDialog(data.getMarket(),this);
+                AshMisc.initPopUpDialog(dialog,1250,640);
+            }
         }
-        if(isButtonChecked(relocate)){
-            data.showReloc = true;
-            forceDismiss();
+        else {
+            if(isButtonChecked(change)){
+                data.showEdit = true;
+                forceDismiss();
+            }
+            if(isButtonChecked(relocate)){
+                data.showReloc = true;
+                forceDismiss();
+            }
+            if(isButtonChecked(delete)){
+                data.showDelete = true;
+                forceDismiss();
+            }
         }
-        if(isButtonChecked(delete)){
-            data.showDelete = true;
-            forceDismiss();
-        }
+
 
     }
     public boolean isButtonChecked(ButtonAPI button){

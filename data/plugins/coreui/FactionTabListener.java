@@ -51,6 +51,7 @@ public class FactionTabListener implements CommandTabListener {
         };
     }
 
+
     @Override
     public CommandUIPlugin createPlugin() {
         return new FactionPanel(UIDataSop.WIDTH,UIDataSop.HEIGHT);

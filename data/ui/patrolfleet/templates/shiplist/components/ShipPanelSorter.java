@@ -2,6 +2,7 @@ package data.ui.patrolfleet.templates.shiplist.components;
 
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.scripts.patrolfleet.utilis.FleetPointUtilis;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,6 +79,7 @@ public class ShipPanelSorter {
                 }
             };
         }
+
         if (nameOfSort.equals("Type")) {
             comparator = new Comparator<ShipHullSpecAPI>() {
                 @Override
@@ -106,6 +108,16 @@ public class ShipPanelSorter {
                 public int compare(ShipHullSpecAPI o1, ShipHullSpecAPI o2) {
                     float price1 = o1.getBaseValue();
                     float price2 = o2.getBaseValue();
+                    return Float.compare(price1, price2);
+                }
+            };
+        }
+        if (nameOfSort.equals("FP")) {
+            comparator = new Comparator<ShipHullSpecAPI>() {
+                @Override
+                public int compare(ShipHullSpecAPI o1, ShipHullSpecAPI o2) {
+                    float price1 = o1.getFleetPoints();
+                    float price2 =  o2.getFleetPoints();
                     return Float.compare(price1, price2);
                 }
             };

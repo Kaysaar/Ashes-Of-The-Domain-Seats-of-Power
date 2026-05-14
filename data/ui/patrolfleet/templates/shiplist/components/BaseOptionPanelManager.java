@@ -223,7 +223,8 @@ public class BaseOptionPanelManager implements OptionPanelInterface {
 
         }
 
-        sortButtons.add(tooltip.addAreaCheckbox("Design type", "Design Type", base, bg, bright, ShipUIData.WIDTH_OF_DESIGN_TYPE-5, 20, 0f));
+        sortButtons.add(tooltip.addAreaCheckbox("Design type", "Design Type", base, bg, bright, ShipUIData.WIDTH_OF_DESIGN_TYPE, 20, 0f));
+        sortButtons.add(tooltip.addAreaCheckbox("FP", "FP", base, bg, bright, ShipUIData.WIDTH_OF_FP-5, 20, 0f));
         float currentX = 0;
         for (ButtonAPI sortButton : sortButtons) {
             sortButton.getPosition().inTL(currentX, 0);

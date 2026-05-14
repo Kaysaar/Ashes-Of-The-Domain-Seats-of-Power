@@ -6,7 +6,7 @@ import data.scripts.patrolfleet.models.BasePatrolFleet;
 import data.ui.patrolfleet.overview.fleetview.FleetButtonComponent;
 
 public class FleetButtonDrop extends DropDownButton {
-    BasePatrolFleet fleet;
+   public BasePatrolFleet fleet;
     public FleetButtonDrop(UITableImpl tableOfReference, float width, float height, float maxWidth, float maxHeight, BasePatrolFleet fleet) {
         super(tableOfReference, width, height, maxWidth, maxHeight, false);
         this.fleet = fleet;
