@@ -11,9 +11,11 @@ import com.fs.starfarer.api.ui.CustomPanelAPI;
 import com.fs.starfarer.api.ui.PositionAPI;
 import com.fs.starfarer.combat.CombatViewport;
 import com.fs.starfarer.combat.entities.terrain.Planet;
+import com.fs.starfarer.loading.specs.PlanetSpec;
 import data.misc.ReflectionUtilis;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.awt.*;
 import java.util.List;
 
 public class EntityRenderer implements ExtendedUIPanelPlugin {
@@ -23,13 +25,37 @@ public class EntityRenderer implements ExtendedUIPanelPlugin {
     public EntityRenderer(SectorEntityToken tokenOfMarket, float boxSize) {
         mainPanel = Global.getSettings().createCustom(boxSize,boxSize,this);
         if(tokenOfMarket instanceof PlanetAPI planet){
-            graphics = new Planet(planet.getTypeId(),planet.getRadius(),0f,new Vector2f());
-            graphics.setTilt(planet.getSpec().getTilt());
-            Planet original = (Planet) ReflectionUtilis.invokeMethodWithAutoProjection("getGraphics",planet);
-            graphics.setAngle(original.getAngle());
-            graphics.setPitch(original.getPitch());
-            float scale = boxSize/(planet.getRadius()*2);
-            graphics.setScale(scale);
+            // If system is a nebula, show the nebula sprite
+            if (planet.getSpec().isNebulaCenter()) {
+                sprite = Global.getSettings().getSprite(planet.getSpec().getStarscapeIcon());
+                Color color = planet.getSpec().getIconColor();
+                float originalWidth= boxSize;
+                float originalHeight = boxSize;
+                // Guard against zero/invalid sizes
+                if (originalWidth <= 0f || originalHeight <= 0f) {
+                    originalWidth  = Math.max(1f, sprite.getWidth());
+                    originalHeight = Math.max(1f, sprite.getHeight());
+                }
+                // Scale to fit inside boxSize x boxSize, preserving aspect ratio
+                float scale = Math.min(boxSize / originalWidth, boxSize / originalHeight)*1.5f;
+                float scaledW = originalWidth  * scale;
+                float scaledH = originalHeight * scale;
+
+                // Apply size to the sprite
+                sprite.setSize(scaledW, scaledH);
+                // Apply color to the sprite
+                sprite.setColor(color);
+            }
+            // If not a nebula but proper star
+            else {
+                graphics = new Planet(planet.getTypeId(), planet.getRadius(), 0f, new Vector2f());
+                graphics.setTilt(planet.getSpec().getTilt());
+                Planet original = (Planet) ReflectionUtilis.invokeMethodWithAutoProjection("getGraphics", planet);
+                graphics.setAngle(original.getAngle());
+                graphics.setPitch(original.getPitch());
+                float scale = boxSize / (planet.getRadius() * 2);
+                graphics.setScale(scale);
+            }
         }
         else if (tokenOfMarket != null){
             CustomEntitySpecAPI spec = tokenOfMarket.getCustomEntitySpec();

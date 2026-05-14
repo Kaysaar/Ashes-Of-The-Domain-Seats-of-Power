@@ -15,9 +15,9 @@ import java.awt.*;
 public class ExpandInfrastructure extends BaseFactionPolicy {
     @Override
     public void createTooltipDescription(TooltipMakerAPI tooltip) {
-        tooltip.addPara("For first two years",0f).setAlignment(Alignment.MID);
+        tooltip.addPara("For the first two years only",0f).setAlignment(Alignment.MID);
         tooltip.addPara("Reduce production of all industries by %s",0f,Color.ORANGE,"40%").setAlignment(Alignment.MID);
-        tooltip.addPara("After two years of policy being in effect",5f).setAlignment(Alignment.MID);
+        tooltip.addPara("After two years of the policy being in effect",5f).setAlignment(Alignment.MID);
         tooltip.addPara("Increase accessibility by %s on all colonies",0f,Color.ORANGE,"25%").setAlignment(Alignment.MID);
         super.createTooltipDescription(tooltip);
     }

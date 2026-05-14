@@ -283,7 +283,7 @@ public class AoTDMilitaryBase extends MilitaryBase {
     @Override
     public CampaignFleetAPI spawnFleet(RouteManager.RouteData route) {
 
-        if ((market.getFaction() != null && market.getFaction().isPlayerFaction())) {
+        if (market.getFaction() != null && market.getFaction().isPlayerFaction() && route.getCustom() instanceof AoTDPatrolFleetData) {
 
             AoTDPatrolFleetData custom = (AoTDPatrolFleetData) route.getCustom();
             CampaignFleetAPI fleet = createPatrol(custom.getId(), route);
