@@ -1,12 +1,12 @@
 {
     "masterVersionFile":"https://raw.githubusercontent.com/Kaysaar/Ashes-Of-The-Domain-Seats-of-Power/master/aotd_sop.version",
     "modName":"Ashes of The Domain - Seats of Power",
-    "directDownloadURL":"https://drive.google.com/uc?export=download&id=1PKYiKsYo_dyX9VJyU0fsaOPPloHbJjGY",
+    "directDownloadURL":"https://drive.google.com/uc?export=download&id=12QuirlboiYwgACs__YQZs7f93J6Gl2yC",
     "modThreadId":26307,
     "modVersion":
     {
         "major":3,
-        "minor":0,
-        "patch":8
+        "minor":1,
+        "patch":0
      }
 }
