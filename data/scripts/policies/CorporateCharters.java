@@ -28,7 +28,7 @@ public class CorporateCharters extends BaseFactionPolicy {
         tooltip.setBulletedListMode(BaseIntelPlugin.BULLET);
         tooltip.addPara("Food : (Control over %s of Food market shares) ",3f,Color.ORANGE,"30%");
         tooltip.addPara("Underworld : (Control over %s of Drugs and Organs market shares)",3f,Color.ORANGE,"30%");
-        tooltip.addPara("Military : (Control over %s of Weapons and Hulls market shares)",3f,Color.ORANGE,"30%");
+        tooltip.addPara("Military : (Control over %s of Heavy Armaments, Marines, and Ship Hulls market shares)",3f,Color.ORANGE,"30%");
         tooltip.addPara("Consumer goods : (Control over %s of Domestic and Luxury goods market shares)",3f,Color.ORANGE,"30%");
         tooltip.setBulletedListMode(null);
         tooltip.addPara("Currently achieved monopolies : ",5f);

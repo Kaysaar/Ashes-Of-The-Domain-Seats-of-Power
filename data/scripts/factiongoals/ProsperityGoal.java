@@ -110,7 +110,7 @@ public class ProsperityGoal extends BaseFactionGoal{
             tooltip.addPara(BaseIntelPlugin.INDENT+"For each monopoly you own (Underworld, Agricultural, Military and Consumer Goods) gain distinct bonuses", pad);
             tooltip.addPara(BaseIntelPlugin.INDENT+"Food : (Control over %s of Food market shares) : %s",pad,Color.ORANGE,"30%","Increase stability by 2");
             tooltip.addPara(BaseIntelPlugin.INDENT+"Underworld : (Control over %s of Drugs and Organs market shares) : %s",pad,Color.ORANGE,"30%","Increase income from those exports by 50%");
-            tooltip.addPara(BaseIntelPlugin.INDENT+"Military : (Control over %s of Weapons and Hulls market shares) : %s",pad,Color.ORANGE,"30%","Increase fleet size by 50% on all markets");
+            tooltip.addPara(BaseIntelPlugin.INDENT+"Military : (Control over %s of Heavy Armaments, Marines, and Ship Hulls market shares) : %s",pad,Color.ORANGE,"30%","Increase fleet size by 50% on all markets");
             tooltip.addPara(BaseIntelPlugin.INDENT+"Consumer goods : (Control over %s of Domestic and Luxury goods market shares) : %s",pad,Color.ORANGE,"30%","Increase accessibility by 30%");
 
 
