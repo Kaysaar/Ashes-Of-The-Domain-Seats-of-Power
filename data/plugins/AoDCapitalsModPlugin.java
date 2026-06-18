@@ -36,7 +36,9 @@ import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.managers.PatrolTemplateManager;
 import data.scripts.timelineevents.military.*;
 import data.scripts.timelineevents.prosperity.*;
+import data.scripts.timelineevents.research_explo.HexagonEvent;
 import data.scripts.timelineevents.research_explo.MildConditionEvent;
+import data.scripts.timelineevents.research_explo.NovaExplorariaEvent;
 import data.scripts.timelineevents.special.*;
 import data.scripts.timelineevents.research_explo.FirstVastRuins;
 import data.scripts.timelineevents.templates.FactionExpansionEvent;
@@ -167,6 +169,9 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         TimelineListenerManager.getInstance().addNewListener(new VastRuinsScouredEventListener(AoTDSopMemFlags.VAST_RUINS_DEPLETED));
         TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new FirstPlanetaryShieldEvent(null)));
         TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new FirstHighCommand(null)));
+
+        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new NovaExplorariaEvent(null)));
+        TimelineListenerManager.getInstance().addNewListener(new FirstIndustryListener(AoTDSopMemFlags.FIRST_INDUSTRY, new HexagonEvent(null)));
 
         TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new HegemonyInspectionDefeat()));
         TimelineListenerManager.getInstance().addNewListener(new MiscEventListener(AoTDSopMemFlags.MISC_EVENT, new TriTachyonFendingOffAttacks()));

@@ -14,6 +14,7 @@ public class FactionPolicySpecManager {
     static LinkedHashMap<String, FactionPolicySpec> factionPolicySpecs = new LinkedHashMap<>();
     public static final String specsFilename = "data/campaign/aotd_policies.csv";
     public static FactionPolicySpec getSpec(String id){
+        if(factionPolicySpecs.isEmpty())loadSpecs();
         return factionPolicySpecs.get(id);
     }
 

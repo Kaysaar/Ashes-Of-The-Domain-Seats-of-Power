@@ -114,10 +114,10 @@ public class NovaExploraria extends BaseCapitalIndustry {
     }
 
     public static NovaExploraria getNova(){
-        MarketAPI market = AoTDFactionManager.getInstance().getCapitalMarket();
-
-        if(market!=null){
-            return (NovaExploraria) market.getIndustry("aotd_nova_exploraria");
+        for (MarketAPI playerMarket : Misc.getPlayerMarkets(true)) {
+            if(playerMarket.hasIndustry("aotd_nova_exploraria")){
+                return (NovaExploraria) playerMarket.getIndustry("aotd_nova_exploraria");
+            }
         }
         return null;
     }
@@ -311,8 +311,8 @@ public class NovaExploraria extends BaseCapitalIndustry {
     @Override
     public LinkedHashMap<String, Integer> getDemandCostForRestoration() {
         LinkedHashMap<String,Integer>res = new LinkedHashMap<>();
-        res.put(Commodities.METALS,10);
-        res.put(Commodities.SUPPLIES,5);
+        res.put(Commodities.METALS,8);
+        res.put(Commodities.SUPPLIES,4);
         res.put(Commodities.HEAVY_MACHINERY,5);
         res.put(Commodities.SHIPS,8);
         return res;

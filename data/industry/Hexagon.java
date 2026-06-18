@@ -63,7 +63,7 @@ public class Hexagon extends AoTDMilitaryBase implements GrandWonderAPI {
     @Override
     public LinkedHashMap<String, Integer> getDemandCostForRestoration() {
         LinkedHashMap<String,Integer>res = new LinkedHashMap<>();
-        res.put(Commodities.METALS,15);
+        res.put(Commodities.METALS,8);
         res.put(Commodities.SUPPLIES,5);
         res.put(Commodities.HEAVY_MACHINERY,5);
         return res;
