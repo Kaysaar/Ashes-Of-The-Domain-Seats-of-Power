@@ -63,8 +63,9 @@ public class StarSystemStructuresUI implements ExtendedUIPanelPlugin {
         float widgetH = StableStructureWidget.height; // <-- use your widget height constant
 
         List<SectorEntityToken> objs = system.getEntitiesWithTag(Tags.OBJECTIVE);
+        List<SectorEntityToken> obj2s = system.getEntitiesWithTag(Tags.STABLE_LOCATION);
         int total = objs.size();
-
+        int total2 = obj2s.size();
 
         int perRow = (int) Math.floor((availableWidth + separator) / (widgetW + separator));
         perRow = Math.max(1, perRow);
@@ -97,12 +98,29 @@ public class StarSystemStructuresUI implements ExtendedUIPanelPlugin {
         float neededHeight = rowsPlaced * widgetH + Math.max(0, rowsPlaced - 1) * rowGap;
         tooltip.setHeightSoFar(neededHeight);
         tooltipBottom.setParaFont(Fonts.INSIGNIA_LARGE);
-        LabelAPI label = tooltipBottom.addPara("System Structures: %s / %s", 0f, Misc.getGrayColor(), Color.ORANGE, "" + total, "5");
+        int totalAtAllPos = total2+total;
+        LabelAPI label = tooltipBottom.addPara("System Structures: %s / %s", 0f, Misc.getGrayColor(), Color.ORANGE, "" + total, totalAtAllPos+"");
         label.getPosition().inTL(contentPanel.getPosition().getWidth() - label.computeTextWidth(label.getText()) - 5, 1);
         float x = contentPanel.getPosition().getWidth() - label.computeTextWidth(label.getText()) - 5;
-        tooltipBottom.setButtonFontOrbitron20();
-        ButtonAPI bt = tooltipBottom.addButton("Add System Structure", null, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, Math.min(x-20, 300), 25, 0f);
+        ButtonAPI bt = tooltipBottom.addButton("Manage Star System", null, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TL_BR, Math.min(x-20, 300), 25, 0f);
         bt.setShortcut(Keyboard.KEY_A, true);
+        bt.setEnabled(false);
+        tooltipBottom.addTooltipToPrevious(new TooltipMakerAPI.TooltipCreator() {
+            @Override
+            public boolean isTooltipExpandable(Object tooltipParam) {
+                return false;
+            }
+
+            @Override
+            public float getTooltipWidth(Object tooltipParam) {
+                return 400;
+            }
+
+            @Override
+            public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                tooltip.addPara("In wait of Stable Structure Rework coming in Theory of Toolbox 1.1",3f);
+            }
+        }, TooltipMakerAPI.TooltipLocation.RIGHT,false);
         bt.getPosition().inTL(5, 0);
 
 

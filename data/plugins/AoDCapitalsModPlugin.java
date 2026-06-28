@@ -110,7 +110,6 @@ public class AoDCapitalsModPlugin extends BaseModPlugin {
         }
         Global.getSector().getListenerManager().addListener(new FactionTabListener(), true);
         Global.getSector().getListenerManager().addListener(new PatrolTabListener(), true);
-//        Global.getSector().getListenerManager().addListener(new HoldingsTabListener(),true);
         if (newGame) {
             AmbitionManager.getInstance();
             AmbitionManager.getInstance().setNewGameMode(true);

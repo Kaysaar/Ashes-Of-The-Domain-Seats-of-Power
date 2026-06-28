@@ -5,12 +5,14 @@ import ashlib.data.plugins.ui.models.ExtendedUIPanelPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import com.fs.starfarer.api.ui.CustomPanelAPI;
-import com.fs.starfarer.api.ui.PositionAPI;
+import com.fs.starfarer.api.ui.*;
+import com.fs.starfarer.api.util.Misc;
 import data.misc.ReflectionUtilis;
 import data.ui.holdings.starsystems.components.StarSystemHoldingDropDown;
 import data.ui.holdings.starsystems.components.StarSystemHoldingTable;
+import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StarSystemHoldingsUI implements ExtendedUIPanelPlugin {
@@ -19,6 +21,7 @@ public class StarSystemHoldingsUI implements ExtendedUIPanelPlugin {
     StarSystemHoldingTable table;
     CurrentStarSystemTab currSystem;
     Object originalPanel;
+    ButtonAPI adminButton;
     @Override
     public CustomPanelAPI getMainPanel() {
         return mainPanel;
@@ -35,6 +38,7 @@ public class StarSystemHoldingsUI implements ExtendedUIPanelPlugin {
             contentPanel.removeComponent(mainPanel);
         }
         contentPanel = Global.getSettings().createCustom(mainPanel.getPosition().getWidth(),mainPanel.getPosition().getHeight(),null);
+
         if (table != null) {
             table.recreateTable();
         }
@@ -43,8 +47,8 @@ public class StarSystemHoldingsUI implements ExtendedUIPanelPlugin {
                 float additional = contentPanel.getPosition().getWidth()-StarSystemHoldingTable.getWidth()-18-765;
                 StarSystemHoldingTable.reDestributeAdditionalWidth(additional);
             }
-            CustomPanelAPI panel = Global.getSettings().createCustom(StarSystemHoldingTable.getWidth()+13 , contentPanel.getPosition().getHeight()-25, null);
-            table = new StarSystemHoldingTable(panel.getPosition().getWidth(), panel.getPosition().getHeight(), panel, true, 0, 0);
+            CustomPanelAPI panel = Global.getSettings().createCustom(StarSystemHoldingTable.getWidth()+13 , contentPanel.getPosition().getHeight()-55, null);
+            table = new StarSystemHoldingTable(panel.getPosition().getWidth(), panel.getPosition().getHeight(), panel, true, 0, 0,originalPanel);
             if( Global.getSector().getPlayerMemoryWithoutUpdate().contains("$aotd_tab_holdings_star_id")){
                 String id = Global.getSector().getPlayerMemoryWithoutUpdate().getString("$aotd_tab_holdings_star_id");
                 for (DropDownButton dropDownButton : table.dropDownButtons) {
@@ -59,10 +63,15 @@ public class StarSystemHoldingsUI implements ExtendedUIPanelPlugin {
             table.createTable();
         }
         if(currSystem==null){
-            currSystem = new CurrentStarSystemTab(Math.min(contentPanel.getPosition().getWidth()-StarSystemHoldingTable.getWidth()-18,750),contentPanel.getPosition().getHeight()-25);
+            currSystem = new CurrentStarSystemTab(Math.min(contentPanel.getPosition().getWidth()-StarSystemHoldingTable.getWidth()-18,750),contentPanel.getPosition().getHeight()-45);
         }
         contentPanel.addComponent(currSystem.getMainPanel()).inTL(contentPanel.getPosition().getWidth()-currSystem.getMainPanel().getPosition().getWidth()-15,0);
-        contentPanel.addComponent(table.mainPanel).inTL(0,0);
+        contentPanel.addComponent(table.mainPanel).inTL(-10,0);
+        TooltipMakerAPI tlButton = contentPanel.createUIElement(contentPanel.getPosition().getWidth(),30,false);
+        adminButton =tlButton.addButton("Manage Administrators",originalPanel, Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(), Alignment.MID,CutStyle.BOTTOM,300,25,0f);
+        adminButton.getPosition().inTL(0,0);
+        adminButton.setShortcut(Keyboard.KEY_W,true);
+        contentPanel.addUIElement(tlButton).inTL(0,contentPanel.getPosition().getHeight()-23);
         mainPanel.addComponent(contentPanel).inTL(0,0);
 
     }
@@ -83,7 +92,9 @@ public class StarSystemHoldingsUI implements ExtendedUIPanelPlugin {
 
     @Override
     public void render(float alphaMult) {
-
+        if(table!=null){
+            table.render(alphaMult);
+        }
     }
 
     @Override
@@ -103,6 +114,18 @@ public class StarSystemHoldingsUI implements ExtendedUIPanelPlugin {
                 MarketAPI copy = table.currentlyChosenMarket;
                 table.currentlyChosenMarket = null;
                 ReflectionUtilis.invokeMethodWithAutoProjection("showMarketDetail",originalPanel,copy);
+            }
+        }
+        if(adminButton!=null&&adminButton.isChecked()){
+            adminButton.setChecked(false);
+            ButtonAPI button = null;
+            for (UIComponentAPI componentAPI : ReflectionUtilis.getChildrenCopy((UIPanelAPI) originalPanel)) {
+                if(componentAPI instanceof ButtonAPI bt){
+                    button = bt;
+                }
+            }
+            if(button!=null){
+                ReflectionUtilis.invokeMethodWithAutoProjection("actionPerformed",originalPanel,null,button);
             }
         }
 

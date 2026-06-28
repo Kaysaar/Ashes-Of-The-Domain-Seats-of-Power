@@ -13,12 +13,13 @@ import java.util.List;
 public class StarSystemHoldingDropDown extends DropDownButton {
     StarSystemAPI main;
     ArrayList<MarketAPI> sub;
-
+    Object originalPanel;
     public StarSystemHoldingDropDown(UITableImpl tableOfReference, float width, float height, float maxWidth,
-    float maxHeight, boolean droppableMode, StarSystemAPI system, ArrayList < MarketAPI > markets){
+    float maxHeight, boolean droppableMode, StarSystemAPI system, ArrayList < MarketAPI > markets,Object originalPanel){
         super(tableOfReference, width, height, maxWidth, maxHeight, system != null);
         this.main = system;
         this.sub = markets;
+        this.originalPanel = originalPanel;
     }
 
     public List<MarketAPI> getMarkets () {
@@ -70,16 +71,16 @@ public class StarSystemHoldingDropDown extends DropDownButton {
             buttons = new ArrayList<>();
             if (droppableMode) {
                 for (MarketAPI subSpec : sub) {
-                    StarSystemHoldingButton button = new StarSystemHoldingButton(width - 5f, height, subSpec, 5f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
+                    StarSystemHoldingButton button = new StarSystemHoldingButton(width - 5f, height, subSpec, 5f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false,originalPanel);
                     button.createUI();
                     buttons.add(button);
                 }
             }
             if (droppableMode) {
-                mainButton = new StarSystemHoldingButton(width, height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), true);
+                mainButton = new StarSystemHoldingButton(width, height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), true,originalPanel);
 
             } else {
-                mainButton = new StarSystemHoldingButton(width, height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false);
+                mainButton = new StarSystemHoldingButton(width, height, main, 0f, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Misc.getBrightPlayerColor(), false,originalPanel);
 
             }
             mainButton.createUI();

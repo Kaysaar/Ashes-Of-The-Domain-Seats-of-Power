@@ -7,35 +7,54 @@ import com.fs.starfarer.api.campaign.PlanetAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
-import com.fs.starfarer.api.ui.Alignment;
-import com.fs.starfarer.api.ui.CustomPanelAPI;
-import com.fs.starfarer.api.ui.LabelAPI;
-import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.input.InputEventAPI;
+import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
+import data.misc.ReflectionUtilis;
 import data.ui.patrolfleet.overview.components.EntityWithNameComponent;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.util.ArrayList;
 
 public class StarSystemHoldingButton extends CustomButton {
+    ButtonWithImageComponent buttonWithImageComponent;
+    Object origPanel;
+    CustomPanelAPI container;
+    CustomPanelAPI contOriginal;
+    public ButtonWithImageComponent getButtonWithImageComponent() {
+        return buttonWithImageComponent;
+    }
 
-    public StarSystemHoldingButton(float width, float height, Object buttonData, float indent, Color base, Color bg, Color bright, boolean isWithArrow) {
+    public StarSystemHoldingButton(float width, float height, Object buttonData, float indent, Color base, Color bg, Color bright, boolean isWithArrow,Object originalPanel) {
         super(width, height, buttonData, indent, base, bg, bright);
+        this.origPanel = originalPanel;
         this.setWithArrow(isWithArrow);
     }
 
     @Override
     public void createButtonContent(TooltipMakerAPI tooltip) {
-        CustomPanelAPI container = Global.getSettings().createCustom(this.width,this.height,null);
+        container = Global.getSettings().createCustom(this.width,this.height,null);
+         contOriginal = Global.getSettings().createCustom(width,height,null);
         createContainerContent(container);
-        tooltip.addCustom(container,0f).getPosition().inTL(0,0);
+        contOriginal.addComponent(container).inTL(0,0);
+        tooltip.addCustom(contOriginal,0f).getPosition().inTL(0,0);
         float centerY = height/2;
         if(isWithArrow){
             panelIndicator = Global.getSettings().createCustom(15,15,null);
             tooltip.addCustom(panelIndicator,0f).getPosition().inTL((float) StarSystemHoldingTable.widthMap.get("name")*0.75f,centerY-7);
 
         }
+    }
+    public void recreateContainer(){
+        contOriginal.removeComponent(container);
+        container = Global.getSettings().createCustom(width,height,null);
+        createContainerContent(container);
+        contOriginal.addComponent(container).inTL(0,0);
+
     }
     public void createContainerContent(CustomPanelAPI container) {
 
@@ -120,6 +139,40 @@ public class StarSystemHoldingButton extends CustomButton {
             l.getPosition().inTL(0,(height/2)-(l.computeTextHeight(l.getText())/2));
             l.setAlignment(Alignment.MID);
             container.addUIElement(tooltipIncome).inTL(startingX,0);
+            startingX = StarSystemHoldingTable.getStartingX("admin")-indent+7;
+            width = StarSystemHoldingTable.widthMap.get("admin");
+            final StarSystemHoldingButton button = this;
+             buttonWithImageComponent = new ButtonWithImageComponent(height-4,height-4,market.getAdmin().getPortraitSprite()){
+                 PersonAPI prevAdmin = market.getAdmin();
+                @Override
+                public void advance(float amount) {
+                    super.advance(amount);
+                    if(market.getAdmin()!=null){
+                        if(prevAdmin!=market.getAdmin()){
+                            this.setViewerSpriteId(market.getAdmin().getPortraitSprite());
+                            button.recreateContainer();
+                        }
+
+                    }
+                }
+
+                @Override
+                public void performActionOnClickWithEvent(boolean isRightClick,InputEventAPI event) {
+                    if(!isRightClick){
+                        ArrayList<Object> rows = (ArrayList<Object>) ReflectionUtilis.invokeMethodWithAutoProjection("getRows", data.misc.ReflectionUtilis.getChildrenCopy((UIPanelAPI) origPanel).get(0));
+                        for (Object row : rows) {
+                           MarketAPI marketFound = (MarketAPI) ReflectionUtilis.findFieldByType(data.misc.ReflectionUtilis.invokeMethodWithAutoProjection("getData",row),MarketAPI.class);
+                            if(marketFound.getId().equals(market.getId())){
+                                ButtonAPI button = Global.getSettings().createCheckbox("test", ButtonAPI.UICheckboxSize.SMALL);
+                                button.setCustomData(row);
+                                ReflectionUtilis.invokeMethodWithAutoProjection("actionPerformed",origPanel,event,button);
+                            }
+                        }
+                    }
+                }
+            };
+            buttonWithImageComponent.setShouldRenderBorders(false);
+            container.addComponent(buttonWithImageComponent.getPanelOfButton()).inTL(startingX,2);
         }
 
     }

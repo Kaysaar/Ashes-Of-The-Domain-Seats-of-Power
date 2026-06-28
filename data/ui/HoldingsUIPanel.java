@@ -49,8 +49,10 @@ public class HoldingsUIPanel extends CommandUIPlugin {
     public void init(String panelToShowcase, Object data) {
         renderer = new UILinesRenderer(0f);
         original = ReflectionUtilis.invokeMethodWithAutoProjection("getColoniesPanel",data);
+
         this.panelForPlugins = mainPanel.createCustomPanel(mainPanel.getPosition().getWidth(), mainPanel.getPosition().getHeight() - 45, null);
         AoTDFactionManager.getInstance().advance(0f);
+
         if (!AshMisc.isStringValid(panelToShowcase)) {
             panelToShowcase = "star systems & colonies";
         }
@@ -144,15 +146,12 @@ public class HoldingsUIPanel extends CommandUIPlugin {
         bg = Global.getSector().getPlayerFaction().getDarkUIColor();
         customProd = buttonTooltip.addButton("Star Systems & Colonies", null, base, bg, Alignment.MID, CutStyle.TOP, 205, 20, 0f);
         research = buttonTooltip.addButton("Warehouses", null, base, bg, Alignment.MID, CutStyle.TOP, 150, 20, 0f);
-        sp = buttonTooltip.addButton("Trade Companies", null, base, bg, Alignment.MID, CutStyle.TOP, 180, 20, 0f);
 
         customProd.setShortcut(Keyboard.KEY_R, false);
         customProd.getPosition().inTL(0, 0);
 
         research.setShortcut(Keyboard.KEY_W, false);
         research.getPosition().inTL(206, 0);
-        sp.setShortcut(Keyboard.KEY_T, false);
-        sp.getPosition().inTL(357,0) ;
 
         buttonPanel.addUIElement(buttonTooltip).inTL(0, 0);
         buttonPanel.addComponent(panelHelper).inTL(0, 20);

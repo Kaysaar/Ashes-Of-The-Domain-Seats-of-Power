@@ -61,10 +61,9 @@ public class CurrentStarSystemTab implements ExtendedUIPanelPlugin {
         float startingY = contentPanel.getPosition().getHeight()-heightLeft;
         TooltipMakerAPI tooltipFirst = contentPanel.createUIElement(contentPanel.getPosition().getWidth(),heightLeft,false);
         tooltipFirst.setParaFont(Fonts.ORBITRON_16);
-        tooltipFirst.addCustom(new StarSystemAdminComponent(contentPanel.getPosition().getWidth(),Global.getSector().getPlayerPerson(),currStarSystem).getMainPanel(),0f).getPosition().inTL(0,0);
         tooltipFirst.addPara("System Structures", AoTDSopMisc.getClaimingFaction(currStarSystem.getCenter()).getBaseUIColor(),17f).setAlignment(Alignment.MID);
         if(struct==null){
-            struct = new StarSystemStructuresUI(contentPanel.getPosition().getWidth(),heightLeft-125,currStarSystem);
+            struct = new StarSystemStructuresUI(contentPanel.getPosition().getWidth(),heightLeft,currStarSystem);
         }
         struct.setSystem(currStarSystem);
         tooltipFirst.addCustom(struct.getMainPanel(),5f);
