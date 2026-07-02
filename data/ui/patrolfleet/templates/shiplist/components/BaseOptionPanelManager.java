@@ -74,25 +74,25 @@ public class BaseOptionPanelManager implements OptionPanelInterface {
         return result.toString();
     }
     public void createDesignButtons( LinkedHashMap<String,Integer> designs) {
-        buttonDesignPanel = panel.createCustomPanel(ShipUIData.WIDTH_OF_OPTIONS, 120, null);
-        TooltipMakerAPI tooltipButDesigners = buttonDesignPanel.createUIElement(ShipUIData.WIDTH_OF_OPTIONS, buttonDesignPanel.getPosition().getHeight(), true);
-        float currY = 1;
-        for (RowData calculateAmountOfRow : ShipUIData.calculateAmountOfRows(ShipUIData.WIDTH_OF_OPTIONS,designs, 5)) {
-            float x = 0;
-            tooltipButDesigners.setButtonFontDefault();
-            for (Map.Entry<String, Integer> entry : calculateAmountOfRow.stringsInRow.entrySet()) {
-                String manu = extractManufacturer(entry.getKey());
-                ButtonAPI button = tooltipButDesigners.addAreaCheckbox("", manu, base, bg, bright, entry.getValue(), 30, 0f);
-                button.getPosition().inTL(x, currY);
-                buttons.add(button);
-                tooltipButDesigners.addPara(entry.getKey(), Misc.getDesignTypeColor(manu), 0f).getPosition().inTL((x + 15), currY + 8);
-                x += entry.getValue() + 5f;
-            }
-            currY += 35;
-        }
-        tooltipButDesigners.setHeightSoFar(currY);
-        buttonDesignPanel.addUIElement(tooltipButDesigners).inTL(-5, 0);
-        panel.addComponent(buttonDesignPanel).inTL(0, panel.getPosition().getHeight() - 185 );
+//        buttonDesignPanel = panel.createCustomPanel(ShipUIData.WIDTH_OF_OPTIONS, 120, null);
+//        TooltipMakerAPI tooltipButDesigners = buttonDesignPanel.createUIElement(ShipUIData.WIDTH_OF_OPTIONS, buttonDesignPanel.getPosition().getHeight(), true);
+//        float currY = 1;
+//        for (RowData calculateAmountOfRow : ShipUIData.calculateAmountOfRows(ShipUIData.WIDTH_OF_OPTIONS,designs, 5)) {
+//            float x = 0;
+//            tooltipButDesigners.setButtonFontDefault();
+//            for (Map.Entry<String, Integer> entry : calculateAmountOfRow.stringsInRow.entrySet()) {
+//                String manu = extractManufacturer(entry.getKey());
+//                ButtonAPI button = tooltipButDesigners.addAreaCheckbox("", manu, base, bg, bright, entry.getValue(), 30, 0f);
+//                button.getPosition().inTL(x, currY);
+//                buttons.add(button);
+//                tooltipButDesigners.addPara(entry.getKey(), Misc.getDesignTypeColor(manu), 0f).getPosition().inTL((x + 15), currY + 8);
+//                x += entry.getValue() + 5f;
+//            }
+//            currY += 35;
+//        }
+//        tooltipButDesigners.setHeightSoFar(currY);
+//        buttonDesignPanel.addUIElement(tooltipButDesigners).inTL(-5, 0);
+//        panel.addComponent(buttonDesignPanel).inTL(0, panel.getPosition().getHeight() - 185 );
 
     }
 
@@ -133,25 +133,25 @@ public class BaseOptionPanelManager implements OptionPanelInterface {
 
 
     public void createDesignButtonsForFleet( LinkedHashMap<String,Integer> designs) {
-        buttonDesignPanel = panel.createCustomPanel(ShipUIData.WIDTH_OF_OPTIONS, 120, null);
-        TooltipMakerAPI tooltipButDesigners = buttonDesignPanel.createUIElement(panel.getPosition().getWidth() * 0.70f, bottomHeight, true);
-        float currY = 1;
-        for (RowData calculateAmountOfRow : ShipUIData.calculateAmountOfRows(ShipUIData.WIDTH_OF_OPTIONS,designs, 5)) {
-            float x = 0;
-            tooltipButDesigners.setButtonFontDefault();
-            for (Map.Entry<String, Integer> entry : calculateAmountOfRow.stringsInRow.entrySet()) {
-                String manu = extractManufacturer(entry.getKey());
-                ButtonAPI button = tooltipButDesigners.addAreaCheckbox("", manu, base, bg, bright, entry.getValue(), 30, 0f);
-                button.getPosition().inTL(x, currY);
-                buttons.add(button);
-                tooltipButDesigners.addPara(entry.getKey(), Misc.getDesignTypeColor(manu), 0f).getPosition().inTL((x + 15), currY + 8);
-                x += entry.getValue() + 5f;
-            }
-            currY += 35;
-        }
-        tooltipButDesigners.setHeightSoFar(currY);
-        buttonDesignPanel.addUIElement(tooltipButDesigners).inTL(0, 0);
-        panel.addComponent(buttonDesignPanel).inTL(0, YHeight + 130);
+//        buttonDesignPanel = panel.createCustomPanel(ShipUIData.WIDTH_OF_OPTIONS, 120, null);
+//        TooltipMakerAPI tooltipButDesigners = buttonDesignPanel.createUIElement(panel.getPosition().getWidth() * 0.70f, bottomHeight, true);
+//        float currY = 1;
+//        for (RowData calculateAmountOfRow : ShipUIData.calculateAmountOfRows(ShipUIData.WIDTH_OF_OPTIONS,designs, 5)) {
+//            float x = 0;
+//            tooltipButDesigners.setButtonFontDefault();
+//            for (Map.Entry<String, Integer> entry : calculateAmountOfRow.stringsInRow.entrySet()) {
+//                String manu = extractManufacturer(entry.getKey());
+//                ButtonAPI button = tooltipButDesigners.addAreaCheckbox("", manu, base, bg, bright, entry.getValue(), 30, 0f);
+//                button.getPosition().inTL(x, currY);
+//                buttons.add(button);
+//                tooltipButDesigners.addPara(entry.getKey(), Misc.getDesignTypeColor(manu), 0f).getPosition().inTL((x + 15), currY + 8);
+//                x += entry.getValue() + 5f;
+//            }
+//            currY += 35;
+//        }
+//        tooltipButDesigners.setHeightSoFar(currY);
+//        buttonDesignPanel.addUIElement(tooltipButDesigners).inTL(0, 0);
+//        panel.addComponent(buttonDesignPanel).inTL(0, YHeight + 130);
 
     }
 

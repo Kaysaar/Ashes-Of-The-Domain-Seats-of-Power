@@ -17,6 +17,7 @@ import data.scripts.patrolfleet.managers.AoTDFactionPatrolsManager;
 import data.scripts.patrolfleet.utilis.PatrolFleetFactory;
 import data.ui.patrolfleet.overview.OverviewPatrolPanel;
 import data.ui.patrolfleet.overview.components.PatrolFleetHoldingsTable;
+import data.ui.patrolfleet.overview.dialogs.ArmoryTabDialog;
 
 import java.awt.*;
 import java.util.List;
@@ -33,6 +34,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
     ProgressBarComponentV2 thresholdForPicket;
     ProgressBarComponentV2 thresholdForMarketDefence;
     LabelAPI l1,l2;
+    ButtonAPI armoryTab;
     public static int perSection =25;
     public OverviewStatPanel(float width, float height) {
         mainPanel = Global.getSettings().createCustom(width, height, this);
@@ -199,6 +201,7 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
                 this.getProgressLabel().setHighlight(""+total,""+taken);
             }
         };
+
         tooltip.addSectionHeading("Fleet point role thresholds",Alignment.MID,5f);
         barsTl.addCustom(thresholdForPicket.getMainPanel(),18).getPosition().inTL(0,18);
         barsTl.addCustom(thresholdForMarketDefence.getMainPanel(),0f).getPosition().inTL(mainPSecond.getPosition().getWidth()-thresholdForMarketDefence.getMainPanel().getPosition().getWidth()-5,18);
@@ -215,8 +218,25 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
         label.getPosition().aboveMid(thresholdForMarketDefence.getMainPanel(),18);
         mainPSecond.addUIElement(barsTl).inTL(0,0);
         tooltip.addCustom(mainPSecond,18);
+        armoryTab = tooltip.addButton("Access Faction Armory",null,Misc.getBasePlayerColor(),Misc.getDarkPlayerColor(),Alignment.MID,CutStyle.TL_BR,componentPanel.getPosition().getWidth()-15,25,5f);
+        tooltip.addTooltipToPrevious(new TooltipMakerAPI.TooltipCreator() {
+            @Override
+            public boolean isTooltipExpandable(Object tooltipParam) {
+                return false;
+            }
 
-        tooltip.addSectionHeading("Faction Holdings", Alignment.MID, 5f);
+            @Override
+            public float getTooltipWidth(Object tooltipParam) {
+                return 450;
+            }
+
+            @Override
+            public void createTooltip(TooltipMakerAPI tooltip, boolean expanded, Object tooltipParam) {
+                tooltip.addPara("Access armory from this tab, where you can choose, which weapons and fighters should be prioritized to be used by our faction",3f);
+                tooltip.addPara("You can also choose ships to be prioritized by other fleets, that are created by our faction, and are not designated as patrol fleets.",5f);
+            }
+        }, TooltipMakerAPI.TooltipLocation.RIGHT,false);
+        tooltip.addSectionHeading("Faction Holdings", Alignment.MID, 10f);
         CustomPanelAPI panelInDenial = Global.getSettings().createCustom(width, componentPanel.getPosition().getHeight() - tooltip.getHeightSoFar() - 35, null);
 
         float offsetY;
@@ -277,6 +297,11 @@ public class OverviewStatPanel implements ExtendedUIPanelPlugin {
 
     @Override
     public void advance(float amount) {
+        if(armoryTab!=null&&armoryTab.isChecked()){
+            armoryTab.setChecked(false);
+            new ArmoryTabDialog();
+            return;
+        }
         if (table != null) {
             table.advance(amount);
             MarketAPI prev = currentMarket;

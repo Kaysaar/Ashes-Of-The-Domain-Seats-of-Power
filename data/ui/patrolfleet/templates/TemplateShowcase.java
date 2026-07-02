@@ -81,6 +81,7 @@ public class TemplateShowcase implements ExtendedUIPanelPlugin {
         if(!template.isTemplateValidForModList()){
             LabelAPI labelAPI = tooltip.addPara("Missing essential mods to use template properly!",Misc.getNegativeHighlightColor(),3f);
             labelAPI.setHighlightOnMouseover(true);
+
             tooltip.addTooltipTo(new TooltipMakerAPI.TooltipCreator() {
                 @Override
                 public boolean isTooltipExpandable(Object tooltipParam) {
@@ -125,7 +126,7 @@ public class TemplateShowcase implements ExtendedUIPanelPlugin {
                     ArrayList<String>names = new ArrayList<>();
                     for (String string : template.assignedShipsThatShouldSpawn.keySet()) {
                         ShipHullSpecAPI specAPI = Global.getSettings().getHullSpec(string);
-                        if(!ShipPanelData.learnedShips.contains(specAPI)){
+                        if(!Global.getSector().getPlayerFaction().knowsShip(string)){
                             names.add(specAPI.getHullName());
                         }
                     }

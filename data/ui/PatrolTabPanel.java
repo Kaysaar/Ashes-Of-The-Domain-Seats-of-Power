@@ -122,7 +122,6 @@ public class PatrolTabPanel  extends CommandUIPlugin {
                     CommandTabMemoryManager.getInstance().getTabStates().put(getTabStateId(),entry.getKey().getText().toLowerCase());
                     if(currentlyChosen.getCustomData() instanceof  String data){
                         if(!AshMisc.isPLayerHavingHeavyIndustry()){
-                            ShipPanelData.reinit(data.equals("template"));
                             TemplatePanel.forceRequestUpdateListOnly = true;
                         }
                     }
@@ -178,21 +177,11 @@ public class PatrolTabPanel  extends CommandUIPlugin {
         bg = Global.getSector().getPlayerFaction().getDarkUIColor();
         customProd = buttonTooltip.addButton("Overview", "overview", base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         research = buttonTooltip.addButton("Templates", "template", base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
-        ;
-        sp = buttonTooltip.addButton("Armory", null, base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
-        ;
-        sp.setEnabled(false);
-        sp.setShowTooltipWhileInactive(true);
+
         customProd.setShortcut(Keyboard.KEY_R, false);
         research.setShortcut(Keyboard.KEY_T, false);
-        sp.setShortcut(Keyboard.KEY_A, false);
         customProd.getPosition().inTL(0, 0);
         research.getPosition().inTL(141, 0);
-        sp.getPosition().inTL(282, 0);
-
-        // Until Armory is implemented
-        buttonTooltip.addTooltipTo(new TempArmoryTooltip(),sp,TooltipMakerAPI.TooltipLocation.BELOW);
-
         buttonPanel.addUIElement(buttonTooltip).inTL(0, 0);
         mainPanel.addComponent(buttonPanel).inTL(0, 10);
         insertPatrolTemplatePanel(research);

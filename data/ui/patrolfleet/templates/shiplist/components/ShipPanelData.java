@@ -8,7 +8,8 @@ import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.Misc;
-import data.kaysaar.aotd.vok.campaign.econ.produciton.specs.AoTDProductionSpecManager;
+
+import data.kaysaar.aotd.vok.scripts.specialprojects.BlackSiteProjectManager;
 import data.kaysaar.aotd.vok.scripts.specialprojects.models.ProjectReward;
 import org.jetbrains.annotations.Nullable;
 /// TODO IMPL AFTER VOK 5.0
@@ -117,15 +118,13 @@ public class ShipPanelData {
     }
     public static  void reinit(boolean forTemplate){
         ShipPanelData.updateList(forTemplate);
-        ShipPanelData.populateShipInfo();
-        ShipPanelData.populateShipSizeInfo();
-        ShipPanelData.populateShipTypeInfo();
     }
 
     public static ArrayList<ShipHullSpecAPI> getLearnedShipPackages(boolean forTemplate) {
         ArrayList<ShipHullSpecAPI> list = new ArrayList<>();
         Set<String> known = Global.getSettings().getFactionSpec(Factions.PLAYER).getKnownShips();
-        for (ShipHullSpecAPI allShipHullSpec : Global.getSettings().getAllShipHullSpecs()) {
+        for (String s : known) {
+            ShipHullSpecAPI allShipHullSpec = Global.getSettings().getHullSpec(s);
             if (allShipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.STATION)) continue;
             if (allShipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.MODULE)) continue;
             if (allShipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.UNDER_PARENT)) continue;
@@ -133,7 +132,6 @@ public class ShipPanelData {
             if (allShipHullSpec.getHullSize().equals(ShipAPI.HullSize.FIGHTER)) continue;
 
             if (allShipHullSpec.hasTag(Tags.MODULE_HULL_BAR_ONLY)) continue;
-
             if (Global.getSettings().getHullIdToVariantListMap().get(allShipHullSpec.getHullId()).isEmpty()) {
                 boolean found = false;
                 for (String allVariantId : Global.getSettings().getAllVariantIds()) {
@@ -146,7 +144,7 @@ public class ShipPanelData {
                 if (!found) continue;
             }
             if (Global.getSettings().getModManager().isModEnabled("aotd_vok")) {
-                if (AoTDProductionSpecManager.hasSpecialProject(ProjectReward.ProjectRewardType.SHIP, allShipHullSpec.getHullId()))
+                if (!BlackSiteProjectManager.getProjectMatchingRewardThroughSpec(ProjectReward.ProjectRewardType.SHIP, allShipHullSpec.getHullId()).isEmpty())
                     continue;
             }
             if (!Global.getSector().getPlayerFaction().knowsShip(allShipHullSpec.getHullId())&& !Global.getSettings().isDevMode()) continue;

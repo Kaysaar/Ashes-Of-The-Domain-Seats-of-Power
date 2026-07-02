@@ -126,7 +126,7 @@ public class BasePatrolFleetTemplate {
     public boolean doesKnowAllShips() {
         if (!isTemplateValidForModList()) return false;
         for (PatrolShipData value : data.values()) {
-            if (!ShipPanelData.learnedShips.contains(Global.getSettings().getHullSpec(value.shipId))) return false;
+            if (!Global.getSector().getPlayerFaction().knowsShip(value.getShipId())) return false;
         }
         return true;
     }
