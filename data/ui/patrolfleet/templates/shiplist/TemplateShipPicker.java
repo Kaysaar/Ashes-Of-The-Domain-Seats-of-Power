@@ -3,8 +3,10 @@ package data.ui.patrolfleet.templates.shiplist;
 import ashlib.data.plugins.ui.plugins.UITableImpl;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import data.kaysaar.aotd.tot.produciton.specs.AoTDProductionSpec;
+import data.kaysaar.aotd.tot.ui.customprod.common.ProductionOptionList;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionBrowserSection;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionCustomButton;
+import data.ui.patrolfleet.overview.dialogs.ArmoryBrowserSection;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -92,6 +94,16 @@ public class TemplateShipPicker extends ProductionBrowserSection {
         ));
 
         return columns;
+    }
+
+    @Override
+    protected ProductionOptionList createProductionOptionList(List<AoTDProductionSpec> specs, float width, float height, AoTDProductionSpec.AoTDProductionSpecType prodType) {
+        final TemplateShipPicker section = this;
+        return new ProductionOptionList(specs, width, height,27, prodType) {
+            public ProductionCustomButton createButtonForType(AoTDProductionSpec.AoTDProductionSpecType type, float width, float height, AoTDProductionSpec spec) {
+                return section.createProductionButtonForType(type, width, height, spec);
+            }
+        };
     }
 
     @Override

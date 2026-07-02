@@ -41,7 +41,7 @@ public class TemplateShipShowcase extends ButtonComponent {
         if(shipId!=null) {
             Color col = null;
             ShipHullSpecAPI spec = Global.getSettings().getHullSpec(shipId);
-            if(!ShipPanelData.learnedShips.contains(spec)) {
+            if(!Global.getSector().getPlayerFaction().knowsShip(shipId)) {
                 col = new Color(54, 54, 54);
             }
             shipPanel =  ShipInfoGenerator.getShipImage(spec,boxSize-10,col).one;
@@ -78,7 +78,7 @@ public class TemplateShipShowcase extends ButtonComponent {
         if(shipId!=null) {
             Color col = null;
             ShipHullSpecAPI spec = Global.getSettings().getHullSpec(shipId);
-            if(!ShipPanelData.learnedShips.contains(spec)) {
+            if(!Global.getSector().getPlayerFaction().knowsShip(shipId)) {
                 col = new Color(54, 54, 54);
             }
             shipPanel =  ShipInfoGenerator.getShipImage(spec,boxSize-10,col).one;

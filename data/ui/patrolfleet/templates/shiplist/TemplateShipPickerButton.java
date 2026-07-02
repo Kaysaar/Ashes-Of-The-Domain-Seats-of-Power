@@ -41,7 +41,7 @@ public class TemplateShipPickerButton extends ProductionCustomButton {
 
         float rowHeight = container.getPosition().getHeight();
         float iconSize = rowHeight - 4f;
-        float opadText = 12f;
+        float opadText = 6;
 
         CustomPanelAPI shipPanel = ShipInfoGenerator.getShipImage(shipSpec, iconSize, null).one;
         container.addComponent(shipPanel).inTL(2, 2);
