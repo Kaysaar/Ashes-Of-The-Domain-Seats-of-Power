@@ -23,6 +23,7 @@ import data.ui.patrolfleet.templates.TemplatePanel;
 import data.ui.patrolfleet.templates.TemplateShowcase;
 import data.ui.patrolfleet.templates.shiplist.TemplateShipPicker;
 import data.ui.patrolfleet.templates.shiplist.TemplateShipPickerButton;
+import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
 import data.ui.patrolfleet.templates.shiplist.components.ShipSelector;
 import data.ui.patrolfleet.templates.shiplist.dialog.templaterandom.TemplateRandomSection;
 
@@ -182,7 +183,7 @@ public class TemplateCreatorDialog extends BasePopUpDialog {
                     float height,
                     AoTDProductionSpec spec
             ) {
-                if(patrolFleetCreatorMode&&!AshMisc.isPLayerHavingHeavyIndustry()&&!Global.getSector().getPlayerFaction().knowsShip(spec.getId()))return null;
+                if(!ShipPanelData.learnedShips.contains(spec.getUnderlyingSpec()))return null;
                 return new TemplateShipPickerButton(width, height, spec, getColumnLayout());
             }
         };

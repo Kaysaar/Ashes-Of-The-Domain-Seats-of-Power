@@ -17,6 +17,7 @@ import data.kaysaar.aotd.tot.ui.customprod.common.ProductionOptionList;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionBrowserSection;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionCustomButton;
 import data.kaysaar.aotd.vok.misc.AoTDMisc;
+import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -142,13 +143,11 @@ public class ArmoryBrowserSection extends ProductionBrowserSection {
 
         float manufacturerY = 55f + sectionsHeight + 5f + BULK_BUTTON_SECTION_HEIGHT;
         float manufacturerHeight = Math.max(0f, heightOfManus - BULK_BUTTON_SECTION_HEIGHT);
-
         chooseManufacturerPanel = new ChooseManufacturerPanel(
                 contentPanel.getPosition().getWidth(),
                 manufacturerHeight,
-                AoTDProductionUIData.getManInfoBasedOnType(prodType)
+                manus
         );
-
         contentPanel.addComponent(chooseManufacturerPanel.getMainPanel()).inTL(0, manufacturerY);
     }
 
@@ -226,7 +225,19 @@ public class ArmoryBrowserSection extends ProductionBrowserSection {
             float height,
             AoTDProductionSpec spec
     ) {
-        return new ArmoryTabButton(width, height, spec, getColumnLayout(), this);
+        if(type.equals(AoTDProductionSpec.AoTDProductionSpecType.SHIP)){
+            if(ShipPanelData.learnedShips.contains(spec.getUnderlyingSpec())){
+                return new ArmoryTabButton(width, height, spec, getColumnLayout(), this);
+
+            }
+            else {
+                return null;
+            }
+        }
+        else{
+            return new ArmoryTabButton(width, height, spec, getColumnLayout(), this);
+
+        }
     }
 
     @Override

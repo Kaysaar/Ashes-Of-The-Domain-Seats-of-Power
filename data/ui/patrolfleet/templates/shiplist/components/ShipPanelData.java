@@ -118,11 +118,13 @@ public class ShipPanelData {
     }
     public static  void reinit(boolean forTemplate){
         ShipPanelData.updateList(forTemplate);
+        populateShipInfo();
     }
 
     public static ArrayList<ShipHullSpecAPI> getLearnedShipPackages(boolean forTemplate) {
         ArrayList<ShipHullSpecAPI> list = new ArrayList<>();
-        Set<String> known = Global.getSettings().getFactionSpec(Factions.PLAYER).getKnownShips();
+        Set<String> known = Global.getSector().getFaction(Factions.PLAYER).getKnownShips();
+        Set<String> known2 = Global.getSector().getFaction(Factions.PLAYER).getAlwaysKnownShips();
         for (String s : known) {
             ShipHullSpecAPI allShipHullSpec = Global.getSettings().getHullSpec(s);
             if (allShipHullSpec.getHints().contains(ShipHullSpecAPI.ShipTypeHints.STATION)) continue;
@@ -147,8 +149,7 @@ public class ShipPanelData {
                 if (!BlackSiteProjectManager.getProjectMatchingRewardThroughSpec(ProjectReward.ProjectRewardType.SHIP, allShipHullSpec.getHullId()).isEmpty())
                     continue;
             }
-            if (!Global.getSector().getPlayerFaction().knowsShip(allShipHullSpec.getHullId())&& !Global.getSettings().isDevMode()) continue;
-            if (!AshMisc.isPLayerHavingHeavyIndustry()&& known.contains(allShipHullSpec.getHullId())) {
+            if (!AshMisc.isPLayerHavingHeavyIndustry()&& known2.contains(allShipHullSpec.getHullId())) {
                 list.add(allShipHullSpec);
             } else if(AshMisc.isPLayerHavingHeavyIndustry()||forTemplate||Global.getSettings().isDevMode()) {
                 list.add(allShipHullSpec);

@@ -2,11 +2,14 @@ package data.ui.patrolfleet.templates.shiplist;
 
 import ashlib.data.plugins.ui.plugins.UITableImpl;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
+import data.kaysaar.aotd.tot.produciton.AoTDProductionUIData;
 import data.kaysaar.aotd.tot.produciton.specs.AoTDProductionSpec;
+import data.kaysaar.aotd.tot.ui.customprod.common.ChooseManufacturerPanel;
 import data.kaysaar.aotd.tot.ui.customprod.common.ProductionOptionList;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionBrowserSection;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionCustomButton;
 import data.ui.patrolfleet.overview.dialogs.ArmoryBrowserSection;
+import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -105,6 +108,7 @@ public class TemplateShipPicker extends ProductionBrowserSection {
             }
         };
     }
+
 
     @Override
     protected String getInitialSortColumnId() {

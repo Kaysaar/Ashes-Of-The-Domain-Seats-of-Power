@@ -122,6 +122,7 @@ public class PatrolTabPanel  extends CommandUIPlugin {
                     CommandTabMemoryManager.getInstance().getTabStates().put(getTabStateId(),entry.getKey().getText().toLowerCase());
                     if(currentlyChosen.getCustomData() instanceof  String data){
                         if(!AshMisc.isPLayerHavingHeavyIndustry()){
+                            ShipPanelData.reinit(data.equals("template"));
                             TemplatePanel.forceRequestUpdateListOnly = true;
                         }
                     }
@@ -177,7 +178,6 @@ public class PatrolTabPanel  extends CommandUIPlugin {
         bg = Global.getSector().getPlayerFaction().getDarkUIColor();
         customProd = buttonTooltip.addButton("Overview", "overview", base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
         research = buttonTooltip.addButton("Templates", "template", base, bg, Alignment.MID, CutStyle.TOP, 140, 20, 0f);
-
         customProd.setShortcut(Keyboard.KEY_R, false);
         research.setShortcut(Keyboard.KEY_T, false);
         customProd.getPosition().inTL(0, 0);
