@@ -22,9 +22,6 @@ import data.kaysaar.aotd.tot.ui.UIData;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionBrowserSection;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionCustomButton;
 
-import java.awt.Color;
-
-import static data.kaysaar.aotd.vok.ui.UIData.createFighterTooltip;
 
 public class ArmoryTabButton extends ProductionCustomButton {
 
@@ -136,7 +133,8 @@ public class ArmoryTabButton extends ProductionCustomButton {
                 getSpec().getId()
         );
 
-        createFighterTooltip(fleetMember, fighterSpec, fighterPanel);
+        UIData.createFighterTooltip(fleetMember, fighterSpec, fighterPanel);
+
     }
 
     protected void addNameColumn(CustomPanelAPI container, float rowHeight, float opadText) {

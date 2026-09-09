@@ -6,17 +6,14 @@ import ashlib.data.plugins.ui.plugins.UITableImpl;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
-import com.fs.starfarer.api.loading.FighterWingSpecAPI;
 import com.fs.starfarer.api.loading.WeaponSpecAPI;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
-import data.kaysaar.aotd.tot.produciton.AoTDProductionUIData;
 import data.kaysaar.aotd.tot.produciton.specs.AoTDProductionSpec;
 import data.kaysaar.aotd.tot.ui.customprod.common.ChooseManufacturerPanel;
 import data.kaysaar.aotd.tot.ui.customprod.common.ProductionOptionList;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionBrowserSection;
 import data.kaysaar.aotd.tot.ui.customprod.components.ProductionCustomButton;
-import data.kaysaar.aotd.vok.misc.AoTDMisc;
 import data.ui.patrolfleet.templates.shiplist.components.ShipPanelData;
 import org.lwjgl.input.Keyboard;
 
@@ -302,7 +299,7 @@ public class ArmoryBrowserSection extends ProductionBrowserSection {
                 if (candidate == null) continue;
 
                 String normalized = candidate.toLowerCase();
-                int distance = AoTDMisc.levenshteinDistance(searchString, normalized);
+                int distance = AshMisc.levenshteinDistance(searchString, normalized);
 
                 if (distance <= threshold || normalized.contains(searchString)) {
                     result.add(spec);
