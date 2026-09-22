@@ -140,7 +140,6 @@ public class ShrineOfGilead extends BaseIndustry implements GrandWonderAPI {
     public void finishedConstruction(MarketAPI marketAPI) {
 
     }
-
     @Override
     public String getWonderTypeId() {
         return "aotd_religion_wonder";

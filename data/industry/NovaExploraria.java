@@ -65,6 +65,7 @@ public class NovaExploraria extends BaseCapitalIndustry {
     }
     @Override
     public boolean isAvailableToBuild() {
+        if(!market.isPlayerOwned())return false;
         return AoTDFactionManager.getInstance().doesControlCapital()&&reachedThresholdOfPoints();
     }
 

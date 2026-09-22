@@ -109,7 +109,7 @@ public class FleetPointUtilis {
         }
         int am = 0;
         for (MarketAPI factionMarket : markets) {
-
+            if (factionMarket.isHidden()) continue;
             if (!factionMarket.isInEconomy()) continue;
             am += (int) getFleetPointsGeneratedByMarket(factionMarket);
         }

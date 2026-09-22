@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 public class Hexagon extends AoTDMilitaryBase implements GrandWonderAPI {
     @Override
     public boolean isAvailableToBuild() {
+        if(!market.isPlayerOwned())return false;
         return AoTDFactionManager.getInstance().doesControlCapital();
     }
 

@@ -8,6 +8,7 @@ import com.fs.starfarer.api.impl.campaign.intel.events.BaseEventIntel;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.industry.NovaExploraria;
 import data.scripts.managers.AoTDFactionManager;
 
 import java.awt.*;
@@ -18,9 +19,11 @@ import java.util.Set;
 public class TechHunterFleetIntel extends BaseIntelPlugin {
     CampaignFleetAPI target;
     CargoAPI savedCargo;
+
     public CargoAPI getCargo() {
         return savedCargo;
     }
+
     public void setFinished(boolean finished) {
         this.finished = finished;
     }
@@ -30,13 +33,14 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
         savedCargo = Global.getFactory().createCargo(false);
 
     }
+
     public static TechHunterFleetIntel get(CampaignFleetAPI target) {
         for (IntelInfoPlugin intelInfoPlugin : Global.getSector().getIntelManager().getIntel(TechHunterFleetIntel.class)) {
-            if (((TechHunterFleetIntel) intelInfoPlugin).target.equals(target)){
+            if (((TechHunterFleetIntel) intelInfoPlugin).target.equals(target)) {
                 return (TechHunterFleetIntel) intelInfoPlugin;
             }
         }
-        return  new TechHunterFleetIntel(target);
+        return new TechHunterFleetIntel(target);
     }
 
     public boolean successful = false;
@@ -52,6 +56,7 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
     }
 
     boolean canBeDeleted = false;
+
     @Override
     protected void notifyEnded() {
         target = null;
@@ -61,10 +66,12 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
             Global.getSector().getIntelManager().removeIntel(this);
         }
     }
+
     @Override
     protected void addDeleteButton(TooltipMakerAPI info, float width) {
         addDeleteButton(info, width, "Delete Nova Exploraria log entry");
     }
+
     @Override
     protected void createDeleteConfirmationPrompt(TooltipMakerAPI prompt) {
         prompt.addPara("Are you sure you want to permanently delete this Nova Exploraria log entry?", Misc.getTextColor(), 0f);
@@ -74,6 +81,7 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
     public String getIcon() {
         return Global.getSettings().getSpriteName("intel", "fleet_log");
     }
+
     @Override
     public boolean shouldRemoveIntel() {
         return isEnded();
@@ -89,41 +97,45 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
         if (!finished) {
             info.addPara("Currently fleet is conducting tech mining operations across entire sector", pad, Color.ORANGE, target.getName());
 
-        }
-        else{
-            if(successful){
-                info.addPara("Tech Hunters have brought valuable loot that has been re-located to local storages of %s", opad, Color.ORANGE, Global.getSector().getPlayerFaction().getProduction().getGatheringPoint().getName());
-                bullet(info);
-                info.showCargo(savedCargo, 20, true, opad);
-            }
-            else{
-                info.addPara("Tech Hunters fleet was destroyed during operation, probably result of hostile actions of third parties",Misc.getTooltipTitleAndLightHighlightColor(),opad);
+        } else {
+            if (successful) {
+                if (NovaExploraria.getNova() != null) {
+                    info.addPara("Tech Hunters have brought valuable loot that has been re-located to local storages of %s", opad, Color.ORANGE, NovaExploraria.getNova().getMarket().getName());
+                    bullet(info);
+                    info.showCargo(savedCargo, 20, true, opad);
+                }
+
+
+            } else {
+                info.addPara("Tech Hunters fleet was destroyed during operation, probably result of hostile actions of third parties", Misc.getTooltipTitleAndLightHighlightColor(), opad);
             }
             canBeDeleted = true;
         }
         if (canBeDeleted) {
-            addDeleteButton(info,width-10);
+            addDeleteButton(info, width - 10);
             info.addSpacer(5f);
         }
 
     }
+
     @Override
     protected void addBulletPoints(TooltipMakerAPI info, ListInfoMode mode) {
         bullet(info);
         float pad = 3f;
         float opad = 10f;
-        if(mode.equals(ListInfoMode.MESSAGES)){
-            if(isSuccessful()){
-                    info.addPara("Fleet has successfully returned from expedition!",pad);
+        if (mode.equals(ListInfoMode.MESSAGES)) {
+            if (isSuccessful()) {
+                info.addPara("Fleet has successfully returned from expedition!", pad);
 
             } else if (finished) {
-                info.addPara("Contact with fleet has been lost",pad);
+                info.addPara("Contact with fleet has been lost", pad);
             }
 
-            info.addPara("Exploration is ready to find forgotten artefacts across the Sector",pad);
+            info.addPara("Exploration is ready to find forgotten artefacts across the Sector", pad);
         }
         unindent(info);
     }
+
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
         // Caused a 'return value of "data.scripts.managers.AoTDFactionManager.getCapitalMarket()" is null'
         // when losing the capital post sending a fleet with existing intel bulletins
@@ -133,8 +145,7 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
             SectorEntityToken capitalEntity = AoTDFactionManager.getInstance().getCapitalMarket().getPrimaryEntity();
             Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().set("$knownCapital", capitalEntity);
             return capitalEntity;
-        }
-        else {
+        } else {
             SectorEntityToken knownCapital = (SectorEntityToken) Global.getSector().getPlayerFaction().getMemoryWithoutUpdate().get("$knownCapital");
             if (knownCapital == null) throw new RuntimeException("Player faction capital has never been set");
             else return knownCapital;
@@ -143,7 +154,7 @@ public class TechHunterFleetIntel extends BaseIntelPlugin {
 
     @Override
     protected String getName() {
-        if(isSuccessful()){
+        if (isSuccessful()) {
             return "Tech Hunter Report : Success";
 
         } else if (finished) {

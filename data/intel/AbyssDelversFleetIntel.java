@@ -12,6 +12,7 @@ import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.industry.NovaExploraria;
 import data.scripts.managers.AoTDFactionManager;
 
 import java.awt.*;
@@ -115,9 +116,12 @@ public class AbyssDelversFleetIntel extends BaseIntelPlugin {
 
                 }
                 else{
-                    info.addPara("Abyss Delvers have brought valuable loot that has been re-located to local storages of %s", opad, Color.ORANGE, Global.getSector().getPlayerFaction().getProduction().getGatheringPoint().getName());
-                    bullet(info);
-                    info.showCargo(savedCargo, 20, true, opad);
+                    if(NovaExploraria.getNova()!=null){
+                        info.addPara("Abyss Delvers have brought valuable loot that has been re-located to local storages of %s", opad, Color.ORANGE, NovaExploraria.getNova().getMarket().getName());
+                        bullet(info);
+                        info.showCargo(savedCargo, 20, true, opad);
+                    }
+
 
                 }
 
