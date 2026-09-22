@@ -53,7 +53,7 @@ public class TemplateManufactureFilter implements ExtendedUIPanelPlugin {
         TooltipMakerAPI tooltipButDesigners = componentPanel.createUIElement(componentPanel.getPosition().getWidth(), componentPanel.getPosition().getHeight()-25, true);
 
         LinkedHashMap<String,Integer>manu = ShipPanelData.getManuForShipsUnbound();
-        pruneMap(manu);
+        pruneMap(manu); // Prunes manufacturer map
         Color base = Misc.getBasePlayerColor();
         Color bg = Misc.getDarkPlayerColor();
         Color bright = Misc.getBrightPlayerColor();

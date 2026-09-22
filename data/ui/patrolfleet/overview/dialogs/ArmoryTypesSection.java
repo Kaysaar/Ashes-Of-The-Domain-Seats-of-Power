@@ -7,9 +7,7 @@ import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
 import data.kaysaar.aotd.tot.produciton.specs.AoTDProductionSpec;
 import data.kaysaar.aotd.tot.produciton.specs.AoTDProductionSpecManager;
-import data.kaysaar.aotd.vok.Ids.AoTDTechIds;
-import data.kaysaar.aotd.vok.scripts.research.AoTDMainResearchManager;
-import data.kaysaar.aotd.vok.ui.onhover.ButtonOnHoverInfo;
+import data.kaysaar.aotd.tot.ui.onhover.ButtonOnHoverInfo;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -42,13 +40,13 @@ public class ArmoryTypesSection implements ExtendedUIPanelPlugin {
         ship = tooltip.addButton("Ships", AoTDProductionSpec.AoTDProductionSpecType.SHIP, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TOP, label.computeTextWidth("ships") + 70, 20, 0f);
         ship.getPosition().inTL(0, 0);
         ship.setShortcut(Keyboard.KEY_Q,false);
-        tooltip.addTooltipToPrevious(new ButtonOnHoverInfo(400, false, null, "Here you can order ships to be build in dockyards, and they will be delivered to gathering point when completed.", null, null, null, "Ship building section"), TooltipMakerAPI.TooltipLocation.BELOW, false);
+        tooltip.addTooltipToPrevious(new ButtonOnHoverInfo(400, false, null, "Here you can prioritize ships to be used in faction fleets that are not part of the patrol system.", null, null, null, "Ship priority selection"), TooltipMakerAPI.TooltipLocation.BELOW, false);
 
         weapon = tooltip.addButton("Weapons", AoTDProductionSpec.AoTDProductionSpecType.WEAPON, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TOP, label.computeTextWidth("weapons") + 70, 20, 0f);
-        tooltip.addTooltipToPrevious(new ButtonOnHoverInfo(400, false, null, "Here you can order weapons to be crafted in factories, and they will be delivered to gathering point when completed.", null, null, null, "Weapon crafting section"), TooltipMakerAPI.TooltipLocation.BELOW, false);
+        tooltip.addTooltipToPrevious(new ButtonOnHoverInfo(400, false, null, "Here you can prioritize weapons to be used on ships in faction fleets.", null, null, null, "Weapon priority selection"), TooltipMakerAPI.TooltipLocation.BELOW, false);
         weapon.setShortcut(Keyboard.KEY_W,false);
         fighter = tooltip.addButton("Fighters", AoTDProductionSpec.AoTDProductionSpecType.FIGHTER, Misc.getBasePlayerColor(), Misc.getDarkPlayerColor(), Alignment.MID, CutStyle.TOP, label.computeTextWidth("fighters") + 70, 20, 0f);
-        tooltip.addTooltipToPrevious(new ButtonOnHoverInfo(400, false, null, "Here you can order fighters to be assembled in shipyards, and they will be delivered to gathering point when completed.", null, null, null, "Fighter assembly section"), TooltipMakerAPI.TooltipLocation.BELOW, false);
+        tooltip.addTooltipToPrevious(new ButtonOnHoverInfo(400, false, null, "Here you can prioritize fighters to be used on ships in faction fleets.", null, null, null, "Fighter priority selection"), TooltipMakerAPI.TooltipLocation.BELOW, false);
         fighter.setShortcut(Keyboard.KEY_E,false);
         curr = ship;
         curr.highlight();
