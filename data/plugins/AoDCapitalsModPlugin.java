@@ -19,7 +19,6 @@ import data.listeners.timeline.models.FirstIndustryListener;
 import data.listeners.timeline.models.FirstMarketConditionListener;
 import data.listeners.timeline.models.FirstSizeColonyListener;
 import data.plugins.coreui.FactionTabListener;
-import data.plugins.coreui.HoldingsTabListener;
 import data.plugins.coreui.PatrolTabListener;
 import data.scripts.ambition.AmbitionManager;
 import data.scripts.ambition.AmbitionSpecManager;
